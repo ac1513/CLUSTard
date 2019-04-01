@@ -56,5 +56,5 @@ rule iq_tree:
         pre = expand("trees/{jobID}_clustal_concat_msa", jobID=JOBID)
     shell:
         """
-        iqtree-mpi -s {input} -pre {params.pre} -nt {threads}
+        iqtree -s {input} -pre {params.pre} -nt {threads}
         """
