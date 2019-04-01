@@ -1,4 +1,4 @@
-JOBID = "Methanoregulaceae_1"
+JOBID = "Methanoregulaceae_2"
 
 subworkflow create_bin:
     snakefile:
@@ -23,6 +23,7 @@ rule checkm:
     priority: 500
     shell:
         """
+        module load bio/CheckM
         checkm lineage_wf -x fasta -t {threads} genomes/ {output}
         module unload lang/Python/2.7.15-foss-2018b
         """
