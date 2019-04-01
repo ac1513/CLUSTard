@@ -1,3 +1,5 @@
+JOBID = "Methanoregulaceae_2"
+
 rule all:
     input:
         "family_kraken.txt",
