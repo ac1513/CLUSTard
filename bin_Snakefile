@@ -97,7 +97,7 @@ rule plot:
           """
           ls -S genomes/Cluster*.fasta > {params.files}
           sed -i "s/.fasta/.csv/g" {params.files}
-          sed -i "s/genomes/{params.csv_loc}/g" {params.files}
+          sed -i "s:genomes:{params.csv_loc}:g" {params.files}
           cp scripts/plot.py .
 
           mkdir plots
