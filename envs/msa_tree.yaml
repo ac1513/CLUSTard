@@ -1,0 +1,10 @@
+name: msa_tree
+channels:
+  - bioconda
+  - defaults
+dependencies:
+  - clustalo=1.2.3=0
+  - iqtree=1.6.10=he860b03_0
+  - libgcc-ng=8.2.0=hdf63c60_1
+  - libstdcxx-ng=8.2.0=hdf63c60_1
+  - zlib=1.2.11=h7b6447c_3
