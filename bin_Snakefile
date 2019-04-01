@@ -89,6 +89,7 @@ rule plot:
       params:
           files = "plot_in_files.txt",
           csv_loc = "james_madness/results90"
+          prefix = JOBID
       conda:
           "envs/py3.yaml"
       priority:
@@ -106,9 +107,9 @@ rule plot:
               cp ${{csv_file}} plots/;
           done < {params.files}
 
-          python plot.py {params.files} JOBID
+          python plot.py {params.files} {params.prefix}
 
           rm plot.py
-          rm params.files
+          rm {params.files}
           rm plots/*csv
           """
