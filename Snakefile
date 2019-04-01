@@ -11,7 +11,7 @@ rule all:
         expand("trees/{jobID}_clustal_concat_msa.treefile", jobID=JOBID)
 
 rule checkm:
-    input: create_bin("logs/kraken_out.log")
+    input: create_bin(expand("plots/1_{jobID}_plot.pdf", jobID=JOBID))
     output:
         expand("{jobID}_checkM", jobID=JOBID)
     log:

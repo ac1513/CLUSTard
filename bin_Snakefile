@@ -1,11 +1,11 @@
-JOBID = "Methanoregulaceae_2"
+JOBID = "Methanoregulaceae_3"
 
 rule all:
     input:
         "family_kraken.txt",
         "clusters_oi.txt",
-        "logs/kraken_out.log",
-	expand("plots/1_{jobID}_plot.pdf", jobID=JOBID)
+        expand("plots/1_{jobID}_plot.pdf", jobID=JOBID),
+        "logs/kraken_out.log"
 
 rule kraken_filter:
     input:
@@ -83,17 +83,20 @@ rule download_genomes:
 
 rule plot:
       input:
-          "james_madness/results90"
+          gen = "genomes",
+          log = "logs/kraken_out.log"
       output:
           expand("plots/1_{jobID}_plot.pdf", jobID=JOBID)
       params:
           files = "plot_in_files.txt"
+          csv_loc = "james_madness/results90"
       conda:
           "envs/py3.yml"
       shell:
           """
-          ls -S {input}/Cluster*.fasta > {params.files}
+          ls -S {input.gen}/Cluster*.fasta > {params.files}
           sed -i 's/.fasta/.csv/g' {params.files}
+          sed -i 's/{input.gen}/{params.csv_loc}/g' {params.files}
           cp scripts/plot.py .
 
           mkdir plots
