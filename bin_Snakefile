@@ -90,7 +90,7 @@ rule plot:
           files = "plot_in_files.txt",
           csv_loc = "james_madness/results90"
       conda:
-          "envs/py3.yml"
+          "envs/py3.yaml"
       priority:
           50
       shell:
