@@ -4,7 +4,8 @@ rule all:
     input:
         "family_kraken.txt",
         "clusters_oi.txt",
-        "logs/kraken_out.log"
+        "logs/kraken_out.log",
+	expand("plots/1_{jobID}_plot.pdf", jobID=JOBID)
 
 rule kraken_filter:
     input:
