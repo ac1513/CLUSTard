@@ -48,6 +48,8 @@ rule download_genomes:
         length = "500000"
     priority:
         100
+    conda:
+        "envs/py3.yaml"
     shell:
         """
         rm -fr genomes
