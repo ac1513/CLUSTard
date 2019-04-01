@@ -88,7 +88,7 @@ rule plot:
           expand("plots/1_{jobID}_plot.pdf", jobID=JOBID)
       params:
           files = "plot_in_files.txt",
-          csv_loc = "james_madness/results90"
+          csv_loc = "james_madness/results90",
           prefix = JOBID
       conda:
           "envs/py3.yaml"
