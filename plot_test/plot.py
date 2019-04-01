@@ -17,7 +17,7 @@ prefix = args.prefix
 
 with open(in_file, 'r') as text_file:
     files = text_file.read().strip().split()
-    
+
 counter = 0
 for i in range(0, len(files), 30):
     gs = gsp.GridSpec(5,6)
@@ -54,4 +54,3 @@ for i in range(0, len(files), 30):
     plt.savefig(str(counter) + '-' + prefix + '_plot.pdf', type='pdf')
     print('Generated plot number ' + str(counter) + ' -> ' + str(counter) + '-' + prefix + '_plot.pdf')
     plt.close('all')
-        
