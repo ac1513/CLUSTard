@@ -4,8 +4,8 @@ rule all:
     input:
         "family_kraken.txt",
         "clusters_oi.txt",
-        expand("plots/1_{jobID}_plot.pdf", jobID=JOBID),
-        "logs/kraken_out.log"
+        "logs/kraken_out.log",
+        expand("plots/1_{jobID}_plot.pdf", jobID=JOBID)
 
 rule kraken_filter:
     input:
@@ -92,6 +92,8 @@ rule plot:
           csv_loc = "james_madness/results90"
       conda:
           "envs/py3.yml"
+      priority:
+          50
       shell:
           """
           ls -S {input.gen}/Cluster*.fasta > {params.files}
