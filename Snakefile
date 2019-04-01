@@ -11,7 +11,7 @@ rule all:
         expand("trees/{jobID}_clustal_concat_msa.treefile", jobID=JOBID)
 
 rule checkm:
-    input: create_bin("test.txt")
+    input: create_bin("logs/kraken_out.log")
     output:
         expand("{jobID}_checkM", jobID=JOBID)
     log:
@@ -45,7 +45,7 @@ rule iq_tree:
     output:
         expand("trees/{jobID}_clustal_concat_msa.treefile", jobID=JOBID)
     threads:
-        20
+        40
     priority: 300
     params:
         pre = expand("trees/{jobID}_clustal_concat_msa", jobID=JOBID)
