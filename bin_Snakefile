@@ -78,30 +78,30 @@ rule download_genomes:
         rename '__' 'Cluster_' genomes/*
         """
 
-  rule plot:
-    input:
-        "james_madness/results90"
-    output:
-        expand("plots/1_{jobID}_plot.pdf", jobID=JOBID)
-    params:
-        files = "plot_in_files.txt"
-    conda:
-        "envs/py3.yml"
-    shell:
-        """
-        ls -S {input}/Cluster*.fasta > {params.files}
-        sed -i 's/.fasta/.csv/g' {params.files}
-        cp scripts/plot.py .
+rule plot:
+      input:
+          "james_madness/results90"
+      output:
+          expand("plots/1_{jobID}_plot.pdf", jobID=JOBID)
+      params:
+          files = "plot_in_files.txt"
+      conda:
+          "envs/py3.yml"
+      shell:
+          """
+          ls -S {input}/Cluster*.fasta > {params.files}
+          sed -i 's/.fasta/.csv/g' {params.files}
+          cp scripts/plot.py .
 
-        mkdir plots
+          mkdir plots
 
-        while read csv_file; do
-            cp ${{csv_file}} plots/;
-        done < {params.files}
+          while read csv_file; do
+              cp ${{csv_file}} plots/;
+          done < {params.files}
 
-        python plot.py {params.files} JOBID
+          python plot.py {params.files} JOBID
 
-        rm plot.py
-        rm params.files
-        rm plots/*csv
-        """
+          rm plot.py
+          rm params.files
+          rm plots/*csv
+          """
