@@ -1,4 +1,4 @@
-JOBID = "Methanoregulaceae_3"
+JOBID = "Methanoregulaceae_4"
 
 rule all:
     input:
@@ -83,7 +83,7 @@ rule download_genomes:
 
 rule plot:
       input:
-          log = "logs/kraken_out.log"
+          expand("logs/{jobID}_kraken_out.log", jobID=JOBID)
       output:
           expand("plots/1_{jobID}_plot.pdf", jobID=JOBID)
       params:
@@ -103,13 +103,8 @@ rule plot:
 
           mkdir -p plots
 
-          while read csv_file; do
-              cp ${{csv_file}} plots/;
-          done < {params.files}
-
           python plot.py {params.files} {params.prefix}
 
           rm plot.py
           rm {params.files}
-          rm plots/*csv
           """
