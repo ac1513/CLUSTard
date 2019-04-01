@@ -1,4 +1,4 @@
-JOBID = "test1"
+JOBID = "Methanoregulaceae_1"
 
 subworkflow create_bin:
     snakefile:
