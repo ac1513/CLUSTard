@@ -60,6 +60,7 @@ rule download_genomes:
             if (( size > {params.length} ));
             then
                 cp "james_madness/results90/${{cluster}}.fasta" genomes/;
+                echo "Copying ${{cluster}} to working directory";
                 echo ">${{cluster}}" >> {output};
                 less james_madness/results90/kraken/${{cluster}}_kraken_report.out >> {output};
             else

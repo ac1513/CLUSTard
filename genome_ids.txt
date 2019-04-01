@@ -105,10 +105,6 @@ NZ_CP007142.1
 >Spongiibacteraceae
 NZ_CP014544.1
 NZ_CP019343.1
->Methanomicrobiaceae
-NC_009051.1
-NC_014507.1
-NC_018227.2
 >Methanoregulaceae
 NC_009712.1
 NC_011832.1
