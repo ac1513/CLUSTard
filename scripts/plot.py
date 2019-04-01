@@ -51,6 +51,6 @@ for i in range(0, len(files), 30):
             plt.tick_params(right='off', top='off')
 #            plt.tight_layout()
             gsplace += 1
-    plt.savefig('plots/' + str(counter) + '-' + prefix + '_plot.pdf', type='pdf')
+    plt.savefig('plots/' + str(counter) + '_' + prefix + '_plot.pdf', type='pdf')
     print('Generated plot number ' + str(counter) + ' -> ' + str(counter) + '-' + prefix + '_plot.pdf')
     plt.close('all')

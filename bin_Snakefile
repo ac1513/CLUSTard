@@ -46,7 +46,7 @@ rule download_genomes:
         families = "families.txt",
         outgroups = "outgroups.txt"
     output:
-        "logs/kraken_out.log"
+        expand("logs/{jobID}_kraken_out.log", jobID=JOBID)
     params:
         length = "500000"
     priority:
