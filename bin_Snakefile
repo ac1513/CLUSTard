@@ -100,7 +100,7 @@ rule plot:
           sed -i "s:genomes:{params.csv_loc}:g" {params.files}
           cp scripts/plot.py .
 
-          mkdir plots
+          mkdir -p plots
 
           while read csv_file; do
               cp ${{csv_file}} plots/;
