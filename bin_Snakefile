@@ -83,7 +83,6 @@ rule download_genomes:
 
 rule plot:
       input:
-          gen = "genomes",
           log = "logs/kraken_out.log"
       output:
           expand("plots/1_{jobID}_plot.pdf", jobID=JOBID)
@@ -96,9 +95,9 @@ rule plot:
           50
       shell:
           """
-          ls -S {input.gen}/Cluster*.fasta > {params.files}
+          ls -S genomes/Cluster*.fasta > {params.files}
           sed -i 's/.fasta/.csv/g' {params.files}
-          sed -i 's/{input.gen}/{params.csv_loc}/g' {params.files}
+          sed -i 's/genomes/{params.csv_loc}/g' {params.files}
           cp scripts/plot.py .
 
           mkdir plots
