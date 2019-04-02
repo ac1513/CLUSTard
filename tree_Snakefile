@@ -2,7 +2,7 @@ JOBID = "Methanoregulaceae_4"
 
 subworkflow create_bin:
     snakefile:
-        "bin_Snakefile"
+        "mvseq_Snakefile"
 
 rule all:
     input:
