@@ -91,7 +91,7 @@ rule plot:
           csv_loc = "james_madness/results90",
           prefix = JOBID
       conda:
-          "envs/py3.yaml"
+          "envs/plot2.yaml"
       priority:
           50
       shell:
