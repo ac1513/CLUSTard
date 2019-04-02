@@ -1,6 +1,8 @@
 name: plot2
 channels:
+  - conda-forge
   - anaconda
+  - bioconda
   - defaults
 dependencies:
   - ca-certificates=2019.1.23=0
@@ -34,4 +36,6 @@ dependencies:
   - tk=8.5.18=0
   - wheel=0.32.3=py27_0
   - zlib=1.2.11=h7b6447c_3
+  - pandas=0.20.3=py27_1
+  - python-dateutil=2.8.0=py_0
   - libffi=3.2.1=hd88cf55_4
