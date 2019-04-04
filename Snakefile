@@ -2,6 +2,7 @@ samples= 'NAB1_T0 NAB1_T1 NAB1_T2 NAB1_T3' #should be in order want output
 JOBID = 'test'
 RAW_SR = 'data/'
 REFIN = 'data/yw_polished_anvio.fasta'
+THRESH = '1000'
 
 #run using snakemake --cluster "sbatch -t 02:00:00" -j 20
 
@@ -44,9 +45,22 @@ rule merge_filecounts:
     output:
         txt = 'inter/{JOBID}_read_counts.out'
     conda:
-        "envs/py3"
+        "envs/py3.yaml"
     shell:
         """
         python scripts/merge_filecounts.py inter {JOBID}
-        rm inter/*.txt
+        """
+
+rule derive:
+    input:
+        expand('inter/{JOBID}_read_counts.out', JOBID=JOBID)
+    output:
+        csv = "inter/{JOBID}_read_counts_derived.csv"
+    params:
+        thresh = THRESH
+    conda:
+        "envs/py3.yaml"
+    shell:
+        """
+        python scripts/derive.py inter {JOBID} {params.thresh}
         """

@@ -18,23 +18,29 @@ def deriver(x,y):
         answers.append(value)
     return(answers)
 
-
 import csv as csv
 import os
+import argparse
 
-path = os.path.dirname(os.path.realpath(__file__)) # path goes here
-dir = '/in_files/' # directory containing sequence files goes here
+parser = argparse.ArgumentParser(description='')
+parser.add_argument('loc', help='location count files are in', type=str)
+parser.add_argument('jobid', help='location count files are in', type=str)
+parser.add_argument('thresh', help='location count files are in', type=str)
+args = parser.parse_args()
+loc = args.loc
+jobid = arg.jobid
+thresh = int(arg.thresh)
 
-dir_name = path+dir
-file_name = '/read_counts.output'
+dir_name = str(loc + '/')
+file_name = str(jobid + 'read_counts.output')
 
 new_record=[[]]
 nr=False
 
-with open(path+file_name, 'r') as data_store:
+with open(dir_name+file_name, 'r') as data_store:
     line = csv.reader(data_store, delimiter='\t')
     for i in line:
-        if int(i[1]) >= 1000:
+        if int(i[1]) >= thresh:
             counts = summer(i[2:])
             values = deriver((i[2:]), counts)
             coverage = (counts*150)/int(i[1])
@@ -46,6 +52,6 @@ with open(path+file_name, 'r') as data_store:
                 new_record = [values]
                 nr = True
 
-with open(path+'/read_counts_derived.csv', 'w') as f:
+with open(dir_name + jobid + '/read_counts_derived.csv', 'w') as f:
     writer = csv.writer(f)
     writer.writerows(new_record)
