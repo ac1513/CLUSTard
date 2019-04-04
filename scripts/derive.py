@@ -32,7 +32,7 @@ jobid = args.jobid
 thresh = int(args.thresh)
 
 dir_name = str(loc + '/')
-file_name = str(jobid + '_read_counts.output')
+file_name = str(jobid + '_read_counts.out')
 
 new_record=[[]]
 nr=False
