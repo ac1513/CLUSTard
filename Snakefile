@@ -28,7 +28,7 @@ rule bwa_mem:
         ref_ind = expand("{reference}.sa", reference=REFIN)
     output:
         bam = BWAOUT + '{samples}.bam',
-        counts = INTER + 'counts_{samples}.txt'
+        counts = expand(INTER + 'counts_{samples}.txt', samples=samples.split(' ')),
     threads: 16
     shell:
         """
