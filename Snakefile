@@ -36,7 +36,7 @@ rule bwa_mem:
 
 rule samtools:
     input:
-        bam = 'bwa_out/{samples}.bam'
+        bam = expand('bwa_out/{samples}.bam',samples=samples.split(' '))
     output:
         counts = expand('inter/counts_{samples}.txt', samples=samples.split(' ')),
     shell:
