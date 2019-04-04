@@ -2,15 +2,16 @@ samples= 'NAB1_T0 NAB1_T1 NAB1_T2 NAB1_T3' #should be in order want output
 JOBID = 'test'
 RAW_SR = 'data/'
 REFIN = 'data/yw_polished_anvio.fasta'
-BWAOUT = 'bwa_out/'
 INTER = 'inter_files/'
 
 #run using snakemake --cluster "sbatch -t 02:00:00" -j 20
 
 rule all:
     input:
-        expand(BWAOUT + '{samples}.bam', samples=samples.split(' ')),
-        expand(INTER + JOBID + '_read_counts.out')
+        expand("{REFIN}.sa", REFIN=REFIN)
+        expand('bwa_out/{samples}.bam', samples=samples.split(' ')),
+        expand('{inter}counts_{samples}.txt', (inter=INTER, samples=samples.split(' '))),
+        expand('{inter}{jobid}_read_counts.out', (inter = INTER, jobid= JOBID))
 
 rule bwa_index:
     input:
@@ -27,15 +28,22 @@ rule bwa_mem:
         ref = REFIN,
         ref_ind = expand("{reference}.sa", reference=REFIN)
     output:
-        bam = expand(BWAOUT + '{samples}.bam', samples=samples.split(' ')),
-        counts = expand(INTER + 'counts_{samples}.txt', samples=samples.split(' ')),
+        bam = 'bwa_out/{samples}.bam'
     threads: 16
     shell:
         """
         bwa mem -M -t {threads} {input.ref} {input.fq1} {input.fq2} | samtools view -bhS - | samtools sort -o {output.bam}
-        sleep 2s
-        samtools index {output.bam}
-        samtools idxstats {output.bam} > {output.counts}
+        """
+
+rule samtools:
+    input:
+        bam = 'bwa_out/{samples}.bam'
+    output:
+        counts = INTER + 'counts_{samples}.txt'
+    shell:
+        """
+        samtools index {input.bam}
+        samtools idxstats {input.bam} > {output.counts}
         """
 
 rule merge_filecounts:
