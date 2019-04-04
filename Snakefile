@@ -8,7 +8,6 @@ REFIN = 'data/yw_polished_anvio.fasta'
 rule all:
     input:
         expand("{REFIN}.sa", REFIN=REFIN),
-        expand('bwa_out/{samples}.bam', samples=samples.split(' ')),
         expand('inter/counts_{samples}.txt', samples=samples.split(' ')),
         expand('inter/{jobid}_read_counts.out', jobid= JOBID)
 
@@ -27,27 +26,19 @@ rule bwa_mem:
         ref = REFIN,
         ref_ind = expand("{reference}.sa", reference=REFIN)
     output:
+        counts = 'inter/counts_{samples}.txt'
+    params:
         bam = 'bwa_out/{samples}.bam'
     threads: 16
     shell:
         """
-        bwa mem -M -t {threads} {input.ref} {input.fq1} {input.fq2} | samtools view -bhS - | samtools sort -o {output.bam}
-        """
-
-rule samtools:
-    input:
-        bam = expand('bwa_out/{samples}.bam',samples=samples.split(' '))
-    output:
-        counts = expand('inter/counts_{samples}.txt', samples=samples.split(' ')),
-    shell:
-        """
-        samtools index {input.bam}
-        samtools idxstats {input.bam} > {output.counts}
+        bwa mem -M -t {threads} {input.ref} {input.fq1} {input.fq2} | samtools view -bhS - | samtools sort -o {params.bam}
+        samtools index {params.bam}
+        samtools idxstats {params.bam} > {output.counts}
         """
 
 rule merge_filecounts:
     input:
-        loc = "inter/",
         counts = expand('inter/counts_{samples}.txt', samples=samples.split(' ')),
     output:
         txt = 'inter/{JOBID}_read_counts.out'
