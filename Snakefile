@@ -10,7 +10,7 @@ INTER = 'inter_files/'
 rule all:
     input:
         expand(BWAOUT + '{samples}.bam', samples=samples.split(' ')),
-        '{INTER}{JOBID}_read_counts.out'
+        expand(INTER + JOBID + '_read_counts.out')
 
 rule bwa_index:
     input:
