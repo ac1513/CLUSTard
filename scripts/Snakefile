@@ -1,6 +1,6 @@
-samples= 'NAB1_T0 NAB1_T1 NAB1_T2 NAB1_T3'
+samples= 'NAB1_T0 NAB1_T1 NAB1_T2 NAB1_T3' #should be in order want output
 BWAIN = 'data/'
-BWAOUT = 'align/'
+BWAOUT = 'alignment/'
 
 #run using snakemake --cluster "sbatch -t 02:00:00" -j 20
 
@@ -19,7 +19,7 @@ rule bwa:
     threads: 16
     shell:
         """
-        bwa mem -M -t {threads} {input.ref} {input.fq1} {input.fq2} | samtools view -bh - > {output.bam}
+        bwa mem -M -t {threads} {input.ref} {input.fq1} {input.fq2} | samtools view -bhS - | samtools sort -o {output.bam}
         samtools index {output.bam}
         samtools idxstats {output.bam} > {output.counts}
         """
