@@ -10,7 +10,8 @@ rule all:
     input:
         expand("{REFIN}.sa", REFIN=REFIN),
         expand('inter/counts_{samples}.txt', samples=samples.split(' ')),
-        expand('inter/{jobid}_read_counts.out', jobid= JOBID)
+        expand('inter/{jobid}_read_counts.out', jobid= JOBID),
+        expand('inter/{jobid}_read_counts_derived.csv', jobid= JOBID)
 
 rule bwa_index:
     input:
