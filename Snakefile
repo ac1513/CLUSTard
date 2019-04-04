@@ -2,7 +2,6 @@ samples= 'NAB1_T0 NAB1_T1 NAB1_T2 NAB1_T3' #should be in order want output
 JOBID = 'test'
 RAW_SR = 'data/'
 REFIN = 'data/yw_polished_anvio.fasta'
-INTER = 'inter_files/'
 
 #run using snakemake --cluster "sbatch -t 02:00:00" -j 20
 
@@ -10,8 +9,8 @@ rule all:
     input:
         expand("{REFIN}.sa", REFIN=REFIN),
         expand('bwa_out/{samples}.bam', samples=samples.split(' ')),
-        expand('{inter}counts_{samples}.txt', inter=INTER, samples=samples.split(' ')),
-        expand('{inter}{jobid}_read_counts.out', inter = INTER, jobid= JOBID)
+        expand('inter/counts_{samples}.txt', samples=samples.split(' ')),
+        expand('inter/{jobid}_read_counts.out', jobid= JOBID)
 
 rule bwa_index:
     input:
@@ -39,7 +38,7 @@ rule samtools:
     input:
         bam = 'bwa_out/{samples}.bam'
     output:
-        counts = expand('{inter}counts_{samples}.txt', inter = INTER, samples=samples.split(' ')),
+        counts = expand('inter/counts_{samples}.txt', samples=samples.split(' ')),
     shell:
         """
         samtools index {input.bam}
@@ -49,13 +48,13 @@ rule samtools:
 rule merge_filecounts:
     input:
         loc = INTER,
-        counts = expand('{inter}counts_{samples}.txt', inter = INTER, samples=samples.split(' ')),
+        counts = expand('inter/counts_{samples}.txt', samples=samples.split(' ')),
     output:
         txt = INTER + '{JOBID}_read_counts.out'
     conda:
         "envs/py3"
     shell:
         """
-        python scripts/merge_filecounts.py {INTER} {JOBID}
-        rm {INTER}.*txt
+        python scripts/merge_filecounts.py inter {JOBID}
+        rm inter/*.txt
         """

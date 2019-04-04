@@ -20,7 +20,7 @@ args = parser.parse_args()
 loc = args.loc
 jobid = arg.jobid
 
-fname = sorted(glob.glob(loc+'*.txt'))
+fname = sorted(glob.glob(loc+'/*.txt'))
 
 print ('files with data to be merged: '+str(fname))
 # count lines in one file (they should all be the same...)
