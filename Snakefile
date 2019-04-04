@@ -32,6 +32,7 @@ rule bwa_mem:
     threads: 16
     shell:
         """
+        mkdir -p bwa_out
         bwa mem -M -t {threads} {input.ref} {input.fq1} {input.fq2} | samtools view -bhS - | samtools sort -o {params.bam}
         samtools index {params.bam}
         samtools idxstats {params.bam} > {output.counts}
