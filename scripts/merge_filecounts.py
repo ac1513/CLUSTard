@@ -18,7 +18,7 @@ parser.add_argument('loc', help='location count files are in', type=str)
 parser.add_argument('jobid', help='location count files are in', type=str)
 args = parser.parse_args()
 loc = args.loc
-jobid = arg.jobid
+jobid = args.jobid
 
 fname = sorted(glob.glob(loc+'/*.txt'))
 
