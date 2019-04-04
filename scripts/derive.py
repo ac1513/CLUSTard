@@ -28,7 +28,7 @@ parser.add_argument('jobid', help='location count files are in', type=str)
 parser.add_argument('thresh', help='location count files are in', type=str)
 args = parser.parse_args()
 loc = args.loc
-jobid = arg.jobid
+jobid = args.jobid
 thresh = int(arg.thresh)
 
 dir_name = str(loc + '/')
