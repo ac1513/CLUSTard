@@ -25,11 +25,11 @@ import argparse
 parser = argparse.ArgumentParser(description='')
 parser.add_argument('loc', help='location count files are in', type=str)
 parser.add_argument('jobid', help='location count files are in', type=str)
-parser.add_argument('thresh', help='location count files are in', type=str)
+parser.add_argument('thresh', help='location count files are in', type=int)
 args = parser.parse_args()
 loc = args.loc
 jobid = args.jobid
-thresh = int(args.thresh)
+thresh = args.thresh
 
 dir_name = str(loc + '/')
 file_name = str(jobid + '_read_counts.out')
@@ -41,6 +41,7 @@ with open(dir_name+file_name, 'r') as data_store:
     line = csv.reader(data_store, delimiter='\t')
     for i in line:
         if int(i[1]) >= thresh:
+            print("Yes I am!")
             counts = summer(i[2:])
             values = deriver((i[2:]), counts)
             coverage = (counts*150)/int(i[1])
