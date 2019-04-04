@@ -39,7 +39,7 @@ rule samtools:
     input:
         bam = 'bwa_out/{samples}.bam'
     output:
-        counts = INTER + 'counts_{samples}.txt'
+        counts = expand('{inter}counts_{samples}.txt', inter = INTER, samples=samples.split(' ')),
     shell:
         """
         samtools index {input.bam}
@@ -49,7 +49,7 @@ rule samtools:
 rule merge_filecounts:
     input:
         loc = INTER,
-        counts = expand(INTER + 'counts_{samples}.txt', samples=samples.split(' ')),
+        counts = expand('{inter}counts_{samples}.txt', inter = INTER, samples=samples.split(' ')),
     output:
         txt = INTER + '{JOBID}_read_counts.out'
     conda:
