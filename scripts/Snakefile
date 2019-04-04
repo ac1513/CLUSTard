@@ -1,0 +1,25 @@
+samples= 'NAB1_T0 NAB1_T1 NAB1_T2 NAB1_T3'
+BWAIN = 'data/'
+BWAOUT = 'align/'
+
+#run using snakemake --cluster "sbatch -t 02:00:00" -j 20
+
+rule all:
+    input:
+        expand(BWAOUT + '{samples}.bam', samples=samples.split(' '))
+
+rule bwa:
+    input:
+        fq1 = BWAIN + '{samples}_R1.fastq.gz',
+        fq2 = BWAIN + '{samples}_R2.fastq.gz',
+        ref = 'resources/yw_polished_anvio.fasta' #need to index this beforehand..
+    output:
+        bam = BWAOUT + '{samples}.bam'
+        counts = BWAOUT + 'counts_{samples}.txt'
+    threads: 16
+    shell:
+        """
+        bwa mem -M -t {threads} {input.ref} {input.fq1} {input.fq2} | samtools view -bh - > {output.bam}
+        samtools index {output.bam}
+        samtools idxstats {output.bam} > {output.counts}
+        """
