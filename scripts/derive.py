@@ -41,8 +41,9 @@ with open(dir_name+file_name, 'r') as data_store:
     line = csv.reader(data_store, delimiter='\t')
     for i in line:
         if int(i[1]) >= thresh:
-            print("Yes I am!")
             counts = summer(i[2:])
+            print("got here")
+            print(counts)
             values = deriver((i[2:]), counts)
             coverage = (counts*150)/int(i[1])
             values.append(coverage)	# add coverage to the end of the entry
