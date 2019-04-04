@@ -2,6 +2,7 @@
 
 import os
 import glob
+import argparse
 
 def firstFile(fileName):
         bits = fileName.readline().rsplit('\t',1)
@@ -12,13 +13,14 @@ def otherFile(fileName):
         bits = fileName.readline().split('\t')
         return (bits[2])
 
+parser = argparse.ArgumentParser(description='')
+parser.add_argument('loc', help='location count files are in', type=str)
+parser.add_argument('jobid', help='location count files are in', type=str)
+args = parser.parse_args()
+loc = args.loc
+jobid = arg.jobid
 
-path = os.path.dirname(os.path.realpath(__file__))
-dir = '/short_reads' # assumes files are here
-
-os.chdir(path)
-
-fname = sorted(glob.glob('*.txt'))
+fname = sorted(glob.glob(loc+'*.txt'))
 
 print ('files with data to be merged: '+str(fname))
 # count lines in one file (they should all be the same...)
@@ -36,7 +38,7 @@ print ('number of entries per file: '+str(count))
 # now need to read in all files
 
 filedata = [open(file_name, 'r') for file_name in fname]
-oo = open('read_counts.output', 'w')
+oo = open(str(jobid + '_read_counts.out'), 'w')
 
 for runthrough in range (0,count):
         start_marker = filedata[0]
@@ -50,4 +52,4 @@ for runthrough in range (0,count):
 for closer in filedata:
         closer.close()
 
-print ('merged data saved in: read_counts.output')
+print ('merged data saved in: '+jobid+'_read_counts.out')
