@@ -38,7 +38,7 @@ print ('number of entries per file: '+str(count))
 # now need to read in all files
 
 filedata = [open(file_name, 'r') for file_name in fname]
-oo = open(str(jobid + '_read_counts.out'), 'w')
+oo = open(str(loc + jobid + '_read_counts.out'), 'w')
 
 for runthrough in range (0,count):
         start_marker = filedata[0]
