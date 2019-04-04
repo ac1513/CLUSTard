@@ -10,8 +10,8 @@ rule all:
     input:
         expand("{REFIN}.sa", REFIN=REFIN),
         expand('bwa_out/{samples}.bam', samples=samples.split(' ')),
-        expand('{inter}counts_{samples}.txt', (inter=INTER, samples=samples.split(' '))),
-        expand('{inter}{jobid}_read_counts.out', (inter = INTER, jobid= JOBID))
+        expand('{inter}counts_{samples}.txt', inter=INTER, samples=samples.split(' ')),
+        expand('{inter}{jobid}_read_counts.out', inter = INTER, jobid= JOBID)
 
 rule bwa_index:
     input:
