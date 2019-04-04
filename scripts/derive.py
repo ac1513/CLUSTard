@@ -52,6 +52,6 @@ with open(dir_name+file_name, 'r') as data_store:
                 new_record = [values]
                 nr = True
 
-with open(dir_name + jobid + '/read_counts_derived.csv', 'w') as f:
+with open(dir_name + '/' +  jobid + '_read_counts_derived.csv', 'w') as f:
     writer = csv.writer(f)
     writer.writerows(new_record)
