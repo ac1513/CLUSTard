@@ -47,10 +47,10 @@ rule samtools:
 
 rule merge_filecounts:
     input:
-        loc = INTER,
+        loc = "inter/",
         counts = expand('inter/counts_{samples}.txt', samples=samples.split(' ')),
     output:
-        txt = INTER + '{JOBID}_read_counts.out'
+        txt = 'inter/{JOBID}_read_counts.out'
     conda:
         "envs/py3"
     shell:
