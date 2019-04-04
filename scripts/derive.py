@@ -29,7 +29,7 @@ parser.add_argument('thresh', help='location count files are in', type=str)
 args = parser.parse_args()
 loc = args.loc
 jobid = args.jobid
-thresh = int(arg.thresh)
+thresh = int(args.thresh)
 
 dir_name = str(loc + '/')
 file_name = str(jobid + 'read_counts.output')
