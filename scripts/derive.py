@@ -42,8 +42,6 @@ with open(dir_name+file_name, 'r') as data_store:
     for i in line:
         if int(i[1]) >= thresh:
             counts = summer(i[2:])
-            print("got here")
-            print(counts)
             values = deriver((i[2:]), counts)
             coverage = (counts*150)/int(i[1])
             values.append(coverage)	# add coverage to the end of the entry
