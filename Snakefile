@@ -65,3 +65,16 @@ rule derive:
         """
         python scripts/derive.py inter {JOBID} {params.thresh}
         """
+
+rule start_feeder:
+    input:
+        expand('inter/{JOBID}_read_counts_derived.csv', JOBID=JOBID)
+    output:
+        values = "inter/{JOBID}_values.csv",
+        diffs = "inter/{JOBID}_diffs.csv"
+    conda:
+        "envs/py3.yaml"
+    shell:
+        """
+        python scripts/start_feeder.py inter {JOBID}
+        """
