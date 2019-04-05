@@ -18,10 +18,6 @@ jobid = args.jobid
 
 df = pd.read_csv(loc + '/' + jobid + '_read_counts_derived.csv', header=None, index_col = 0)
 
-names = df.index.values.tolist()
-
-col_num = len(df.columns)
-
 df2 = df #seem to need to have a copy of the df to calc mean
 
 df = df.drop(df.columns[len(df.columns)-1], axis=1) # drop last column so don't include it in stats - is still in df2..
