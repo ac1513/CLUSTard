@@ -148,3 +148,9 @@ NZ_HG934468.1
 >Tannerellaceae
 NC_009615.1
 NC_016610.1
+>Syntrophaceae
+NC_007759.1
+NC_018025.1
+NC_015388.1
+>Syntrophobacteraceae
+NC_008554.1
