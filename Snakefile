@@ -89,11 +89,13 @@ rule split_file:
         diffs = expand("inter/{JOBID}_diffs.csv", JOBID=JOBID)
     output:
         dynamic(expand('inter/{JOBID}_diffs{{PART}}.csv', JOBID = JOBID))
-    params: out = expand("inter/{JOBID}_read_counts_derived", JOBID = JOBID)
+    params:
+        values = expand("inter/{JOBID}_values", JOBID = JOBID),
+        diffs = expand("inter/{JOBID}_diffs", JOBID = JOBID)
     shell:
         """
-        split -d -l 10000 --additional-suffix=.csv {input.values} {params.out}
-        split -d -l 10000 --additional-suffix=.csv {input.diffs} {params.out}
+        split -d -l 10000 --additional-suffix=.csv {input.values} {params.values}
+        split -d -l 10000 --additional-suffix=.csv {input.diffs} {params.diffs}
         """
 (job, part) = glob_wildcards('inter/{JOBID}_diffs{PART}.csv')
 
