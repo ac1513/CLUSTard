@@ -97,6 +97,7 @@ rule split_file:
         split -d -l 10000 --additional-suffix=.csv {input.values} {params.values}
         split -d -l 10000 --additional-suffix=.csv {input.diffs} {params.diffs}
         """
+
 (job, part) = glob_wildcards('inter/{JOBID}_diffs{PART}.csv')
 
 rule bin_feeder:
@@ -104,7 +105,8 @@ rule bin_feeder:
         diffs = expand('inter/{JOBID}_diffs{PART}.csv', JOBID = JOBID, PART=part),
         values = expand('inter/{jobid}_values{PART}.csv', jobid = JOBID, PART=part),
         all_diffs = expand("inter/{JOBID}_diffs.csv", JOBID = JOBID),
-        all_values = expand("inter/{JOBID}_values.csv", JOBID = JOBID)
+        all_values = expand("inter/{JOBID}_values.csv", JOBID = JOBID),
+        dyn_diffs = dynamic(expand('inter/{JOBID}_diffs{{PART}}.csv', JOBID = JOBID))
     output:
         "inter/test.txt"
     shell:
