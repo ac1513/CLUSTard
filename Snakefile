@@ -15,7 +15,7 @@ rule all:
         expand('inter/{jobid}_values.csv', jobid = JOBID),
         expand('inter/{jobid}_diffs.csv', jobid = JOBID),
         dynamic(expand('inter/{JOBID}_diffs{{PART}}.csv', JOBID = JOBID)),
-        "inter/test.txt"
+        expand("bins/output.{PART}", PART = part)
 
 rule bwa_index:
     input:
@@ -108,8 +108,12 @@ rule bin_feeder:
         all_values = expand("inter/{JOBID}_values.csv", JOBID = JOBID),
         dyn_diffs = dynamic(expand('inter/{JOBID}_diffs{{PART}}.csv', JOBID = JOBID))
     output:
-        "inter/test.txt"
+        expand("bins/output.{PART}", PART = part)
+    params:
+        thresh = '0.99' #add this in as a variable at the top later..
+    conda:
+        "envs/py3.yaml"
     shell:
         """
-        echo "{input.diffs} {input.values}" >> {output}
+        python scripts/bin_feeder2.py {input.values} {input.diffs} {input.all_values} {input.all_diffs} {thresh} {output}
         """
