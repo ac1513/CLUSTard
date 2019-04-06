@@ -73,7 +73,7 @@ rule derive:
 rule split_file:
     input: expand('inter/{JOBID}_read_counts_derived.csv', JOBID=JOBID)
     output: dynamic('inter/{JOBID}_read_counts_derived{PART}.csv')
-    params: out = "inter/{JOBID}_read_counts_derived"
+    params: out = expand("inter/{JOBID}_read_counts_derived", JOBID = JOBID)
     shell:
         """
         split -d -l 10000 --additional-suffix=.csv {input} {params.out}
