@@ -100,7 +100,7 @@ rule split_file:
 rule bin_feeder:
     input:
         #diffs = expand('inter/{JOBID}_diffs{PART}.csv', JOBID = JOBID, PART=part),
-        dyn_diffs = dynamic(expand('inter/{JOBID}_diffs{{PART}}.csv', JOBID = JOBID))
+        dyn_diffs = dynamic(expand('inter/{JOBID}_diffs{{PART}}.csv', JOBID = JOBID)),
         diffs = expand('inter/{JOBID}_diffs00.csv', JOBID = JOBID)
     output:
         all = expand("bins/output.{PART}", PART = part),
