@@ -84,23 +84,28 @@ rule start_feeder:
         """
 
 rule split_file:
-    input: expand('inter/{JOBID}_read_counts_derived.csv', JOBID=JOBID)
-    output: dynamic('inter/{JOBID}_read_counts_derived{PART}.csv')
+    input:
+        values = expand('inter/{JOBID}_values.csv', JOBID=JOBID),
+        diffs = expand("inter/{JOBID}_diffs.csv", JOBID=JOBID)
+    output:
+        dynamic(expand('inter/{JOBID}_diffs{{PART}}.csv', JOBID = JOBID))
     params: out = expand("inter/{JOBID}_read_counts_derived", JOBID = JOBID)
     shell:
         """
-        split -d -l 10000 --additional-suffix=.csv {input} {params.out}
+        split -d -l 10000 --additional-suffix=.csv {input.values} {params.out}
+        split -d -l 10000 --additional-suffix=.csv {input.diffs} {params.out}
         """
+(job, part) = glob_wildcards('inter/{JOBID}_diffs{PART}.csv')
 
 rule bin_feeder:
     input:
-        split = dynamic('inter/{JOBID}_read_counts_derived{PART}.csv'),
-        values = expand('inter/{jobid}_values.csv', jobid = JOBID),
-        diffs = expand('inter/{jobid}_diffs.csv', jobid = JOBID),
-        all = expand("inter/{JOBID}_read_counts_derived.csv", JOBID = JOBID)
+        diffs = dynamic(expand('inter/{JOBID}_diffs{{PART}}.csv', JOBID = JOBID),
+        values = expand('inter/{jobid}_values{PART}.csv', jobid = JOBID, PART=part),
+        all_diffs = expand("inter/{JOBID}_diffs.csv", JOBID = JOBID),
+        all_values = expand("inter/{JOBID}_values.csv", JOBID = JOBID)
     output:
         "inter/test.txt"
     shell:
         """
-        echo "{input.split}" > {output}
+        echo "{input.diffs} {input.values}" >> {output}
         """
