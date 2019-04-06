@@ -115,5 +115,5 @@ rule bin_feeder:
         "envs/py3.yaml"
     shell:
         """
-        python scripts/bin_feeder.py {input.values} {input.diffs} {input.all_values} {input.all_diffs} {thresh} {output}
+        python scripts/bin_feeder.py {input.values} {input.diffs} {input.all_values} {input.all_diffs} {params.thresh} {output}
         """
