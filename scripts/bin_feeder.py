@@ -39,7 +39,7 @@ with open(write_file, 'w') as sender:
 	line_1 = 0
 	for contig_x, row in df_diffs_cut.iterrows():
 		line_2 = line_1
-		for contig_y, row1 in df_diffs_all.iterrows()[line_2:]:
+		for contig_y, row1 in df_diffs_all.iloc[line_2:].iterrows():
 			resp_val = pcc(row, row1)
 			if resp_val >= thresh:
 				line_out = (contig_x, contig_y, resp_val)
