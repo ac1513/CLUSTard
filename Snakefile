@@ -12,9 +12,9 @@ rule all:
         expand('inter/counts_{samples}.txt', samples=samples.split(' ')),
         expand('inter/{jobid}_read_counts.out', jobid= JOBID),
         expand('inter/{jobid}_read_counts_derived.csv', jobid= JOBID),
-        dynamic('inter/{JOBID}_read_counts_derived{PART}.csv'),
         expand('inter/{jobid}_values.csv', jobid = JOBID),
         expand('inter/{jobid}_diffs.csv', jobid = JOBID),
+        dynamic(expand('inter/{JOBID}_diffs{{PART}}.csv', JOBID = JOBID)),
         "inter/test.txt"
 
 rule bwa_index:
