@@ -108,7 +108,7 @@ rule bin_feeder:
         all_values = expand("inter/{JOBID}_values.csv", JOBID = JOBID),
         dyn_diffs = dynamic(expand('inter/{JOBID}_diffs{{PART}}.csv', JOBID = JOBID))
     output:
-        all = expand("bins/output.{PART}", PART = part)
+        all = expand("bins/output.{PART}", PART = part),
         top = "bins/output.04"
     params:
         thresh = '0.99' #add this in as a variable at the top later..
