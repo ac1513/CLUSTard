@@ -22,22 +22,16 @@ def pcc(x, y):
 	return result
 
 parser = argparse.ArgumentParser(description='')
-parser.add_argument('cut_values', help='split values', type=str)
 parser.add_argument('cut_diffs', help='split diffs', type=str)
-parser.add_argument('all_values', help='all values', type=str)
 parser.add_argument('all_diffs', help='all diffs', type=str)
 parser.add_argument('thresh', help='pr threshold', type=float)
 parser.add_argument('output', help='output', type=str)
 args = parser.parse_args()
-cut_values = args.cut_values
 cut_diffs = args.cut_diffs
-values = args.all_values
 diffs = args.all_diffs
 write_file = args.output
 thresh = args.thresh
 
-df_val_all = pd.read_csv(values, header=None, index_col = 0)
-df_val_cut = pd.read_csv(cut_values, header=None, index_col = 0)
 df_diffs_all = pd.read_csv(diffs, header=None, index_col = 0)
 df_diffs_cut = pd.read_csv(cut_diffs, header=None, index_col = 0)
 

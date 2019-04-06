@@ -85,16 +85,13 @@ rule start_feeder:
 
 rule split_file:
     input:
-        values = expand('inter/{JOBID}_values.csv', JOBID=JOBID),
         diffs = expand("inter/{JOBID}_diffs.csv", JOBID=JOBID)
     output:
         dynamic(expand('inter/{JOBID}_diffs{{PART}}.csv', JOBID = JOBID))
     params:
-        values = expand("inter/{JOBID}_values", JOBID = JOBID),
         diffs = expand("inter/{JOBID}_diffs", JOBID = JOBID)
     shell:
         """
-        split -d -l 10000 --additional-suffix=.csv {input.values} {params.values}
         split -d -l 10000 --additional-suffix=.csv {input.diffs} {params.diffs}
         """
 
@@ -103,9 +100,7 @@ rule split_file:
 rule bin_feeder:
     input:
         diffs = expand('inter/{JOBID}_diffs{PART}.csv', JOBID = JOBID, PART=part),
-        values = expand('inter/{jobid}_values{PART}.csv', jobid = JOBID, PART=part),
         all_diffs = expand("inter/{JOBID}_diffs.csv", JOBID = JOBID),
-        all_values = expand("inter/{JOBID}_values.csv", JOBID = JOBID),
         dyn_diffs = dynamic(expand('inter/{JOBID}_diffs{{PART}}.csv', JOBID = JOBID))
     output:
         all = expand("bins/output.{PART}", PART = part),
@@ -116,5 +111,5 @@ rule bin_feeder:
         "envs/py3.yaml"
     shell:
         """
-        python scripts/bin_feeder.py {input.values} {input.diffs} {input.all_values} {input.all_diffs} {params.thresh} {output.all}
+        python scripts/bin_feeder.py {input.diffs} {input.all_diffs} {params.thresh} {output.all}
         """
