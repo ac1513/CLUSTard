@@ -12,9 +12,9 @@ rule all:
         expand('inter/counts_{samples}.txt', samples=samples.split(' ')),
         expand('inter/{jobid}_read_counts.out', jobid= JOBID),
         expand('inter/{jobid}_read_counts_derived.csv', jobid= JOBID),
+        dynamic('inter/{JOBID}_read_counts_derived{PART}.csv'),
         expand('inter/{jobid}_values.csv', jobid = JOBID),
         expand('inter/{jobid}_diffs.csv', jobid = JOBID),
-        dynamic('inter/{JOBID}_read_counts_derived{PART}.csv'),
         "inter/test.txt"
 
 rule bwa_index:
@@ -70,15 +70,6 @@ rule derive:
         python scripts/derive.py inter {JOBID} {params.thresh}
         """
 
-rule split_file:
-    input: expand('inter/{JOBID}_read_counts_derived.csv', JOBID=JOBID)
-    output: dynamic('inter/{JOBID}_read_counts_derived{PART}.csv')
-    params: out = expand("inter/{JOBID}_read_counts_derived", JOBID = JOBID)
-    shell:
-        """
-        split -d -l 10000 --additional-suffix=.csv {input} {params.out}
-        """
-
 rule start_feeder:
     input:
         expand('inter/{JOBID}_read_counts_derived.csv', JOBID=JOBID)
@@ -92,14 +83,24 @@ rule start_feeder:
         python scripts/start_feeder.py inter {JOBID}
         """
 
+rule split_file:
+    input: expand('inter/{JOBID}_read_counts_derived.csv', JOBID=JOBID)
+    output: dynamic('inter/{JOBID}_read_counts_derived{PART}.csv')
+    params: out = expand("inter/{JOBID}_read_counts_derived", JOBID = JOBID)
+    shell:
+        """
+        split -d -l 10000 --additional-suffix=.csv {input} {params.out}
+        """
+
 rule bin_feeder:
     input:
         split = dynamic('inter/{JOBID}_read_counts_derived{PART}.csv'),
         values = expand('inter/{jobid}_values.csv', jobid = JOBID),
         diffs = expand('inter/{jobid}_diffs.csv', jobid = JOBID),
+        all = expand("inter/{JOBID}_read_counts_derived.csv", JOBID = JOBID)
     output:
         "inter/test.txt"
     shell:
         """
-        echo "Hmm" > inter/test.txt
+        echo "{input.split}
         """
