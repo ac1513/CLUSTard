@@ -101,7 +101,7 @@ rule split_file:
 
 rule bin_feeder:
     input:
-        diffs = dynamic(expand('inter/{JOBID}_diffs{{PART}}.csv', JOBID = JOBID)),
+        diffs = expand('inter/{JOBID}_diffs{PART}.csv', JOBID = JOBID, PART=part),
         values = expand('inter/{jobid}_values{PART}.csv', jobid = JOBID, PART=part),
         all_diffs = expand("inter/{JOBID}_diffs.csv", JOBID = JOBID),
         all_values = expand("inter/{JOBID}_values.csv", JOBID = JOBID)
