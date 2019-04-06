@@ -100,16 +100,16 @@ rule split_file:
 rule bin_feeder:
     input:
         diffs = expand('inter/{JOBID}_diffs{PART}.csv', JOBID = JOBID, PART=part),
-        all_diffs = expand("inter/{JOBID}_diffs.csv", JOBID = JOBID),
         dyn_diffs = dynamic(expand('inter/{JOBID}_diffs{{PART}}.csv', JOBID = JOBID))
     output:
         all = expand("bins/output.{PART}", PART = part),
         top = "bins/output.04"
     params:
-        thresh = '0.99' #add this in as a variable at the top later..
+        thresh = '0.99', #add this in as a variable at the top later..
+        all_diffs = expand("inter/{JOBID}_diffs.csv", JOBID = JOBID),
     conda:
         "envs/py3.yaml"
     shell:
         """
-        python scripts/bin_feeder.py {input.diffs} {input.all_diffs} {params.thresh} {output.all}
+        python scripts/bin_feeder.py {input.diffs} {params.all_diffs} {params.thresh} {output.all}
         """
