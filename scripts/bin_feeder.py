@@ -36,16 +36,16 @@ df_diffs_all = pd.read_csv(diffs, header=None, index_col = 0)
 df_diffs_cut = pd.read_csv(cut_diffs, header=None, index_col = 0)
 
 with open(write_file, 'w') as sender:
-	line_1 = 0
-	for contig_x, row in df_diffs_cut.iterrows():
-		row = row.to_numpy()
-		line_2 = line_1+1
-		for contig_y, row1 in df_diffs_all.iloc[line_2:].iterrows():
+    line_1 = 0
+    for contig_x, row in df_diffs_cut.iterrows():
+        row = row.to_numpy()
+        line_2 = line_1+1
+        for contig_y, row1 in df_diffs_all.iloc[line_2:].iterrows():
             row1 = row1.to_numpy()
-			resp_val = pcc(row, row1)
-			if resp_val >= thresh:
-				line_out = (contig_x, contig_y, resp_val)
-				writer = csv.writer(sender)
-				writer.writerow(line_out)
-			line_2 += 1
-		line_1 += 1
+            resp_val = pcc(row, row1)
+            if resp_val >= thresh:
+                line_out = (contig_x, contig_y, resp_val)
+                writer = csv.writer(sender)
+                writer.writerow(line_out)
+            line_2 += 1
+        line_1 += 1
