@@ -15,7 +15,7 @@ rule all:
         expand('inter/{jobid}_values.csv', jobid = JOBID),
         expand('inter/{jobid}_diffs.csv', jobid = JOBID),
         dynamic(expand('inter/{JOBID}_diffs{{PART}}.csv', JOBID = JOBID)),
-        expand("bins/output.{PART}", PART = part)
+        "bins/output.04"
 
 rule bwa_index:
     input:
