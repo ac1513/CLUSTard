@@ -102,5 +102,5 @@ rule bin_feeder:
         "inter/test.txt"
     shell:
         """
-        echo "{input.split}
+        echo "{input.split}"
         """
