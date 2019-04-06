@@ -27,5 +27,5 @@ df2["sd"] = df.std(ddof = 1, axis=1)
 
 diffs = df.sub(df.mean(axis=1), axis=0)
 
-diffs.to_csv(loc + '/' + jobid + '_diffs.csv') #diffs
-df2.to_csv(loc + '/' + jobid + '_values.csv') #diffs
+diffs.to_csv(loc + '/' + jobid + '_diffs.csv', header = False) #diffs
+df2.to_csv(loc + '/' + jobid + '_values.csv', header = False) #diffs
