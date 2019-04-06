@@ -14,6 +14,8 @@ rule all:
         expand('inter/{jobid}_read_counts_derived.csv', jobid= JOBID),
         expand('inter/{jobid}_values.csv', jobid = JOBID),
         expand('inter/{jobid}_diffs.csv', jobid = JOBID),
+        dynamic('inter/{JOBID}_read_counts_derived{PART}.csv'),
+        "inter/test.txt"
 
 rule bwa_index:
     input:
@@ -68,11 +70,10 @@ rule derive:
         python scripts/derive.py inter {JOBID} {params.thresh}
         """
 
-rule split:
+rule split_file:
     input: expand('inter/{JOBID}_read_counts_derived.csv', JOBID=JOBID)
-    output: dynamic('inter/{JOBID}_read_counts_derived{PART}.csv'
-    params:
-        out = "inter/{JOBID}_read_counts_derived"
+    output: dynamic('inter/{JOBID}_read_counts_derived{PART}.csv')
+    params: out = "inter/{JOBID}_read_counts_derived"
     shell:
         """
         split -d -l 10000 --additional-suffix=.csv {input} {params.out}
@@ -93,7 +94,7 @@ rule start_feeder:
 
 rule bin_feeder:
     input:
-        split = dynamic('inter/{JOBID}_read_counts_derived{PART}.csv'
+        split = dynamic('inter/{JOBID}_read_counts_derived{PART}.csv'),
         values = expand('inter/{jobid}_values.csv', jobid = JOBID),
         diffs = expand('inter/{jobid}_diffs.csv', jobid = JOBID),
     output:
