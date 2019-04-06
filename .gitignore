@@ -4,3 +4,4 @@
 plot_test/james_plot.py
 .DS_Store
 scripts/.DS_Store
+pipeline_test/*
