@@ -76,7 +76,7 @@ rule start_feeder:
         expand('inter/{JOBID}_read_counts_derived.csv', JOBID=JOBID)
     output:
         values = "inter/{JOBID}_values.csv",
-        diffs = "inter/diffs.csv"
+        diffs = "inter/{JOBID}_diffs.csv"
     conda:
         "envs/py3.yaml"
     shell:
