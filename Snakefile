@@ -16,7 +16,7 @@ subworkflow para:
 rule all:
     input:
 #        "test.txt",
-        expand("results/{JOBID}_summary_stats.csv", JOBID = JOBID)
+        expand("results/{JOBID}_summary_stats.txt", JOBID = JOBID)
 
 #rule test:
 #    input:
