@@ -87,16 +87,23 @@ rule split_file:
     input:
         diffs = expand("inter/{JOBID}_diffs.csv", JOBID=JOBID)
     output:
-        expand("inter/{JOBID}_diffs00.csv", JOBID = JOBID)
+        expand("inter/{JOBID}_output.txt", JOBID = JOBID)
     params:
         diffs = expand("inter/{JOBID}_diffs", JOBID = JOBID)
     shell:
         """
         split -d -l 10000 --additional-suffix=.csv {input.diffs} {params.diffs}
+        echo "Done" > {output}
         """
 
 (job, part) = glob_wildcards('inter/{JOBID}_diffs{PART}.csv')
-print(part)
+
+rule print_out:
+    input:
+        part
+    run:
+        print(part)
+
 
 rule bin_feeder:
     input:
