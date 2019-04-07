@@ -5,9 +5,9 @@ REFIN = 'data/yw_polished_anvio.fasta'
 THRESH = '10000'
 P_THRESH = '0.99'
 
-subworkflow bwa_split:
-    snakefile:
-        "bwa_Snakefile"
+#subworkflow bwa_split:
+#    snakefile:
+#        "bwa_Snakefile"
 
 subworkflow para:
     snakefile:
@@ -15,18 +15,18 @@ subworkflow para:
 
 rule all:
     input:
-        "test.txt",
+#        "test.txt",
         expand("results/{JOBID}_summary_stats.csv", JOBID = JOBID)
 
-rule test:
-    input:
-        bwa_split(expand("inter/{JOBID}_output.txt", JOBID = JOBID))
-    output:
-        "test.txt"
-    shell:
-        """
-        echo "Done BWA" > {output}
-        """
+#rule test:
+#    input:
+#        bwa_split(expand("inter/{JOBID}_output.txt", JOBID = JOBID))
+#    output:
+#        "test.txt"
+#    shell:
+#        """
+#        echo "Done BWA" > {output}
+#        """
 
 rule file_parser:
     input:
