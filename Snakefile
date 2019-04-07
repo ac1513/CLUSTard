@@ -96,6 +96,7 @@ rule split_file:
         """
 
 (job, part) = glob_wildcards('inter/{JOBID}_diffs{PART}.csv')
+print(part)
 
 rule bin_feeder:
     input:
