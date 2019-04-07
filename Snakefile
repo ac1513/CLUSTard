@@ -4,7 +4,6 @@ RAW_SR = 'data/'
 REFIN = 'data/yw_polished_anvio.fasta'
 THRESH = '10000'
 P_THRESH = '0.99'
-PARTS = "00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 "
 
 subworkflow bwa_split:
     snakefile:
@@ -17,7 +16,7 @@ subworkflow para:
 rule all:
     input:
         "test.txt",
-        "test1.txt"
+        "results/{JOBID}_summary_stats.csv"
 
 rule test:
     input:
@@ -26,15 +25,20 @@ rule test:
         "test.txt"
     shell:
         """
-        echo "Done" > {output}
+        echo "Done BWA" > {output}
         """
 
-rule test2:
+rule file_parser:
     input:
-        para(expand("bins/{JOBID}_parallel_merged.out", JOBID = JOBID))
+        clusters = para(expand("bins/{JOBID}_non_red_list.out", JOBID = JOBID))
     output:
-        "test1.txt"
+        results = "results/{JOBID}_summary_stats.csv"
+    params:
+        contigs = REFIN,
+        csv = expand("inter/{JOBID}_read_counts_derived.csv", JOBID = JOBID),
+        wd = "results/",
+        header = samples
     shell:
         """
-        echo "Done" > {output}
+        python scripts/file_parser.py {params.contigs} {params.csv} {input.clusters} {params.wd} {output.results} -l {params.header}
         """
