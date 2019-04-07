@@ -1,0 +1,57 @@
+samples= 'NAB1_T0 NAB1_T1 NAB1_T2 NAB1_T3' #should be in order want output
+JOBID = 'test'
+RAW_SR = 'data/'
+REFIN = 'data/yw_polished_anvio.fasta'
+THRESH = '10000'
+P_THRESH = '0.99'
+
+(job, part) = glob_wildcards('inter/{JOBID}_diffs{PART}.csv')
+
+rule all:
+    input:
+      expand("bins/{JOBID}_output_{PART}.csv", JOBID = JOBID, PART = part),
+      expand("bins/{JOBID}_parallel_sets_{PART}.csv", JOBID = JOBID, PART = part),
+      expand("bins/{JOBID}_parallel_merged.out", JOBID = JOBID)
+
+rule bin_feeder:
+    input:
+        #diffs = expand('inter/{JOBID}_diffs{PART}.csv', JOBID = JOBID, PART=part),
+        #dyn_diffs = dynamic(expand("bins/{JOBID}_diffs{{PART}}.csv", JOBID=JOBID)),
+        diffs = expand('inter/{JOBID}_diffs{PART}.csv', JOBID = JOBID, PART = part)
+    output:
+        all = expand("bins/{JOBID}_output_{PART}.csv", JOBID = JOBID, PART = part),
+    params:
+        thresh = P_THRESH, #add this in as a variable at the top later..
+        all_diffs = expand("inter/{JOBID}_diffs.csv", JOBID = JOBID)
+    conda:
+        "envs/py3.yaml"
+    shell:
+        """
+        python scripts/bin_feeder.py {input.diffs} {params.all_diffs} {params.thresh} {output.all}
+        """
+
+rule para_sets:
+    input:
+        bins = expand("bins/{JOBID}_output_{PART}.csv", JOBID = JOBID, PART = part)
+    output:
+        expand("bins/{JOBID}_parallel_sets_{PART}.csv", JOBID = JOBID, PART = part)
+    params:
+        thresh = P_THRESH
+    conda:
+        "envs/py3.yaml"
+    shell:
+        """
+        python scripts/para_sets.py {input.bins} {output} {params.thresh}
+        """
+
+rule para_merge:
+    input:
+        expand("bins/{JOBID}_parallel_sets_{PART}.csv", JOBID=JOBID, PART = part)
+    output:
+        "bins/{JOBID}_parallel_merged.out"
+    conda:
+        "envs/py3.yaml"
+    shell:
+        """
+        python scripts/parallel_merge_step2.py -i {input} -o {output}
+        """
