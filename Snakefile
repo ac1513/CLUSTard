@@ -4,106 +4,36 @@ RAW_SR = 'data/'
 REFIN = 'data/yw_polished_anvio.fasta'
 THRESH = '10000'
 P_THRESH = '0.99'
+PARTS = "00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 "
 
-#run using snakemake --cluster "sbatch -t 02:00:00" -j 20
-
-rule all:
-    input:
-        expand("{REFIN}.sa", REFIN=REFIN),
-        expand('inter/counts_{samples}.txt', samples=samples.split(' ')),
-        expand('inter/{jobid}_read_counts.out', jobid= JOBID),
-        expand('inter/{jobid}_read_counts_derived.csv', jobid= JOBID),
-        expand('inter/{jobid}_values.csv', jobid = JOBID),
-        expand('inter/{jobid}_diffs.csv', jobid = JOBID),
-        "test.txt"
-
-rule bwa_index:
-    input:
-        ref = REFIN
-    output:
-        '{REFIN}.sa'
-    shell:
-        'bwa index {input.ref}'
-
-rule bwa_mem:
-    input:
-        fq1 = RAW_SR + '{samples}_R1.fastq.gz',
-        fq2 = RAW_SR + '{samples}_R2.fastq.gz',
-        ref = REFIN,
-        ref_ind = expand("{reference}.sa", reference=REFIN)
-    output:
-        counts = 'inter/counts_{samples}.txt'
-    params:
-        bam = 'bwa_out/{samples}.bam'
-    threads: 16
-    shell:
-        """
-        mkdir -p bwa_out
-        bwa mem -M -t {threads} {input.ref} {input.fq1} {input.fq2} | samtools view -bhS - | samtools sort -o {params.bam}
-        samtools index {params.bam}
-        samtools idxstats {params.bam} > {output.counts}
-        """
-
-rule merge_filecounts:
-    input:
-        'inter/'
-    output:
-        txt = 'inter/{JOBID}_read_counts.out'
-    conda:
-        "envs/py3.yaml"
-    shell:
-        """
-        python scripts/merge_filecounts.py inter {JOBID}
-        """
-
-rule derive:
-    input:
-        expand('inter/{JOBID}_read_counts.out', JOBID=JOBID)
-    output:
-        csv = "inter/{JOBID}_read_counts_derived.csv"
-    params:
-        thresh = THRESH
-    conda:
-        "envs/py3.yaml"
-    shell:
-        """
-        python scripts/derive.py inter {JOBID} {params.thresh}
-        """
-
-rule start_feeder:
-    input:
-        expand('inter/{JOBID}_read_counts_derived.csv', JOBID=JOBID)
-    output:
-        values = "inter/{JOBID}_values.csv",
-        diffs = "inter/{JOBID}_diffs.csv"
-    conda:
-        "envs/py3.yaml"
-    shell:
-        """
-        python scripts/start_feeder.py inter {JOBID}
-        """
-
-rule split_file:
-    input:
-        diffs = expand("inter/{JOBID}_diffs.csv", JOBID=JOBID)
-    output:
-        expand("inter/{JOBID}_output.txt", JOBID = JOBID)
-    params:
-        diffs = expand("inter/{JOBID}_diffs", JOBID = JOBID)
-    shell:
-        """
-        split -d -l 10000 --additional-suffix=.csv {input.diffs} {params.diffs}
-        echo "Done" > {output}
-        """
+subworkflow bwa_split:
+    snakefile:
+        "bwa_Snakefile"
 
 subworkflow para:
     snakefile:
         "para_Snakefile"
 
+rule all:
+    input:
+        "test.txt",
+        "test1.txt"
+
 rule test:
-    input: para(expand("bins/{JOBID}_parallel_merged.out", JOBID = JOBID))
+    input:
+        bwa_split(expand("inter/{JOBID}_output.txt", JOBID = JOBID))
     output:
         "test.txt"
+    shell:
+        """
+        echo "Done" > {output}
+        """
+
+rule test:
+    input:
+        para(expand("bins/{JOBID}_parallel_merged.out", JOBID = JOBID))
+    output:
+        "test1.txt"
     shell:
         """
         echo "Done" > {output}
