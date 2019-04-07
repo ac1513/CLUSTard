@@ -140,5 +140,3 @@ rule para_merge:
         """
         python scripts/parallel_merge_step2.py -i {input} -o {output}
         """
-
-update
