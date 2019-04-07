@@ -30,7 +30,7 @@ contig_file = args.contigs
 csv_file = args.csv
 cluster_file = args.clusters
 wd = args.output
-stats_file = args.stats
+stats_file = args.stats # this is never used??
 header = args.header
 
 #add context to header columns

@@ -32,7 +32,7 @@ rule file_parser:
     input:
         clusters = para(expand("bins/{JOBID}_non_red_list.out", JOBID = JOBID))
     output:
-        results = "results/{JOBID}_summary_stats.csv"
+        results = "results/{JOBID}_summary_stats.txt"
     params:
         contigs = REFIN,
         csv = expand("inter/{JOBID}_read_counts_derived.csv", JOBID = JOBID),
@@ -41,4 +41,20 @@ rule file_parser:
     shell:
         """
         python scripts/file_parser.py {params.contigs} {params.csv} {input.clusters} {params.wd} {output.results} -l {params.header}
+        echo "Sort output at somepoint" >> {output.results}
+        """
+
+rule plot:
+    input:
+         expand("results/{JOBID}_summary_stats.txt", JOBID = JOBID)
+    output:
+        "plots/{JOBID}_all_plot.pdf"
+    params:
+        files = "plot_in_files.txt",
+        csv_loc = "results/"
+    shell:
+        """
+        ls -S results/Cluster*.csv > {params.files}
+        python scripts/plot.py {params.files} {params.csv_loc}
+        rm {params.files}
         """
