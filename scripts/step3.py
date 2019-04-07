@@ -3,9 +3,18 @@
 # generated in step 2
 
 import json
+import argparse
+
+parser = argparse.ArgumentParser(description='')
+parser.add_argument('input', help='location of input', type=str)
+parser.add_argument('output', help='location of output', type=str)
+args = parser.parse_args()
+input_file = args.input
+output_file = args.output
+
 
 final_list = []
-with open('bins2/parallel_merged.out' ,'r') as in_file:
+with open(input_file ,'r') as in_file:
 	master_list = json.load(in_file)
 
 while True:
@@ -28,6 +37,5 @@ while True:
 	if master_list == []:
 		break
 
-with open('bins2/total_step3_list.out', 'w') as out_file:
+with open(output_file, 'w') as out_file:
 	json.dump(final_list, out_file)
-

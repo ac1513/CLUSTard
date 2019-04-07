@@ -49,9 +49,23 @@ rule para_merge:
         expand("bins/{JOBID}_parallel_sets_{PART}.csv", JOBID=JOBID, PART = part)
     output:
         "bins/{JOBID}_parallel_merged.out"
+    resources:
+        mem_mb = 64000
     conda:
         "envs/py3.yaml"
     shell:
         """
         python scripts/parallel_merge_step2.py -i {input} -o {output}
         """
+
+rule non_red_step:
+    input:
+      expand("bins/{JOBID}_parallel_merged.out", JOBID = JOBID)
+    output:
+      expand("bins/{JOBID}_non_red_list.out", JOBID = JOBID)
+    conda:
+      "envs/py3.yaml"
+    shell:
+      """
+      python scripts/step3.py {input} {output}
+      """
