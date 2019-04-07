@@ -15,7 +15,7 @@ rule all:
         expand('inter/{jobid}_read_counts_derived.csv', jobid= JOBID),
         expand('inter/{jobid}_values.csv', jobid = JOBID),
         expand('inter/{jobid}_diffs.csv', jobid = JOBID),
-        dynamic(expand("bins/{JOBID}_diffs{{PART}}.csv", JOBID=JOBID)),
+        expand("bins/{JOBID}_diffs00.csv", JOBID=JOBID),
         expand("bins/{JOBID}_parallel_merged.out", JOBID = JOBID)
 
 rule bwa_index:
@@ -88,7 +88,7 @@ rule split_file:
     input:
         diffs = expand("inter/{JOBID}_diffs.csv", JOBID=JOBID)
     output:
-        expand("inter/{JOBID}_diffs00.csv", JOBID = JOBID))
+        expand("inter/{JOBID}_diffs00.csv", JOBID = JOBID)
     params:
         diffs = expand("inter/{JOBID}_diffs", JOBID = JOBID)
     shell:
