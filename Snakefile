@@ -15,7 +15,6 @@ rule all:
         expand('inter/{jobid}_read_counts_derived.csv', jobid= JOBID),
         expand('inter/{jobid}_values.csv', jobid = JOBID),
         expand('inter/{jobid}_diffs.csv', jobid = JOBID),
-        expand("bins/{JOBID}_diffs00.csv", JOBID=JOBID),
         expand("bins/{JOBID}_parallel_merged.out", JOBID = JOBID)
 
 rule bwa_index:
