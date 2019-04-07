@@ -27,8 +27,8 @@ rule bwa_index:
 
 rule bwa_mem:
     input:
-        fq1 = RAW_SR + '{samples}_R1.fastq.gz',
-        fq2 = RAW_SR + '{samples}_R2.fastq.gz',
+        fq1 = expand('data/{samples}_R1.fastq.gz', samples = samples),
+        fq2 = expand('data/{samples}_R2.fastq.gz', samples = samples),
         ref = REFIN,
         ref_ind = expand("{reference}.sa", reference=REFIN)
     output:
