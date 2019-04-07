@@ -11,32 +11,19 @@ short_list = []
 nr_list = []
 final_list = []
 
-def inputter(argv):
-	in_file = ''
-	out_file = ''
-	try:
-		opts, args = getopt.getopt(argv,"hi:o:",["ifile=","ofile="])
-	except getopt.GetoptError:
-		print('new_step2_parallel.py -i <input_file> -o <output_file>')
-		sys.exit(2)
-	for opt, arg in opts:
-		if opt == '-h':
-			print('new_step2_parallel.py -i <input_file> -o <output_file>')
-			sys.exit()
-		elif opt in ("-i", "--ifile"):
-			in_file = arg
-		elif opt in ("-o", "--ofile"):
-			out_file = arg
-	return(in_file, out_file)
-
-variables = inputter(sys.argv[1:])
-read_file = variables[0]
-write_file = variables[1]
+parser = argparse.ArgumentParser(description='')
+parser.add_argument('input', help='location of input', type=str)
+parser.add_argument('output', help='location of output', type=str)
+parser.add_argument('thresh', help='location of output', type=float)
+args = parser.parse_args()
+read_file = args.input
+write_file = args.output
+thresh = args.thresh
 
 with open (read_file, 'r') as incoming:
 	file_reader = csv.reader(incoming, delimiter=',')
 	for row in file_reader:
-		if float(row[2]) >= 0.99:
+		if float(row[2]) >= thresh:
 			short_list.append(row[:2])
 
 while short_list:
@@ -52,4 +39,3 @@ while short_list:
 
 with open(write_file, 'w') as outgoing:
 	json.dump(final_list, outgoing)
-
