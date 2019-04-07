@@ -15,7 +15,7 @@ rule all:
         expand('inter/{jobid}_read_counts_derived.csv', jobid= JOBID),
         expand('inter/{jobid}_values.csv', jobid = JOBID),
         expand('inter/{jobid}_diffs.csv', jobid = JOBID),
-        dynamic(expand("bins/{JOBID}_parallel_sets_{{PART}}.csv", JOBID=JOBID)),
+        dynamic(expand("bins/{JOBID}_diffs{{PART}}.csv", JOBID=JOBID)),
         expand("bins/{JOBID}_parallel_merged.out", JOBID = JOBID)
 
 rule bwa_index:
@@ -96,15 +96,15 @@ rule split_file:
         split -d -l 10000 --additional-suffix=.csv {input.diffs} {params.diffs}
         """
 
-#(job, part) = glob_wildcards('inter/{JOBID}_diffs{PART}.csv')
+(job, part) = glob_wildcards('inter/{JOBID}_diffs{PART}.csv')
 
 rule bin_feeder:
     input:
         #diffs = expand('inter/{JOBID}_diffs{PART}.csv', JOBID = JOBID, PART=part),
-        #dyn_diffs = dynamic(expand('inter/{JOBID}_diffs{{PART}}.csv', JOBID = JOBID)),
-        diffs = expand('inter/{JOBID}_diffs{{PART}}.csv', JOBID = JOBID)
+        dyn_diffs = dynamic(expand('inter/{JOBID}_diffs{{PART}}.csv', JOBID = JOBID)),
+        diffs = expand('inter/{JOBID}_diffs{PART}.csv', JOBID = JOBID, PART = part)
     output:
-        all = expand("bins/{JOBID}_output_{{PART}}.csv", JOBID = JOBID),
+        all = expand("bins/{JOBID}_output_{PART}.csv", JOBID = JOBID, PART = part),
     params:
         thresh = P_THRESH, #add this in as a variable at the top later..
         all_diffs = expand("inter/{JOBID}_diffs.csv", JOBID = JOBID)
@@ -117,9 +117,9 @@ rule bin_feeder:
 
 rule para_sets:
     input:
-        bins = expand("bins/{JOBID}_output_{{PART}}.csv", JOBID = JOBID)
+        bins = expand("bins/{JOBID}_output_{PART}.csv", JOBID = JOBID, PART = part)
     output:
-        expand("bins/{JOBID}_parallel_sets_{{PART}}.csv", JOBID = JOBID)
+        expand("bins/{JOBID}_parallel_sets_{PART}.csv", JOBID = JOBID, PART = part)
     params:
         thresh = P_THRESH
     conda:
@@ -131,7 +131,7 @@ rule para_sets:
 
 rule para_merge:
     input:
-        dynamic(expand("bins/{JOBID}_parallel_sets_{{PART}}.csv", JOBID=JOBID))
+        expand("bins/{JOBID}_parallel_sets_{PART}.csv", JOBID=JOBID, PART = part)
     output:
         "bins/{JOBID}_parallel_merged.out"
     conda:
