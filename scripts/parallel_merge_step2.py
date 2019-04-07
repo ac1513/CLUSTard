@@ -24,10 +24,6 @@ args = parser.parse_args()
 list_files = args.input
 write_file = args.output
 
-read_file = variables[0]
-write_file = variables[1]
-number_files = int(variables[2])
-
 # open first file
 first_file = list_files[0]
 
