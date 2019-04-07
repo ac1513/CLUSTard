@@ -88,7 +88,7 @@ rule split_file:
     input:
         diffs = expand("inter/{JOBID}_diffs.csv", JOBID=JOBID)
     output:
-        dynamic(expand('inter/{JOBID}_diffs{{PART}}.csv', JOBID = JOBID))
+        expand("inter/{JOBID}_diffs00.csv", JOBID = JOBID))
     params:
         diffs = expand("inter/{JOBID}_diffs", JOBID = JOBID)
     shell:
@@ -101,7 +101,7 @@ rule split_file:
 rule bin_feeder:
     input:
         #diffs = expand('inter/{JOBID}_diffs{PART}.csv', JOBID = JOBID, PART=part),
-        dyn_diffs = dynamic(expand("bins/{JOBID}_diffs{{PART}}.csv", JOBID=JOBID)),
+        #dyn_diffs = dynamic(expand("bins/{JOBID}_diffs{{PART}}.csv", JOBID=JOBID)),
         diffs = expand('inter/{JOBID}_diffs{PART}.csv', JOBID = JOBID, PART = part)
     output:
         all = expand("bins/{JOBID}_output_{PART}.csv", JOBID = JOBID, PART = part),
