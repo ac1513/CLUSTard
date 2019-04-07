@@ -32,9 +32,9 @@ rule bwa_mem:
         ref = REFIN,
         ref_ind = expand("{reference}.sa", reference=REFIN)
     output:
-        counts = 'inter/counts_{samples}.txt',
+        counts = expand('inter/counts_{samples}.txt', samples = samples.split(' '))
     params:
-        bam = 'bwa_out/{samples}.bam',
+        bam = expand('bwa_out/{samples}.bam', samples = samples.split(' '))
     threads: 16
     shell:
         """
