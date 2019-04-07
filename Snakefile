@@ -56,7 +56,8 @@ rule plot:
         "envs/plot2.yaml"
     shell:
         """
-        ls -S results/Cluster*.csv > {params.files}
+        ls -S results/Cluster*.fasta > {params.files}
+        sed -i "s/.fasta/.csv/g" {params.files}
         python scripts/plot.py {params.files} {JOBID}
         rm {params.files}
         """
