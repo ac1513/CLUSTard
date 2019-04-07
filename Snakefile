@@ -52,6 +52,8 @@ rule plot:
     params:
         files = "plot_in_files.txt",
         csv_loc = "results/"
+    conda:
+        "envs/plot2.yaml"
     shell:
         """
         ls -S results/Cluster*.csv > {params.files}
