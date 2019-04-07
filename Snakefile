@@ -51,13 +51,12 @@ rule plot:
     output:
         "plots/{JOBID}_all_plot.pdf"
     params:
-        files = "plot_in_files.txt",
-        csv_loc = "results/"
+        files = "plot_in_files.txt"
     conda:
         "envs/plot2.yaml"
     shell:
         """
         ls -S results/Cluster*.csv > {params.files}
-        python scripts/plot.py {params.files} {params.csv_loc}
+        python scripts/plot.py {params.files} {JOBID}
         rm {params.files}
         """
