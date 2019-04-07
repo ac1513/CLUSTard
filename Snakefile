@@ -15,8 +15,8 @@ rule all:
         expand('inter/{jobid}_read_counts_derived.csv', jobid= JOBID),
         expand('inter/{jobid}_values.csv', jobid = JOBID),
         expand('inter/{jobid}_diffs.csv', jobid = JOBID),
-        dynamic(expand('inter/{JOBID}_diffs{{PART}}.csv', JOBID = JOBID)),
-        "bins/output.00"
+        dynamic(expand("bins/{JOBID}_parallel_sets_{{PART}}.csv",
+        "bins/{JOBID}_parallel_merged.out"
 
 rule bwa_index:
     input:
@@ -96,7 +96,7 @@ rule split_file:
         split -d -l 10000 --additional-suffix=.csv {input.diffs} {params.diffs}
         """
 
-(job, part) = glob_wildcards('inter/{JOBID}_diffs{PART}.csv')
+#(job, part) = glob_wildcards('inter/{JOBID}_diffs{PART}.csv')
 
 rule bin_feeder:
     input:
@@ -104,7 +104,7 @@ rule bin_feeder:
         #dyn_diffs = dynamic(expand('inter/{JOBID}_diffs{{PART}}.csv', JOBID = JOBID)),
         diffs = expand('inter/{JOBID}_diffs{{PART}}.csv', JOBID = JOBID)
     output:
-        all = "bins/{JOBID}_output_{PART}.csv", PART = part),
+        all = "bins/{JOBID}_output_{PART}.csv",
     params:
         thresh = P_THRESH, #add this in as a variable at the top later..
         all_diffs = expand("inter/{JOBID}_diffs.csv", JOBID = JOBID)
@@ -130,3 +130,13 @@ rule para_sets:
         """
 
 rule para_merge:
+    input:
+        dynamic(expand("bins/{JOBID}_parallel_sets_{{PART}}.csv", JOBID=JOBID))
+    output:
+        "bins/{JOBID}_parallel_merged.out"
+    conda:
+        "envs/py3.yaml"
+    shell:
+        """
+        python scripts/parallel_merge_step2.py -i {input} -o {output}
+        """

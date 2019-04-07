@@ -9,53 +9,33 @@
 import sys, getopt
 import csv
 import json
+import argparse
 
 short_list = []
 nr_list = []
 final_list = []
 
-def inputter(argv):
-	in_file = ''
-	out_file = ''
-	file_number = 0
-	try:
-		opts, args = getopt.getopt(argv,"hi:o:n:",["ifile=","ofile=", "nfile="])
-	except getopt.GetoptError:
-		print('parallel_merge_step2.py -i <input_file_root> -o <output_file> -n <number_of_files')
-		sys.exit(2)
-	for opt, arg in opts:
-		if opt == '-h':
-			print('new_step2_parallel.py')
-			print('     compiles multiple cluster files into a single set')
-			print('     -i/--ifile     root name of input files (no number post-script)')
-			print('     -o/--ofile     output file name')
-			print('     -n/--num       number of files to be compiled')
-			sys.exit()
-		elif opt in ("-i", "--ifile"):
-			in_file = arg
-		elif opt in ("-o", "--ofile"):
-			out_file = arg
-		elif opt in ("-n", "--num"):
-			file_number = arg
-	return(in_file, out_file, file_number)
+parser = argparse.ArgumentParser(description='')
+parser.add_argument('-i', '--input-list', dest='input', nargs='+', default=[])
+parser.add_argument('-o', dest='output', help='location of output', type=str)
+args = parser.parse_args()
+list_files = args.input
+write_file = args.output
 
-variables = inputter(sys.argv[1:])
 read_file = variables[0]
 write_file = variables[1]
 number_files = int(variables[2])
 
 # open first file
-first_file = read_file+'.1'
+first_file = list_files[0]
 
 with open (first_file, 'r') as master:
 #	print('opening '+str(master))
 	master_list = json.load(master)
 
 # open sequential files and merge into the master list if they match
-for file_cycle in range(1,number_files):
-	current = read_file+'.'+str(file_cycle+1)
-	with open (current, 'r') as working_file:
-#		print('opening '+str(working_file))
+for current_f in list_files[1:]:
+	with open (current_f, 'r') as working_file:
 		working_list = json.load(working_file)
 		for row_1 in master_list:
 			x = set(row_1)
@@ -64,9 +44,7 @@ for file_cycle in range(1,number_files):
 #					print('match between master and '+str(working_file))
 					x.update(row_2)
 					working_list.remove(row_2)
-
-# add any sets left to the end of the master list
-	for entries in working_list:
+	for entries in working_list: # add any sets left to the end of the master list
 #		print('adding unmatched entries from '+str(working_file))
 		y = [list(set(entries))]
 		master_list.extend(y)
