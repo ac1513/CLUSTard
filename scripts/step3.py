@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # STEP 3 STARTS HERE:
 # make a non-redundant list from the sets
 # generated in step 2

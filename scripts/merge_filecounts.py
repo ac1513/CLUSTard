@@ -1,4 +1,6 @@
-# updated version using glob and other tricks to be pythonic rather than brutal
+#!/usr/bin/env python3
+
+updated version using glob and other tricks to be pythonic rather than brutal
 
 import os
 import glob

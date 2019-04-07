@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # make incoming file into a list
 # make a set from list that matches Pcc >= 0.997
 # then make a list of sets by exclusion instead of inclusion (I think)

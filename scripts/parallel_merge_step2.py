@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # 15/2/17 see if changing the logical flow of operations speeds things up
 # make incoming file into a list
 # make a set from list that matches Pcc >= 0.997

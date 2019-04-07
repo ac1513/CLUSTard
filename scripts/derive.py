@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # code to select a subset of the "csv" file generated
 # this works!
 # JC 23/06/16
