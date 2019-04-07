@@ -76,7 +76,7 @@ rule start_feeder:
         expand('inter/{JOBID}_read_counts_derived.csv', JOBID=JOBID)
     output:
         values = "inter/{JOBID}_values.csv",
-        diffs = "inter/{JOBID}_diffs.csv"
+        diffs = "inter/diffs.csv"
     conda:
         "envs/py3.yaml"
     shell:
@@ -104,7 +104,7 @@ rule bin_feeder:
         #dyn_diffs = dynamic(expand('inter/{JOBID}_diffs{{PART}}.csv', JOBID = JOBID)),
         diffs = expand('inter/{JOBID}_diffs{{PART}}.csv', JOBID = JOBID)
     output:
-        all = "bins/{JOBID}_output_{PART}.csv",
+        all = expand("bins/{JOBID}_output_{{PART}}.csv", JOBID = JOBID),
     params:
         thresh = P_THRESH, #add this in as a variable at the top later..
         all_diffs = expand("inter/{JOBID}_diffs.csv", JOBID = JOBID)
@@ -119,7 +119,7 @@ rule para_sets:
     input:
         bins = expand("bins/{JOBID}_output_{{PART}}.csv", JOBID = JOBID)
     output:
-        "bins/{JOBID}_parallel_sets_{PART}.csv"
+        expand("bins/{JOBID}_parallel_sets_{{PART}}.csv", JOBID = JOBID)
     params:
         thresh = P_THRESH
     conda:
