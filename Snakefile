@@ -112,7 +112,7 @@ rule bin_feeder:
         "envs/py3.yaml"
     shell:
         """
-        python scripts/bin_feeder.py {input.diffs} {params.all_diffs} {params.thresh} {output.top}
+        python scripts/bin_feeder.py {input.diffs} {params.all_diffs} {params.thresh} {output.all}
         """
 
 rule para_sets:
