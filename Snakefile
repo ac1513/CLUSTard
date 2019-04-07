@@ -29,7 +29,7 @@ rule test:
         echo "Done" > {output}
         """
 
-rule test:
+rule test2:
     input:
         para(expand("bins/{JOBID}_parallel_merged.out", JOBID = JOBID))
     output:
