@@ -4,6 +4,7 @@ RAW_SR = 'data/'
 REFIN = 'data/yw_polished_anvio.fasta'
 THRESH = '1000'
 P_THRESH = '0.99'
+krakendb = "/mnt/lustre/groups/biol-chong-2019/databases/krakendb/kraken2_samstudio8/"
 
 subworkflow bwa_split:
     snakefile:
@@ -17,7 +18,8 @@ rule all:
     input:
         "test.txt",
         expand("results/{JOBID}_summary_stats.txt", JOBID = JOBID),
-        expand("plots/{JOBID}_all_plot.pdf", JOBID = JOBID)
+        expand("kraken/{JOBID}_top_kraken.out", JOBID = JOBID),
+        expand("plots/1_{JOBID}_plot.pdf", JOBID = JOBID)
 
 rule test:
     input:
@@ -45,11 +47,39 @@ rule file_parser:
         echo "Sort output at somepoint" >> {output.results}
         """
 
+clusters = glob_wildcards("results/{clusters}.fasta")
+rule kraken:
+    input:
+        expand("results/{clusters}.fasta", clusters=clusters)
+    output:
+        "kraken/{clusters}_kraken.out"
+    threads:
+        4
+    params:
+        db = krakendb
+    conda:
+        "envs/kraken2.yaml"
+    shell:
+        """
+        kraken2 -db {params.db} --threads 4 --report {output} --output ${NAME}_kraken_names.out --use-names $FILE
+        """
+
+rule kraken_merge:
+    input: expand("kraken/{clusters}_kraken.out", clusters = clusters)
+    output: expand("kraken/{JOBID}_top_kraken.out", JOBID = JOBID)
+    params:
+        level = 'F'
+    shell:
+    """
+    find -name '*report.out' -type f -printf '\n%p\t' -exec sh -c 'echo {{}} | sort -k1nr {{}} | grep -P "\t{level}\t" | head -n1 ' \;
+    """
+
 rule plot:
     input:
-         expand("results/{JOBID}_summary_stats.txt", JOBID = JOBID)
+         expand("results/{JOBID}_summary_stats.txt", JOBID = JOBID),
+         expand("kraken/{JOBID}_top_kraken.out", JOBID = JOBID)
     output:
-        "plots/{JOBID}_all_plot.pdf"
+        "plots/1_{JOBID}_plot.pdf"
     params:
         files = "plot_in_files.txt"
     conda:
