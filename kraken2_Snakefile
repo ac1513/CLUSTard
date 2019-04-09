@@ -15,7 +15,7 @@ rule all:
 
 rule kraken:
     input:
-        expand("results/{clusters}.fasta", clusters=clusters
+        expand("results/{clusters}.fasta", clusters=clusters)
     output:
         "kraken/{clusters}_kraken.out"
     threads:
