@@ -6,12 +6,13 @@ THRESH = '1000'
 P_THRESH = '0.99'
 krakendb = "/mnt/lustre/groups/biol-chong-2019/databases/krakendb/kraken2_samstudio8/"
 
-CLUSTERS, = glob_wildcards("results/{CLUSTERS}.fasta")
+(CLUSTERS,) = glob_wildcards("results/{CLUSTER}.fasta")
 
 rule all:
     input:
         expand("kraken/{JOBID}_{CLUSTERS}_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS),
-        #expand("kraken/{JOBID}_top_kraken.out", JOBID = JOBID)
+
+#expand("kraken/{JOBID}_top_kraken.out", JOBID = JOBID)
 
 rule kraken:
     input:
