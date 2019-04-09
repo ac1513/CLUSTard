@@ -6,7 +6,7 @@ THRESH = '1000'
 P_THRESH = '0.99'
 krakendb = "/mnt/lustre/groups/biol-chong-2019/databases/krakendb/kraken2_samstudio8/"
 
-(CLUSTERS,) = glob_wildcards("results/{CLUSTER}.fasta")
+(CLUSTERS,) = glob_wildcards("results/{CLUSTER}.csv")
 
 rule all:
     input:
