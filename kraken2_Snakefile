@@ -26,14 +26,14 @@ rule kraken:
         "envs/kraken2.yaml"
     shell:
         """
-        kraken2 -db {params.db} --threads 4 --report {output} --output ${NAME}_kraken_names.out --use-names $FILE
+        kraken2 -db {params.db} --threads {threads} --report {output} --output ${NAME}_kraken_names.out --use-names $FILE
         """
 
 rule kraken_merge:
     input:
         "kraken/{clusters}_kraken.out"
     output:
-        expand("kraken/{JOBID}_top_kraken.out", JOBID = JOBID)
+        "kraken/{JOBID}_top_kraken.out"
     params:
         level = 'F'
     shell:
