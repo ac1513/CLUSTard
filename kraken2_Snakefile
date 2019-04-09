@@ -11,6 +11,7 @@ krakendb = "/mnt/lustre/groups/biol-chong-2019/databases/krakendb/kraken2_samstu
 rule all:
     input:
         expand("kraken/{JOBID}_{CLUSTERS}_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS),
+        "kraken/{JOBID}_top_kraken.out"
 
 #expand("kraken/{JOBID}_top_kraken.out", JOBID = JOBID)
 
