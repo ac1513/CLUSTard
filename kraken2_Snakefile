@@ -10,14 +10,15 @@ CLUSTERS, = glob_wildcards("results/{CLUSTERS}.fasta")
 
 rule all:
     input:
-        expand("kraken/{JOBID}_{clusters}_kraken.out", JOBID = JOBID, clusters = CLUSTERS),
+        expand("kraken/{JOBID}_{clusters}_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS),
         #expand("kraken/{JOBID}_top_kraken.out", JOBID = JOBID)
 
 rule kraken:
     input:
-        "results/{clusters}.fasta"
+        "results/{CLUSTERS}.fasta"
     output:
-        "kraken/{JOBID}_{clusters}_kraken.out"
+        report = "kraken/{JOBID}_{CLUSTERS}_report_kraken.out",
+        output = "kraken/{JOBID}_{CLUSTERS}_kraken.out",
     threads:
         4
     params:
@@ -26,7 +27,7 @@ rule kraken:
         "envs/kraken2.yaml"
     shell:
         """
-        kraken2 -db {params.db} --threads {threads} --report {output} --output ${NAME}_kraken_names.out --use-names $FILE
+        kraken2 -db {params.db} --threads {threads} --report {output.result} --output {output.output} --use-names {input}
         """
 
 #rule kraken_merge:
