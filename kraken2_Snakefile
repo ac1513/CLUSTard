@@ -33,7 +33,7 @@ rule kraken:
 
 rule kraken_merge:
     input:
-        report = "kraken/{JOBID}_{CLUSTERS}_report_kraken.out",
+        report = "kraken/" + JOBID + "_{CLUSTERS}_report_kraken.out"
     output:
         "kraken/{JOBID}_top_kraken.out"
     params:
