@@ -10,7 +10,7 @@ CLUSTERS, = glob_wildcards("results/{CLUSTERS}.fasta")
 
 rule all:
     input:
-        expand("kraken/{JOBID}_{clusters}_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS),
+        expand("kraken/{JOBID}_{CLUSTERS}_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS),
         #expand("kraken/{JOBID}_top_kraken.out", JOBID = JOBID)
 
 rule kraken:
