@@ -20,7 +20,6 @@ rule kraken:
     output:
         report = "kraken/{JOBID}_{CLUSTERS}_report_kraken.out",
         output = "kraken/{JOBID}_{CLUSTERS}_kraken.out",
-        txt = "kraken/test.txt"
     threads:
         4
     params:
@@ -30,17 +29,16 @@ rule kraken:
     shell:
         """
         kraken2 -db {params.db} --threads {threads} --report {output.result} --output {output.output} --use-names {input}
-        echo "test" > {output.txt}
         """
 
-#rule kraken_merge:
-#    input:
-#        "kraken/{clusters}_kraken.out"
-#    output:
-#        "kraken/{JOBID}_top_kraken.out"
-#    params:
-#        level = 'F'
-#    shell:
-#        """
-#        find -name 'kraken/*kraken.out' -type f -printf '\n%p\t' -exec sh -c 'echo {{}} | sort -k1nr {{}} | grep -P "\t{level}\t" | head -n1 ' \; > {output}
-#        """
+rule kraken_merge:
+    input:
+        report = "kraken/{JOBID}_{CLUSTERS}_report_kraken.out",
+    output:
+        "kraken/{JOBID}_top_kraken.out"
+    params:
+        level = 'F'
+    shell:
+        """
+        find -name 'kraken/*kraken.out' -type f -printf '\n%p\t' -exec sh -c 'echo {{}} | sort -k1nr {{}} | grep -P "\t{level}\t" | head -n1 ' \; > {output}
+        """

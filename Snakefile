@@ -53,7 +53,7 @@ rule file_parser:
 rule plot:
     input:
          file_out = expand("results/{JOBID}_summary_stats.txt", JOBID = JOBID),
-         kraken = kraken2(expand("kraken/test.txt", JOBID = JOBID))
+         kraken = kraken2(expand("kraken/{JOBID}_top_kraken.out", JOBID = JOBID))
     output:
         "plots/1_{JOBID}_plot.pdf"
     params:
