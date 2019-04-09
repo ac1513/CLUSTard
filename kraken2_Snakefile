@@ -15,7 +15,7 @@ rule all:
 
 rule kraken:
     input:
-        expand("results/{clusters}.fasta", clusters=clusters)
+        "results/{clusters}.fasta"
     output:
         "kraken/{clusters}_kraken.out"
     threads:
@@ -31,7 +31,7 @@ rule kraken:
 
 rule kraken_merge:
     input:
-        expand("kraken/{clusters}_kraken.out", clusters = clusters)
+        "kraken/{clusters}_kraken.out"
     output:
         expand("kraken/{JOBID}_top_kraken.out", JOBID = JOBID)
     params:
