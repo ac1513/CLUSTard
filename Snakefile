@@ -70,9 +70,9 @@ rule kraken_merge:
     params:
         level = 'F'
     shell:
-    """
-    find -name '*report.out' -type f -printf '\n%p\t' -exec sh -c 'echo {{}} | sort -k1nr {{}} | grep -P "\t{level}\t" | head -n1 ' \;
-    """
+        """
+        find -name '*report.out' -type f -printf '\n%p\t' -exec sh -c 'echo {{}} | sort -k1nr {{}} | grep -P "\t{level}\t" | head -n1 ' \;
+        """
 
 rule plot:
     input:
