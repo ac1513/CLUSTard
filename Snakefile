@@ -14,6 +14,10 @@ subworkflow para:
     snakefile:
         "para_Snakefile"
 
+subworkflow kraken2:
+    snakefile:
+        "kraken2_Snakefile"
+
 rule all:
     input:
         "test.txt",
@@ -47,37 +51,10 @@ rule file_parser:
         echo "Sort output at somepoint" >> {output.results}
         """
 
-clusters = glob_wildcards("results/{clusters}.fasta")
-rule kraken:
-    input:
-        expand("results/{clusters}.fasta", clusters=clusters)
-    output:
-        "kraken/{clusters}_kraken.out"
-    threads:
-        4
-    params:
-        db = krakendb
-    conda:
-        "envs/kraken2.yaml"
-    shell:
-        """
-        kraken2 -db {params.db} --threads 4 --report {output} --output ${NAME}_kraken_names.out --use-names $FILE
-        """
-
-rule kraken_merge:
-    input: expand("kraken/{clusters}_kraken.out", clusters = clusters)
-    output: expand("kraken/{JOBID}_top_kraken.out", JOBID = JOBID)
-    params:
-        level = 'F'
-    shell:
-        """
-        find -name '*report.out' -type f -printf '\n%p\t' -exec sh -c 'echo {{}} | sort -k1nr {{}} | grep -P "\t{level}\t" | head -n1 ' \;
-        """
-
 rule plot:
     input:
-         expand("results/{JOBID}_summary_stats.txt", JOBID = JOBID),
-         expand("kraken/{JOBID}_top_kraken.out", JOBID = JOBID)
+         file_out = expand("results/{JOBID}_summary_stats.txt", JOBID = JOBID),
+         kraken = kraken2(expand("kraken/{JOBID}_top_kraken.out", JOBID = JOBID))
     output:
         "plots/1_{JOBID}_plot.pdf"
     params:
