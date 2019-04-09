@@ -22,7 +22,6 @@ rule all:
     input:
         "test.txt",
         expand("results/{JOBID}_summary_stats.txt", JOBID = JOBID),
-        expand("kraken/{JOBID}_top_kraken.out", JOBID = JOBID),
         expand("plots/1_{JOBID}_plot.pdf", JOBID = JOBID)
 
 rule test:
