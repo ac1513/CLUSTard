@@ -11,7 +11,7 @@ CLUSTERS, = glob_wildcards("results/{CLUSTERS}.fasta")
 rule all:
     input:
         expand("kraken/{clusters}_kraken.out", clusters = CLUSTERS),
-        expand("kraken/{JOBID}_top_kraken.out", JOBID = JOBID)
+        #expand("kraken/{JOBID}_top_kraken.out", JOBID = JOBID)
 
 rule kraken:
     input:
@@ -29,14 +29,14 @@ rule kraken:
         kraken2 -db {params.db} --threads {threads} --report {output} --output ${NAME}_kraken_names.out --use-names $FILE
         """
 
-rule kraken_merge:
-    input:
-        "kraken/{clusters}_kraken.out"
-    output:
-        "kraken/{JOBID}_top_kraken.out"
-    params:
-        level = 'F'
-    shell:
-        """
-        find -name 'kraken/*kraken.out' -type f -printf '\n%p\t' -exec sh -c 'echo {{}} | sort -k1nr {{}} | grep -P "\t{level}\t" | head -n1 ' \; > {output}
-        """
+#rule kraken_merge:
+#    input:
+#        "kraken/{clusters}_kraken.out"
+#    output:
+#        "kraken/{JOBID}_top_kraken.out"
+#    params:
+#        level = 'F'
+#    shell:
+#        """
+#        find -name 'kraken/*kraken.out' -type f -printf '\n%p\t' -exec sh -c 'echo {{}} | sort -k1nr {{}} | grep -P "\t{level}\t" | head -n1 ' \; > {output}
+#        """
