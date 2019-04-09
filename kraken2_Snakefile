@@ -20,6 +20,7 @@ rule kraken:
     output:
         report = "kraken/{JOBID}_{CLUSTERS}_report_kraken.out",
         output = "kraken/{JOBID}_{CLUSTERS}_kraken.out",
+        txt = "kraken/test.txt"
     threads:
         4
     params:
@@ -29,6 +30,7 @@ rule kraken:
     shell:
         """
         kraken2 -db {params.db} --threads {threads} --report {output.result} --output {output.output} --use-names {input}
+        echo "test" > {output.txt}
         """
 
 #rule kraken_merge:
