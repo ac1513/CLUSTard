@@ -57,7 +57,7 @@ for i in range(0, len(files), 30):
             if kraken_file:
                 for line in open(kraken_file, 'r'):
                     if re.search(na, line):
-                        cont = line.split('\t')[-1]
+                        cont = line.split('\t')[-1].strip()
                         if './' in cont:
                             cont = ' '
                         else:             
