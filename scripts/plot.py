@@ -60,7 +60,8 @@ for i in range(0, len(files), 30):
                         cont = line.split('  ')[-1]
                         if './' in cont:
                             cont = ' '
-                        else:                         
+                        else:             
+                            print(line.split('  '))
                             per = line.split('  ')[3]
                             per = per.strip()
                         plt.text(5, 0.1, per+'%:  ' + cont, fontsize=3)
