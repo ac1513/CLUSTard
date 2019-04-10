@@ -37,7 +37,7 @@ rule kraken_merge:
     input:
         report = expand("kraken/{JOBID}_Cluster_{CLUSTERS}_report_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS)
     output:
-        "kraken/{JOBID}_top_kraken.out"
+        "kraken/{JOBID}_{kraken_level}_top_kraken.out"
     params:
         level = {kraken_level}
     shell:
