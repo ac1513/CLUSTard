@@ -63,7 +63,7 @@ for i in range(0, len(files), 30):
                         else:
                             per = line.split('\t')[1]
                             per = per.strip()
-                        plt.text(5, 0.1, per+'%:  ' + cont, fontsize=3)
+                        plt.text(5, 0.1, per+'%:  ' + cont, fontsize=3, wrap=True)
             plt.text(5, 0.4, na, fontsize = 3)
             plt.text(5, 0.0001, nu+' cov:'+av_cov+'+/-'+sd_cov, fontsize=3)
             plt.text(5, 0.00045, tot_len +'kb', fontsize=3)
