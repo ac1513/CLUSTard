@@ -5,7 +5,7 @@ REFIN = 'data/yw_polished_anvio.fasta'
 THRESH = '1000'
 P_THRESH = '0.99'
 krakendb = "/mnt/lustre/groups/biol-chong-2019/databases/krakendb/kraken2_samstudio8/"
-kraken_level = 'F'
+kraken_level = 'S'
 
 subworkflow bwa_split:
     snakefile:
