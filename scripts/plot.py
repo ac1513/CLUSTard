@@ -52,7 +52,7 @@ for i in range(0, len(files), 30):
                 axes1.plot(x_range, y_range)
             plt.semilogy(linewidth=0.25,mew=0.25)
             x1,x2,y1,y2 = plt.axis()
-            plt.axis((x1,x2+10,0.00001,1))
+            plt.axis((x1,x2,0.00001,1))
             plt.axhline(y=0.01, ls='--', lw = 0.5, c = 'black')
             if kraken_file:
                 for line in open(kraken_file, 'r'):
