@@ -6,21 +6,21 @@ THRESH = '1000'
 P_THRESH = '0.99'
 krakendb = "/mnt/lustre/groups/biol-chong-2019/databases/krakendb/kraken2_samstudio8/"
 
-(CLUSTERS,) = glob_wildcards("results/{CLUSTER}.csv")
+(CLUSTERS,) = glob_wildcards("results/Cluster_{CLUSTER}.csv")
 
 rule all:
     input:
-        expand("kraken/{JOBID}_{CLUSTERS}_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS),
+        expand("kraken/{JOBID}_Cluster_{CLUSTERS}_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS),
         "kraken/{JOBID}_top_kraken.out"
 
 #expand("kraken/{JOBID}_top_kraken.out", JOBID = JOBID)
 
 rule kraken:
     input:
-        "results/{CLUSTERS}.fasta"
+        "results/Cluster_{CLUSTERS}.fasta"
     output:
-        report = "kraken/{JOBID}_{CLUSTERS}_report_kraken.out",
-        output = "kraken/{JOBID}_{CLUSTERS}_kraken.out",
+        report = "kraken/{JOBID}_Cluster_{CLUSTERS}_report_kraken.out",
+        output = "kraken/{JOBID}_Cluster_{CLUSTERS}_kraken.out",
     threads:
         4
     params:
@@ -34,7 +34,7 @@ rule kraken:
 
 rule kraken_merge:
     input:
-        report = expand("kraken/{JOBID}_{CLUSTERS}_report_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS)
+        report = expand("kraken/{JOBID}_Cluster_{CLUSTERS}_report_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS)
     output:
         "kraken/{JOBID}_top_kraken.out"
     params:
