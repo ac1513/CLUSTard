@@ -58,7 +58,7 @@ for i in range(0, len(files), 30):
                 for line in open(kraken_file, 'r'):
                     if re.search(na, line):
                         cont = line.split(' ')[-1]
-                        plt.text(5, 0.25, cont, fontsize=3)
+                        plt.text(5, 0.1, cont, fontsize=3)
             plt.text(5, 0.4, na, fontsize = 3)
             plt.text(5, 0.0001, nu+' cov:'+av_cov+'+/-'+sd_cov, fontsize=3)
             plt.text(5, 0.00045, tot_len +'kb', fontsize=3)
