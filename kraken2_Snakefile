@@ -12,7 +12,7 @@ kraken_level = 'S'
 rule all:
     input:
         expand("kraken/{JOBID}_Cluster_{CLUSTERS}_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS),
-        "kraken/{JOBID}_top_kraken.out"
+        expand("kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
 
 #expand("kraken/{JOBID}_top_kraken.out", JOBID = JOBID)
 
