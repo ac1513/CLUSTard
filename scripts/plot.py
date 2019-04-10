@@ -60,7 +60,10 @@ for i in range(0, len(files), 30):
                         cont = line.split('  ')[-1]
                         if './' in cont:
                             cont = ' '
-                        plt.text(5, 0.1, cont, fontsize=3)
+                        else:                         
+                            per = line.split('  ')[3]
+                            per = per.strip()
+                        plt.text(5, 0.1, per+'%:  ' + cont, fontsize=3)
             plt.text(5, 0.4, na, fontsize = 3)
             plt.text(5, 0.0001, nu+' cov:'+av_cov+'+/-'+sd_cov, fontsize=3)
             plt.text(5, 0.00045, tot_len +'kb', fontsize=3)
