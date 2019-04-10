@@ -5,6 +5,7 @@ REFIN = 'data/yw_polished_anvio.fasta'
 THRESH = '1000'
 P_THRESH = '0.99'
 krakendb = "/mnt/lustre/groups/biol-chong-2019/databases/krakendb/kraken2_samstudio8/"
+kraken_level = 'F'
 
 subworkflow bwa_split:
     snakefile:
@@ -53,7 +54,7 @@ rule file_parser:
 rule plot:
     input:
          file_out = expand("results/{JOBID}_summary_stats.txt", JOBID = JOBID),
-         kraken = kraken2(expand("kraken/{JOBID}_top_kraken.out", JOBID = JOBID))
+         kraken = kraken2(expand("kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level))
     output:
         "plots/1_{JOBID}_plot.pdf"
     params:

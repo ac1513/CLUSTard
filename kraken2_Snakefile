@@ -5,6 +5,7 @@ REFIN = 'data/yw_polished_anvio.fasta'
 THRESH = '1000'
 P_THRESH = '0.99'
 krakendb = "/mnt/lustre/groups/biol-chong-2019/databases/krakendb/kraken2_samstudio8/"
+kraken_level = 'F'
 
 (CLUSTERS,) = glob_wildcards("results/Cluster_{CLUSTER}.csv")
 
@@ -38,7 +39,7 @@ rule kraken_merge:
     output:
         "kraken/{JOBID}_top_kraken.out"
     params:
-        level = 'F'
+        level = {kraken_level}
     shell:
         """
         cd kraken
