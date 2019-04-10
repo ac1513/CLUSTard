@@ -15,8 +15,6 @@ rule all:
 
 rule bin_feeder:
     input:
-        #diffs = expand('inter/{JOBID}_diffs{PART}.csv', JOBID = JOBID, PART=part),
-        #dyn_diffs = dynamic(expand("bins/{JOBID}_diffs{{PART}}.csv", JOBID=JOBID)),
         diffs = 'inter/' + JOBID + '_diffs{PART}.csv'
     output:
         all = "bins/" + JOBID + "_output_{PART}.csv",
