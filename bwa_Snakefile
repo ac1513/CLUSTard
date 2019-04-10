@@ -41,7 +41,7 @@ rule bwa_mem:
         module load bio/BWA
         module load bio/SAMtools
         mkdir -p bwa_out
-        bwa mem -M -t {threads} {input.ref} {input.fq1} {input.fq2} | samtools view -bhS - | samtools sort -o {params.bam}
+        bwa mem -M -t {threads} {input.ref} {input.fq1} {input.fq2} | samtools view -buS - | samtools sort -o {params.bam}
         samtools index {params.bam}
         samtools idxstats {params.bam} > {output.counts}
         """
