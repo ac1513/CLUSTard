@@ -64,6 +64,6 @@ rule plot:
         """
         ls -S results/Cluster*.fasta > {params.files}
         sed -i "s/.fasta/.csv/g" {params.files}
-        python scripts/plot.py {params.files} {JOBID}
+        python scripts/plot.py {params.files} {JOBID} -k {input.kraken}
         rm {params.files}
         """

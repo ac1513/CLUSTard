@@ -9,15 +9,21 @@ import matplotlib.gridspec as gsp
 import matplotlib.pyplot as plt
 import pandas as pd
 import argparse
+import re
 
 
 parser = argparse.ArgumentParser(description='usage = python entrez_down.py file_list_of_queries')
 parser.add_argument('in_file', help='the name of the file containing a list of csv files', type=str)
 parser.add_argument('prefix', help='prefix of the jobs', type=str)
+parser.add_argument('-k', '--kraken', help = 'merged kraken input file', type=str)
 args = parser.parse_args()
 in_file = args.in_file
 prefix = args.prefix
 
+if args.kraken:
+    kraken_file = args.kraken
+else:
+    print("Add a merged kraken input file if you want taxonomy info on the plot")
 
 with open(in_file, 'r') as text_file:
     files = text_file.read().strip().split()
@@ -48,6 +54,11 @@ for i in range(0, len(files), 30):
             x1,x2,y1,y2 = plt.axis()
             plt.axis((x1,x2+10,0.00001,1))
             plt.axhline(y=0.01, ls='--', lw = 0.5, c = 'black')
+            if kraken_file:
+                for line in open(kraken_file, 'r'):
+                    if re.search(na, line):
+                        cont = line.split(' ')[-1]
+                        plt.text(5, 0.25, cont, fontsize=3)
             plt.text(5, 0.4, na, fontsize = 3)
             plt.text(5, 0.0001, nu+' cov:'+av_cov+'+/-'+sd_cov, fontsize=3)
             plt.text(5, 0.00045, tot_len +'kb', fontsize=3)
