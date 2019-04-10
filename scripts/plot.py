@@ -57,12 +57,12 @@ for i in range(0, len(files), 30):
             if kraken_file:
                 for line in open(kraken_file, 'r'):
                     if re.search(na, line):
-                        cont = line.split('  ')[-1]
+                        cont = line.split('\t')[-1]
                         if './' in cont:
                             cont = ' '
                         else:             
-                            print(line.split('  '))
-                            per = line.split('  ')[3]
+                            print(line.split('\t'))
+                            per = line.split('\t')[1]
                             per = per.strip()
                         plt.text(5, 0.1, per+'%:  ' + cont, fontsize=3)
             plt.text(5, 0.4, na, fontsize = 3)
