@@ -1,8 +1,7 @@
 configfile: "scripts/config.yaml"
 
-sample_file = config["sample_file"]
-
-samples = read_table(sample_file)['sample']
+import pandas as pd
+samples = pd.read_table(config["samples"])
 
 subworkflow bwa_split:
     snakefile:
