@@ -1,7 +1,7 @@
 configfile: "config.yaml"
 
 import pandas as pd
-df_samples = pd.read_csv(config["samples"])
+df_samples = pd.read_csv(config["samples"], sep ='\t', index_col = 0)
 samples = df_samples["sample"].to_list()
 
 JOBID = config["jobid"]
