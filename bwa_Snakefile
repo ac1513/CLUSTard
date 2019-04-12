@@ -40,7 +40,7 @@ rule bwa_mem:
 
 rule merge_filecounts:
     input:
-        test = expand('inter/counts_{SAMPLES}.txt', SAMPLES = samples.split(' '))
+        test = expand('inter/counts_{SAMPLES}.txt', SAMPLES = samples)
     output:
         txt = 'inter/{JOBID}_read_counts.out'
     conda:
