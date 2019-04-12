@@ -1,0 +1,8 @@
+JOBID: 'NAB_all'
+sample_file: 'samples.tsv'
+RAW_SR: 'data/'
+REFIN: 'data/yw_polished_anvio.fasta'
+CONTIG_T: '1000'
+P_THRESH: '0.99'
+krakendb: "/mnt/lustre/groups/biol-chong-2019/databases/krakendb/kraken2_samstudio8/"
+kraken_level: 'F'
