@@ -1,7 +1,7 @@
 configfile: "config.yaml"
 
 import pandas as pd
-samples = pd.read_csv(config["samples"]).to_list()
+samples = pd.read_csv(config["samples"])["sample"]
 
 JOBID = config["jobid"]
 RAW_SR = config["RAW_SR"]
