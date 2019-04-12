@@ -1,4 +1,4 @@
-JOBID: NAB_all
+jobid: NAB_all
 samples: samples.tsv
 RAW_SR: data/
 REFIN: data/yw_polished_anvio.fasta

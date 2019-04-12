@@ -3,17 +3,16 @@ configfile: "config.yaml"
 import pandas as pd
 samples = pd.read_csv(config["samples"])
 
+JOBID = config["jobid"]
+
 subworkflow bwa_split:
     snakefile:
         "bwa_Snakefile"
-    configfile:
-        "config.yaml"
 
 subworkflow para:
     snakefile:
         "para_Snakefile"
-    configfile:
-        "config.yaml"
+
 
 subworkflow kraken2:
     snakefile:
