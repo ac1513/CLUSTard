@@ -1,19 +1,25 @@
 configfile: "config.yaml"
 
 import pandas as pd
-samples = pd.read_table(config["samples"])
+samples = pd.read_csv(config["samples"])
 
 subworkflow bwa_split:
     snakefile:
         "bwa_Snakefile"
+    configfile:
+        "config.yaml"
 
 subworkflow para:
     snakefile:
         "para_Snakefile"
+    configfile:
+        "config.yaml"
 
 subworkflow kraken2:
     snakefile:
         "kraken2_Snakefile"
+    configfile:
+        "config.yaml"
 
 rule all:
     input:
