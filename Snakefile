@@ -1,4 +1,4 @@
-configfile: "scripts/config.yaml"
+configfile: "config.yaml"
 
 import pandas as pd
 samples = pd.read_table(config["samples"])
