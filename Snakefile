@@ -4,6 +4,12 @@ import pandas as pd
 samples = pd.read_csv(config["samples"])
 
 JOBID = config["jobid"]
+RAW_SR = config["RAW_SR"]
+REFIN: config["REFIN"]
+CONTIG_T: config["CONTIG_T"]
+P_THRESH: config["P_THRESH"]
+krakendb: config["krakendb"]
+kraken_level: config["kraken_level"]
 
 subworkflow bwa_split:
     snakefile:
