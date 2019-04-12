@@ -1,5 +1,5 @@
 JOBID: 'NAB_all'
-sample_file: 'samples.tsv'
+samples: 'samples.tsv'
 RAW_SR: 'data/'
 REFIN: 'data/yw_polished_anvio.fasta'
 CONTIG_T: '1000'
