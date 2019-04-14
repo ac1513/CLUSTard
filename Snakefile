@@ -20,12 +20,10 @@ subworkflow para:
     snakefile:
         "para_Snakefile"
 
-
 subworkflow kraken2:
     snakefile:
         "kraken2_Snakefile"
-    configfile:
-        "config.yaml"
+
 
 rule all:
     input:
@@ -35,7 +33,7 @@ rule all:
 
 rule test:
     input:
-        bwa_split(expand("inter/{JOBID}_output.txt", JOBID = JOBID))
+        bwa_split(expand("inter/{JOBID}_bwa_output.txt", JOBID = JOBID))
     output:
         "test.txt"
     shell:
