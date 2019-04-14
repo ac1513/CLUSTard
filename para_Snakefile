@@ -63,7 +63,7 @@ rule non_red_step:
     conda:
       "envs/py3.yaml"
     benchmark:
-        "benchmarks/{JOBID}_non_red.tsv"
+      "benchmarks/{JOBID}_non_red.tsv"
     shell:
       """
       python scripts/step3.py {input} {output}
