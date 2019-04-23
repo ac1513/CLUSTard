@@ -15,7 +15,7 @@ rule bin_feeder:
         thresh = P_THRESH, #add this in as a variable at the top later..
         all_diffs = expand("inter/{JOBID}_diffs.csv", JOBID = JOBID)
     benchmark:
-        "benchmarks/{JOBID}_bin_feeder.tsv"
+        "benchmarks/bin_feeder.tsv"
     conda:
         "envs/py3.yaml"
     shell:
@@ -31,7 +31,7 @@ rule para_sets:
     params:
         thresh = P_THRESH
     benchmark:
-        "benchmarks/{JOBID}_para_sets.tsv"
+        "benchmarks/para_sets.tsv"
     conda:
         "envs/py3.yaml"
     shell:
@@ -49,7 +49,7 @@ rule para_merge:
     conda:
         "envs/py3.yaml"
     benchmark:
-        "benchmarks/{JOBID}_para_merge.tsv"
+        "benchmarks/para_merge.tsv"
     shell:
         """
         python scripts/parallel_merge_step2.py -i {input} -o {output}
@@ -63,7 +63,7 @@ rule non_red_step:
     conda:
       "envs/py3.yaml"
     benchmark:
-      "benchmarks/{JOBID}_non_red.tsv"
+      "benchmarks/non_red.tsv"
     shell:
       """
       python scripts/step3.py {input} {output}
