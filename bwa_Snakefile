@@ -4,7 +4,7 @@ import pandas as pd
 df_samples = pd.read_csv(config["samples"], sep ='\t', index_col = 0)
 samples = df_samples["sample"].to_list()
 
-JOBID = config["jobid"]
+JOBID = str(config["jobid"])
 RAW_SR = config["RAW_SR"]
 REFIN = config["REFIN"]
 CONTIG_T = config["CONTIG_T"]
