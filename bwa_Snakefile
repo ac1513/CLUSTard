@@ -28,7 +28,7 @@ rule bwa_index:
     output:
         '{REFIN}.sa'
     benchmark:
-        "benckmarks/{JOBID}_bwa_in.tsv"
+        expand("benckmarks/{JOBID}_bwa_in.tsv", JOBID=JOBID)
     shell:
         'bwa index {input.ref}'
 
