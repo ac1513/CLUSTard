@@ -28,7 +28,7 @@ rule bwa_index:
     output:
         '{REFIN}.sa'
     benchmark:
-        expand("benckmarks/{JOBID}_bwa_in.tsv", JOBID=JOBID)
+        "benckmarks/bwa_in.tsv"
     shell:
         'bwa index {input.ref}'
 
@@ -42,8 +42,8 @@ rule bwa_mem:
         counts = 'inter/counts_{samples}.txt'
     params:
         bam = 'bwa_out/{samples}.bam'
-#    benchmark:
-#        expand("benckmarks/{JOBID}_bwa.tsv", JOBID=JOBID)
+    benchmark:
+        "benckmarks/bwa.tsv"
     threads: 16
     shell:
         """
@@ -62,8 +62,8 @@ rule merge_filecounts:
         txt = 'inter/{JOBID}_read_counts.out'
     conda:
         "envs/py3.yaml"
-#    benchmark:
-#        expand("benchmarks/{JOBID}_merge_files.tsv", JOBID=JOBID)
+    benchmark:
+        "benchmarks/merge_files.tsv"
     shell:
         """
         python scripts/merge_filecounts.py inter {JOBID}
@@ -76,8 +76,8 @@ rule derive:
         csv = "inter/{JOBID}_read_counts_derived.csv"
     params:
         thresh = CONTIG_T
-#    benchmark:
-#        expand("benchmarks/{JOBID}_derive.tsv", JOBID=JOBID)
+    benchmark:
+        "benchmarks/derive.tsv"
     conda:
         "envs/py3.yaml"
     shell:
@@ -93,8 +93,8 @@ rule start_feeder:
         diffs = "inter/{JOBID}_diffs.csv"
     conda:
         "envs/py3.yaml"
-#    benchmark:
-#        expand("benchmarks/{JOBID}_start_feeder.tsv", JOBID = JOBID)
+    benchmark:
+        "benchmarks/start_feeder.tsv"
     shell:
         """
         python scripts/start_feeder.py inter {JOBID}
