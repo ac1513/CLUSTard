@@ -25,7 +25,7 @@ rule kraken:
         "results/Cluster_{CLUSTERS}.fasta"
     output:
         report = "kraken/{JOBID}_Cluster_{CLUSTERS}_report_kraken.out",
-        output = "kraken/{JOBID}_Cluster_{CLUSTERS}_kraken.out",
+        output = "kraken/{JOBID}_Cluster_{CLUSTERS}_kraken.out"
     threads:
         4
     params:
@@ -37,15 +37,15 @@ rule kraken:
         kraken2 -db {params.db} --threads {threads} --report {output.report} --output {output.output} --use-names {input}
         """
 
-rule kraken_merge:
-    input:
-        report = expand("kraken/{JOBID}_Cluster_{CLUSTERS}_report_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS)
-    output:
-        "kraken/{JOBID}_{kraken_level}_top_kraken.out"
-    params:
-        level = {kraken_level}
-    shell:
-        """
-        cd kraken
-        find -name '{JOBID}*_report_kraken.out' -type f -printf '\\n%p\\t' -exec sh -c 'echo {{}} | sort -k1nr {{}} | grep -P "\\t{params.level}\\t" | head -n1 ' \\; > {JOBID}_{kraken_level}_top_kraken.out
-        """
+#rule kraken_merge:
+#    input:
+#        report = expand("kraken/{JOBID}_Cluster_{CLUSTERS}_report_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS)
+#    output:
+#        "kraken/{JOBID}_{kraken_level}_top_kraken.out"
+#    params:
+#        level = {kraken_level}
+#    shell:
+#        """
+#        cd kraken
+#        find -name '{JOBID}*_report_kraken.out' -type f -printf '\\n%p\\t' -exec sh -c 'echo {{}} | sort -k1nr {{}} | grep -P "\\t{params.level}\\t" | head -n1 ' \\; > {JOBID}_{kraken_level}_top_kraken.out
+#        """
