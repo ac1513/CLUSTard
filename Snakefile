@@ -54,7 +54,7 @@ rule file_parser:
     shell:
         """
         mkdir -p {params.wd}
-        python scripts/file_parser.py {params.contigs} {params.csv} {input.clusters} {params.wd} {output.results} -l {params.header}
+        python scripts/file_parser.py {params.contigs} {params.csv} {input.clusters} {params.wd} {output} -l {params.header}
         """
 
 rule plot:
