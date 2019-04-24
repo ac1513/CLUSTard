@@ -34,6 +34,7 @@ rule kraken:
         "envs/kraken2.yaml"
     shell:
         """
+        echo {params.db} {threads} {input}
         kraken2 -db {params.db} --threads {threads} --report {output.report} --output {output.output} --use-names {input}
         """
 
