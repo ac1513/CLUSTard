@@ -48,6 +48,5 @@ rule kraken_merge:
     shell:
         """
         cd kraken
-        echo {params.level}
         find -name '{JOBID}*_report_kraken.out' -type f -printf '\\n%p\\t' -exec sh -c 'echo {{}} | sort -k1nr {{}} | grep -P "\\t{params.level}\\t" | head -n1 ' \\; > {JOBID}_{kraken_level}_top_kraken.out
         """
