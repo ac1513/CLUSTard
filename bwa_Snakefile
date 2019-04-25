@@ -44,7 +44,7 @@ rule bwa_mem:
     params:
         bam = 'bwa_out/{samples}.bam'
     benchmark:
-        "benckmarks/bwa.tsv"
+        "benchmarks/bwa.tsv"
     threads: 16
     shell:
         """
