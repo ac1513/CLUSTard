@@ -21,7 +21,7 @@ rule all:
         expand('output/clustering/{jobid}_read_counts_derived.csv', jobid= JOBID),
         expand('output/clustering/{jobid}_values.csv', jobid = JOBID),
         expand('output/clustering/{jobid}_diffs.csv', jobid = JOBID),
-        expand("output/clustering/{JOBID}_output.txt", JOBID = JOBID),
+        expand("output/clustering/{JOBID}_bwa_output.txt", JOBID = JOBID),
 
 rule bwa_index:
     input:
