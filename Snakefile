@@ -12,21 +12,49 @@ P_THRESH = config["P_THRESH"]
 krakendb = config["krakendb"]
 kraken_level = config["kraken_level"]
 
+subworkflow bwa_split:
+    snakefile:
+        "bwa_Snakefile"
 
-include: "bwa_Snakefile"
+subworkflow para:
+    snakefile:
+        "para_Snakefile"
 
-include: "para_Snakefile"
+subworkflow kraken2:
+    snakefile:
+        "kraken2_Snakefile"
 
-include: "kraken2_Snakefile"
 
 rule all:
     input:
+        "test.txt",
+        expand("results/{JOBID}_summary_stats.txt", JOBID = JOBID),
         expand("plots/1_{JOBID}_plot.pdf", JOBID = JOBID)
+
+rule test:
+    input:
+        bwa_split(expand("inter/{JOBID}_bwa_output.txt", JOBID = JOBID))
+    output:
+        "test.txt"
+    shell:
+        """
+        echo "Done BWA" > {output}
+        """
+
+rule file_parser:
+    input:
+        clusters = para(expand("results/{JOBID}_summary_stats.txt", JOBID = JOBID))
+    output:
+        "results/{JOBID}_summary_stats.txt"
+    shell:
+        """
+        echo "Done" >> {output}
+        """
 
 rule plot:
     input:
          file_out = expand("results/{JOBID}_summary_stats.txt", JOBID = JOBID),
-         kraken = (expand("kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level))
+         kraken = kraken2(expand("kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level))
     output:
         "plots/1_{JOBID}_plot.pdf"
     params:
