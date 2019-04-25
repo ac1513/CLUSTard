@@ -1,25 +1,4 @@
-configfile: "config.yaml"
-
-import pandas as pd
-df_samples = pd.read_csv(config["samples"], sep ='\t', index_col = 0)
-samples = df_samples["sample"].to_list()
-
-JOBID = config["jobid"]
-RAW_SR = config["RAW_SR"]
-REFIN = config["REFIN"]
-CONTIG_T = config["CONTIG_T"]
-P_THRESH = config["P_THRESH"]
-krakendb = config["krakendb"]
-kraken_level = config["kraken_level"]
-
-
 (job, part) = glob_wildcards('inter/{JOBID}_diffs{PART}.csv')
-
-rule all:
-    input:
-      expand("bins/{JOBID}_output_{PART}.csv", JOBID = JOBID, PART = part),
-      expand("bins/{JOBID}_parallel_sets_{PART}.csv", JOBID = JOBID, PART = part),
-      expand("bins/{JOBID}_parallel_merged.out", JOBID = JOBID)
 
 rule bin_feeder:
     input:

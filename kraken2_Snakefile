@@ -1,23 +1,4 @@
-configfile: "config.yaml"
-
-import pandas as pd
-df_samples = pd.read_csv(config["samples"], sep ='\t', index_col = 0)
-samples = df_samples["sample"].to_list()
-
-JOBID = config["jobid"]
-RAW_SR = config["RAW_SR"]
-REFIN = config["REFIN"]
-CONTIG_T = config["CONTIG_T"]
-P_THRESH = config["P_THRESH"]
-krakendb = config["krakendb"]
-kraken_level = config["kraken_level"]
-
 (CLUSTERS,) = glob_wildcards("results/Cluster_{CLUSTER}.csv")
-
-rule all:
-    input:
-        expand("kraken/{JOBID}_Cluster_{CLUSTERS}_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS),
-        expand("kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
 
 rule kraken:
     input:
