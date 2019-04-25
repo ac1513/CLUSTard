@@ -10,7 +10,7 @@ REFIN = config["REFIN"]
 CONTIG_T = config["CONTIG_T"]
 P_THRESH = config["P_THRESH"]
 krakendb = config["krakendb"]
-kraken_level = config["kraken_level"]
+kraken_level = str(config["kraken_level"])
 
 (CLUSTERS,) = glob_wildcards("results/Cluster_{CLUSTER}.csv")
 
