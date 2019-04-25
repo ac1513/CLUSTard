@@ -83,3 +83,20 @@ rule non_red_step:
       """
       python scripts/step3.py {input} {output}
       """
+
+rule file_parser:
+    input:
+        expand("bins/{JOBID}_non_red_list.out", JOBID = JOBID)
+    output:
+        "results/{JOBID}_summary_stats.txt"
+    params:
+        contigs = REFIN,
+        csv = expand("inter/{JOBID}_read_counts_derived.csv", JOBID = JOBID),
+        wd = "results/",
+        header = samples
+    shell:
+        """
+        mkdir -p {params.wd}
+        python scripts/file_parser.py {params.contigs} {params.csv} {input} {params.wd} {output} -l {params.header}
+        echo "Done" > {output}
+        """
