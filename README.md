@@ -2,9 +2,9 @@
 
 ## How to run
 1. Install snakemake into conda environment
-2. git clone **
+2. git clone https://github.com/ac1513/CLUSTard.git
 3. Create data directory (containing samples [names ending in \_R1.fastq.gz or \_R2.fastq.gz] and assembled reference)
 4. Put sample prefixes into samples.tsv  (samples column) in the order that you want the final plot to be
-5. Edit config.yaml file 
+5. Edit config.yaml file
 6. Run using ``snakemake --use-conda --cluster "sbatch -t 48:00:00 --mem-per-cpu=64G" -j 6000``
 * (Add --config then e.g. jobid=test to change config without having to edit the whole file - esp useful with the jobid and the kraken_level steps.)
