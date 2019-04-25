@@ -29,7 +29,7 @@ parser.add_argument('loc', help='location count files are in', type=str)
 parser.add_argument('jobid', help='location count files are in', type=str)
 parser.add_argument('thresh', help='location count files are in', type=int)
 args = parser.parse_args()
-loc = args.loc
+loc = str("output/" + args.loc)
 jobid = args.jobid
 thresh = args.thresh
 

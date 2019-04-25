@@ -27,34 +27,36 @@ subworkflow kraken2:
 
 rule all:
     input:
-        "test.txt",
+        expand("logs/{JOBID}_all_bwa_output.txt", JOBID=JOBID)
         expand("results/{JOBID}_summary_stats.txt", JOBID = JOBID),
         expand("plots/1_{JOBID}_{kraken_level}_plot.pdf", JOBID = JOBID, kraken_level = kraken_level)
 
 rule test:
     input:
-        bwa_split(expand("inter/{JOBID}_bwa_output.txt", JOBID = JOBID))
+        bwa_split(expand("output/clustering/{JOBID}_bwa_output.txt", JOBID = JOBID))
     output:
-        "test.txt"
+        "logs/{JOBID}_all_bwa_output.txt"
     shell:
         """
-        echo "Done BWA" > {output}
+        more *.out > {output} 2> /dev/null
+        rm *.out
         """
 
 rule para_out:
     input:
-        clusters = para(expand("results/{JOBID}_summary_stats.txt", JOBID = JOBID))
+        clusters = para(expand("logs/{JOBID}_para_done.txt", JOBID = JOBID))
     output:
-        "results/{JOBID}_summary_stats.txt"
+        "logs/{JOBID}_para_out.txt"
     shell:
         """
-        echo "Done" >> {output}
+        more *.out > {output} 2> /dev/null
+        rm *.out
         """
 
 rule plot:
     input:
-         file_out = expand("results/{JOBID}_summary_stats.txt", JOBID = JOBID),
-         kraken = kraken2(expand("kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level))
+         file_out = expand("logs/{JOBID}_para_out.txt", JOBID = JOBID),
+         kraken = kraken2(expand("output/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level))
     output:
         "plots/1_{JOBID}_{kraken_level}_plot.pdf"
     params:
@@ -63,7 +65,7 @@ rule plot:
         "envs/plot2.yaml"
     shell:
         """
-        ls -S results/Cluster*.fasta > {params.files}
+        ls -S output/results/Cluster*.fasta > {params.files}
         sed -i "s/.fasta/.csv/g" {params.files}
         python scripts/plot.py {params.files} {JOBID} -k {input.kraken} -k_l {kraken_level}
         rm {params.files}

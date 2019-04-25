@@ -23,14 +23,12 @@ parser.add_argument('contigs', help='the files', type=str)
 parser.add_argument('csv', help='read_counts_derived', type=str)
 parser.add_argument('clusters', help='output from step3', type=str)
 parser.add_argument('output', help='output directory', type=str)
-parser.add_argument('stats', help='stats file', type=str)
 parser.add_argument('-l', '--header-list', dest='header', nargs='+', default=[])
 args = parser.parse_args()
 contig_file = args.contigs
 csv_file = args.csv
 cluster_file = args.clusters
-wd = args.output
-stats_file = args.stats # this is never used??
+wd = str("output/" + args.output)
 header = args.header
 
 #add context to header columns

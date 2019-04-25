@@ -13,23 +13,23 @@ krakendb = config["krakendb"]
 kraken_level = config["kraken_level"]
 
 
-(job, part) = glob_wildcards('inter/{JOBID}_diffs{PART}.csv')
+(job, part) = glob_wildcards('output/clustering/{JOBID}_diffs{PART}.csv')
 
 rule all:
     input:
-      expand("bins/{JOBID}_output_{PART}.csv", JOBID = JOBID, PART = part),
-      expand("bins/{JOBID}_parallel_sets_{PART}.csv", JOBID = JOBID, PART = part),
-      expand("bins/{JOBID}_parallel_merged.out", JOBID = JOBID),
+      expand("output/clustering/{JOBID}_output_{PART}.csv", JOBID = JOBID, PART = part),
+      expand("output/clustering/{JOBID}_parallel_sets_{PART}.csv", JOBID = JOBID, PART = part),
+      expand("output/clustering/{JOBID}_parallel_merged.out", JOBID = JOBID),
       expand("results/{JOBID}_summary_stats.txt", JOBID=JOBID)
 
 rule bin_feeder:
     input:
-        diffs = 'inter/' + JOBID + '_diffs{PART}.csv'
+        diffs = 'output/clustering/' + JOBID + '_diffs{PART}.csv'
     output:
-        all = "bins/" + JOBID + "_output_{PART}.csv",
+        all = "output/clustering/" + JOBID + "_output_{PART}.csv",
     params:
-        thresh = P_THRESH, #add this in as a variable at the top later..
-        all_diffs = expand("inter/{JOBID}_diffs.csv", JOBID = JOBID)
+        thresh = P_THRESH,
+        all_diffs = expand("output/clustering/{JOBID}_diffs.csv", JOBID = JOBID)
     benchmark:
         "benchmarks/bin_feeder.tsv"
     conda:
@@ -41,9 +41,9 @@ rule bin_feeder:
 
 rule para_sets:
     input:
-        bins = "bins/" + JOBID + "_output_{PART}.csv"
+        bins = "output/clustering/" + JOBID + "_output_{PART}.csv"
     output:
-        "bins/" + JOBID + "_parallel_sets_{PART}.csv"
+        "output/clustering/" + JOBID + "_parallel_sets_{PART}.csv"
     params:
         thresh = P_THRESH
     benchmark:
@@ -57,9 +57,9 @@ rule para_sets:
 
 rule para_merge:
     input:
-        expand("bins/{JOBID}_parallel_sets_{PART}.csv", JOBID=JOBID, PART = part)
+        expand("output/clustering/{JOBID}_parallel_sets_{PART}.csv", JOBID=JOBID, PART = part)
     output:
-        "bins/{JOBID}_parallel_merged.out"
+        "output/clustering/{JOBID}_parallel_merged.out"
     resources:
         mem_mb = 64000
     conda:
@@ -73,9 +73,9 @@ rule para_merge:
 
 rule non_red_step:
     input:
-      expand("bins/{JOBID}_parallel_merged.out", JOBID = JOBID)
+      expand("output/clustering/{JOBID}_parallel_merged.out", JOBID = JOBID)
     output:
-      expand("bins/{JOBID}_non_red_list.out", JOBID = JOBID)
+      expand("output/clustering/{JOBID}_non_red_list.out", JOBID = JOBID)
     conda:
       "envs/py3.yaml"
     benchmark:
@@ -87,17 +87,16 @@ rule non_red_step:
 
 rule file_parser:
     input:
-        expand("bins/{JOBID}_non_red_list.out", JOBID = JOBID)
+        expand("output/clustering/{JOBID}_non_red_list.out", JOBID = JOBID)
     output:
-        "results/{JOBID}_summary_stats.txt"
+        touch("logs/{JOBID}_para_done.txt")
     params:
         contigs = REFIN,
-        csv = expand("inter/{JOBID}_read_counts_derived.csv", JOBID = JOBID),
-        wd = "results/",
+        csv = expand("output/clustering/{JOBID}_read_counts_derived.csv", JOBID = JOBID),
+        wd = "results",
         header = samples
     shell:
         """
         mkdir -p {params.wd}
-        python scripts/file_parser.py {params.contigs} {params.csv} {input} {params.wd} {output} -l {params.header}
-        echo "Done" > {output}
+        python scripts/file_parser.py {params.contigs} {params.csv} {input} {params.wd} -l {params.header}
         """

@@ -16,12 +16,12 @@ kraken_level = config["kraken_level"]
 rule all:
     input:
         expand("{REFIN}.sa", REFIN=REFIN),
-        expand('inter/counts_{samples}.txt', samples=samples),
-        expand('inter/{jobid}_read_counts.out', jobid= JOBID),
-        expand('inter/{jobid}_read_counts_derived.csv', jobid= JOBID),
-        expand('inter/{jobid}_values.csv', jobid = JOBID),
-        expand('inter/{jobid}_diffs.csv', jobid = JOBID),
-        expand("inter/{JOBID}_output.txt", JOBID = JOBID),
+        expand('output/clustering/counts_{samples}.txt', samples=samples),
+        expand('output/clustering/{jobid}_read_counts.out', jobid= JOBID),
+        expand('output/clustering/{jobid}_read_counts_derived.csv', jobid= JOBID),
+        expand('output/clustering/{jobid}_values.csv', jobid = JOBID),
+        expand('output/clustering/{jobid}_diffs.csv', jobid = JOBID),
+        expand("output/clustering/{JOBID}_output.txt", JOBID = JOBID),
 
 rule bwa_index:
     input:
@@ -40,9 +40,9 @@ rule bwa_mem:
         ref = REFIN,
         ref_ind = expand("{reference}.sa", reference=REFIN) #waits for indexed reference
     output:
-        counts = 'inter/counts_{samples}.txt'
+        counts = 'output/clustering/counts_{samples}.txt'
     params:
-        bam = 'bwa_out/{samples}.bam'
+        bam = 'output/alignment/{samples}.bam'
     benchmark:
         "benchmarks/bwa.tsv"
     threads: 16
@@ -50,7 +50,7 @@ rule bwa_mem:
         """
         module load bio/BWA
         module load bio/SAMtools
-        mkdir -p bwa_out
+        mkdir -p output/alignment
         bwa mem -M -t {threads} {input.ref} {input.fq1} {input.fq2} | samtools view -buS - | samtools sort -o {params.bam}
         samtools index {params.bam}
         samtools idxstats {params.bam} > {output.counts}
@@ -58,23 +58,23 @@ rule bwa_mem:
 
 rule merge_filecounts:
     input:
-        test = expand('inter/counts_{SAMPLES}.txt', SAMPLES = samples)
+        test = expand('output/clustering/counts_{SAMPLES}.txt', SAMPLES = samples)
     output:
-        txt = 'inter/{JOBID}_read_counts.out'
+        txt = 'output/clustering/{JOBID}_read_counts.out'
     conda:
         "envs/py3.yaml"
     benchmark:
         "benchmarks/merge_files.tsv"
     shell:
         """
-        python scripts/merge_filecounts.py inter {JOBID}
+        python scripts/merge_filecounts.py clustering {JOBID}
         """
 
 rule derive:
     input:
-        expand('inter/{JOBID}_read_counts.out', JOBID=JOBID)
+        expand('output/clustering/{JOBID}_read_counts.out', JOBID=JOBID)
     output:
-        csv = "inter/{JOBID}_read_counts_derived.csv"
+        csv = "output/clustering/{JOBID}_read_counts_derived.csv"
     params:
         thresh = CONTIG_T
     benchmark:
@@ -83,31 +83,31 @@ rule derive:
         "envs/py3.yaml"
     shell:
         """
-        python scripts/derive.py inter {JOBID} {params.thresh}
+        python scripts/derive.py clustering {JOBID} {params.thresh}
         """
 
 rule start_feeder:
     input:
-        expand('inter/{JOBID}_read_counts_derived.csv', JOBID=JOBID)
+        expand('output/clustering/{JOBID}_read_counts_derived.csv', JOBID=JOBID)
     output:
-        values = "inter/{JOBID}_values.csv",
-        diffs = "inter/{JOBID}_diffs.csv"
+        values = "output/clustering/{JOBID}_values.csv",
+        diffs = "output/clustering/{JOBID}_diffs.csv"
     conda:
         "envs/py3.yaml"
     benchmark:
         "benchmarks/start_feeder.tsv"
     shell:
         """
-        python scripts/start_feeder.py inter {JOBID}
+        python scripts/start_feeder.py clustering {JOBID}
         """
 
 rule split_file:
     input:
-        diffs = expand("inter/{JOBID}_diffs.csv", JOBID=JOBID)
+        diffs = expand("output/clustering/{JOBID}_diffs.csv", JOBID=JOBID)
     output:
-        touch("inter/{JOBID}_bwa_output.txt")
+        touch("output/clustering/{JOBID}_output/alignmentput.txt")
     params:
-        diffs = expand("inter/{JOBID}_diffs", JOBID = JOBID)
+        diffs = expand("output/clustering/{JOBID}_diffs", JOBID = JOBID)
     shell:
         """
         split -d -l 10000 --additional-suffix=.csv {input.diffs} {params.diffs}
