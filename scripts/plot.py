@@ -27,7 +27,7 @@ else:
     print("Add a merged kraken input file if you want taxonomy info on the plot")
 
 if args.kraken_level:
-    prefix = str(prefix + args.kraken_level + "_")
+    prefix = str(prefix + "_" + args.kraken_level)
 else:
     prefix = prefix
 
