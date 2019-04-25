@@ -41,7 +41,7 @@ rule test:
         echo "Done BWA" > {output}
         """
 
-rule file_parser:
+rule para_out:
     input:
         clusters = para(expand("results/{JOBID}_summary_stats.txt", JOBID = JOBID))
     output:
