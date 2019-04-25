@@ -50,8 +50,7 @@ rule para_out:
         "logs/{JOBID}_para_out.txt"
     shell:
         """
-        more *.out > {output} 2> /dev/null
-        rm *.out
+        echo "Done" >> {output}
         """
 
 rule plot:
