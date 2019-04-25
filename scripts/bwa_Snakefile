@@ -105,7 +105,7 @@ rule split_file:
     input:
         diffs = expand("output/clustering/{JOBID}_diffs.csv", JOBID=JOBID)
     output:
-        touch("output/clustering/{JOBID}_output/alignmentput.txt")
+        touch("output/clustering/{JOBID}_bwa_output.txt")
     params:
         diffs = expand("output/clustering/{JOBID}_diffs", JOBID = JOBID)
     shell:
