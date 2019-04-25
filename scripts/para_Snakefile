@@ -20,7 +20,8 @@ rule all:
       expand("output/clustering/{JOBID}_output_{PART}.csv", JOBID = JOBID, PART = part),
       expand("output/clustering/{JOBID}_parallel_sets_{PART}.csv", JOBID = JOBID, PART = part),
       expand("output/clustering/{JOBID}_parallel_merged.out", JOBID = JOBID),
-      expand("results/{JOBID}_summary_stats.txt", JOBID=JOBID)
+      expand("output/clustering/{JOBID}_non_red_list.out", JOBID = JOBID),
+      expand("logs/{JOBID}_para_done.txt", JOBID=JOBID)
 
 rule bin_feeder:
     input:
