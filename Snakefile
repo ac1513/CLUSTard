@@ -14,15 +14,15 @@ kraken_level = config["kraken_level"]
 
 subworkflow bwa_split:
     snakefile:
-        "bwa_Snakefile"
+        "scripts/bwa_Snakefile"
 
 subworkflow para:
     snakefile:
-        "para_Snakefile"
+        "scripts/para_Snakefile"
 
 subworkflow kraken2:
     snakefile:
-        "kraken2_Snakefile"
+        "scripts/kraken2_Snakefile"
 
 
 rule all:
