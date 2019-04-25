@@ -32,7 +32,7 @@ rule kraken:
         db = krakendb,
         output = "output/kraken/{JOBID}_Cluster_{CLUSTERS}_kraken.out"
     conda:
-        "envs/kraken2.yaml"
+        "../envs/kraken2.yaml"
     shell:
         """
         kraken2 -db {params.db} --threads {threads} --report {output.report} --output {params.output} --use-names {input}

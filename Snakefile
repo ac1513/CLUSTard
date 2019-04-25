@@ -15,14 +15,10 @@ kraken_level = config["kraken_level"]
 subworkflow bwa_split:
     snakefile:
         "scripts/bwa_Snakefile"
-    workdir:
-        "."
 
 subworkflow para:
     snakefile:
         "scripts/para_Snakefile"
-    workdir:
-        "."
 
 
 subworkflow kraken2:
