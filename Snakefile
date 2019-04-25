@@ -12,15 +12,16 @@ P_THRESH = config["P_THRESH"]
 krakendb = config["krakendb"]
 kraken_level = config["kraken_level"]
 
-rule all:
-    input:
-        expand("plots/1_{JOBID}_plot.pdf", JOBID = JOBID)
 
 include: "bwa_Snakefile"
 
 include: "para_Snakefile"
 
 include: "kraken2_Snakefile"
+
+rule all:
+    input:
+        expand("plots/1_{JOBID}_plot.pdf", JOBID = JOBID)
 
 rule plot:
     input:
