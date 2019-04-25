@@ -45,7 +45,7 @@ rule file_parser:
     input:
         clusters = para(expand("bins/{JOBID}_non_red_list.out", JOBID = JOBID))
     output:
-        touch("results/{JOBID}_summary_stats.txt")
+        "results/{JOBID}_summary_stats.txt"
     params:
         contigs = REFIN,
         csv = expand("inter/{JOBID}_read_counts_derived.csv", JOBID = JOBID),
@@ -55,6 +55,7 @@ rule file_parser:
         """
         mkdir -p {params.wd}
         python scripts/file_parser.py {params.contigs} {params.csv} {input.clusters} {params.wd} {output} -l {params.header}
+        echo "Done" > {output}
         """
 
 rule plot:
