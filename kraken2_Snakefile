@@ -14,6 +14,8 @@ kraken_level = str(config["kraken_level"])
 
 (CLUSTERS,) = glob_wildcards("results/Cluster_{CLUSTER}.csv")
 
+localrules: kraken_merge
+
 rule all:
     input:
         expand("kraken/{JOBID}_Cluster_{CLUSTERS}_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS),
@@ -46,5 +48,6 @@ rule kraken_merge:
     shell:
         """
         cd kraken
+        echo {params.level}
         find -name '{JOBID}*_report_kraken.out' -type f -printf '\\n%p\\t' -exec sh -c 'echo {{}} | sort -k1nr {{}} | grep -P "\\t{params.level}\\t" | head -n1 ' \\; > {JOBID}_{kraken_level}_top_kraken.out
         """
