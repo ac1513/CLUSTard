@@ -67,7 +67,6 @@ print('Loading cluster details')
 with open(cluster_file, 'r') as clusters:
     working_cluster = json.load(clusters)
     for current_cluster in working_cluster:
-        print('new cluster')
         cluster_filename = (wd+'Cluster_'+str(current_cluster[0])+'.csv')
         fasta_cluster_filename = (wd+'Cluster_'+str(current_cluster[0])+'.fasta')
         fasta_entry = []
