@@ -28,8 +28,8 @@ subworkflow kraken2:
 rule all:
     input:
         expand("logs/{JOBID}_all_bwa_output.txt", JOBID=JOBID),
-        expand("results/{JOBID}_summary_stats.txt", JOBID = JOBID),
-        expand("plots/1_{JOBID}_{kraken_level}_plot.pdf", JOBID = JOBID, kraken_level = kraken_level)
+        expand("output/results/{JOBID}_summary_stats.txt", JOBID = JOBID),
+        expand("output/plots/1_{JOBID}_{kraken_level}_plot.pdf", JOBID = JOBID, kraken_level = kraken_level)
 
 rule test:
     input:
