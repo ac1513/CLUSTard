@@ -12,56 +12,20 @@ P_THRESH = config["P_THRESH"]
 krakendb = config["krakendb"]
 kraken_level = config["kraken_level"]
 
-subworkflow bwa_split:
-    snakefile:
-        "bwa_Snakefile"
-
-subworkflow para:
-    snakefile:
-        "para_Snakefile"
-
-subworkflow kraken2:
-    snakefile:
-        "kraken2_Snakefile"
-
-
 rule all:
     input:
-        "test.txt",
-        expand("results/{JOBID}_summary_stats.txt", JOBID = JOBID),
         expand("plots/1_{JOBID}_plot.pdf", JOBID = JOBID)
 
-rule test:
-    input:
-        bwa_split(expand("inter/{JOBID}_bwa_output.txt", JOBID = JOBID))
-    output:
-        "test.txt"
-    shell:
-        """
-        echo "Done BWA" > {output}
-        """
+include: "bwa_Snakefile"
 
-rule file_parser:
-    input:
-        clusters = para(expand("bins/{JOBID}_non_red_list.out", JOBID = JOBID))
-    output:
-        "results/{JOBID}_summary_stats.txt"
-    params:
-        contigs = REFIN,
-        csv = expand("inter/{JOBID}_read_counts_derived.csv", JOBID = JOBID),
-        wd = "results/",
-        header = samples
-    shell:
-        """
-        mkdir -p {params.wd}
-        python scripts/file_parser.py {params.contigs} {params.csv} {input.clusters} {params.wd} {output} -l {params.header}
-        echo "Done" > {output}
-        """
+include: "para_Snakefile"
+
+include: "kraken2_Snakefile"
 
 rule plot:
     input:
          file_out = expand("results/{JOBID}_summary_stats.txt", JOBID = JOBID),
-         kraken = kraken2(expand("kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level))
+         kraken = (expand("kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level))
     output:
         "plots/1_{JOBID}_plot.pdf"
     params:
