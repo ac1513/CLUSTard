@@ -16,6 +16,7 @@ parser = argparse.ArgumentParser(description='usage = python entrez_down.py file
 parser.add_argument('in_file', help='the name of the file containing a list of csv files', type=str)
 parser.add_argument('prefix', help='prefix of the jobs', type=str)
 parser.add_argument('-k', '--kraken', help = 'merged kraken input file', type=str)
+parser.add_argument('-k_l', '--kraken_level', help = 'merged kraken input file', type=str)
 args = parser.parse_args()
 in_file = args.in_file
 prefix = args.prefix
@@ -24,6 +25,11 @@ if args.kraken:
     kraken_file = args.kraken
 else:
     print("Add a merged kraken input file if you want taxonomy info on the plot")
+
+if args.kraken_level:
+    prefix = str(prefix + args.kraken_level + "_")
+else:
+    prefix = prefix
 
 with open(in_file, 'r') as text_file:
     files = text_file.read().strip().split()

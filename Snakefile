@@ -29,7 +29,7 @@ rule all:
     input:
         "test.txt",
         expand("results/{JOBID}_summary_stats.txt", JOBID = JOBID),
-        expand("plots/1_{JOBID}_plot.pdf", JOBID = JOBID)
+        expand("plots/1_{JOBID}_{kraken_level}_plot.pdf", JOBID = JOBID)
 
 rule test:
     input:
@@ -56,7 +56,7 @@ rule plot:
          file_out = expand("results/{JOBID}_summary_stats.txt", JOBID = JOBID),
          kraken = kraken2(expand("kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level))
     output:
-        "plots/1_{JOBID}_plot.pdf"
+        "plots/1_{JOBID}_{kraken_level}_plot.pdf"
     params:
         files = "plot_in_files.txt"
     conda:
@@ -65,6 +65,6 @@ rule plot:
         """
         ls -S results/Cluster*.fasta > {params.files}
         sed -i "s/.fasta/.csv/g" {params.files}
-        python scripts/plot.py {params.files} {JOBID} -k {input.kraken}
+        python scripts/plot.py {params.files} {JOBID} -k {input.kraken} -k_l {kraken_level}
         rm {params.files}
         """
