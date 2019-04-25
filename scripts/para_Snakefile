@@ -93,7 +93,7 @@ rule file_parser:
     params:
         contigs = REFIN,
         csv = expand("output/clustering/{JOBID}_read_counts_derived.csv", JOBID = JOBID),
-        wd = "results",
+        wd = "results/",
         header = samples
     shell:
         """
