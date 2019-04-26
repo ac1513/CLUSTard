@@ -104,6 +104,8 @@ rule start_feeder:
         python scripts/start_feeder.py clustering {JOBID}
         """
 
+localrules: split_file
+
 rule split_file:
     input:
         diffs = expand("output/clustering/{JOBID}_diffs.csv", JOBID=JOBID)
