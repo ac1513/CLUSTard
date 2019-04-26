@@ -29,7 +29,7 @@ rule bwa_index:
     output:
         '{REFIN}.sa'
     benchmark:
-        "benckmarks/bwa_in.tsv"
+        "benchmarks/bwa_in.tsv"
     shell:
         """
         module load bio/BWA
