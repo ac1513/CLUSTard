@@ -31,7 +31,10 @@ rule bwa_index:
     benchmark:
         "benckmarks/bwa_in.tsv"
     shell:
-        'bwa index {input.ref}'
+        """
+        module load bio/BWA
+        bwa index {input.ref}
+        """
 
 rule bwa_mem:
     input:
