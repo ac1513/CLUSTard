@@ -98,6 +98,6 @@ rule file_parser:
         header = samples
     shell:
         """
-        mkdir -p {params.wd}
+        mkdir -p output/{params.wd}
         python scripts/file_parser.py {params.contigs} {params.csv} {input} {params.wd} -l {params.header}
         """
