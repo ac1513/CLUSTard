@@ -62,7 +62,7 @@ rule plot:
     params:
         files = "plot_in_files.txt"
     conda:
-        "envs/plot2.yaml"
+        "envs/py3.yaml"
     shell:
         """
         ls -S output/results/Cluster*.fasta > {params.files}
