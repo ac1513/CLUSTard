@@ -31,7 +31,13 @@ if args.kraken_level:
 else:
     prefix = prefix
 
+
 matplotlib.rcParams['lines.linewidth'] = 0.5
+matplotlib.rcParams['ytick.left'] = True
+matplotlib.rcParams['ytick.minor.size'] = 1
+matplotlib.rcParams['ytick.minor.width'] = 0.25
+matplotlib.rcParams['axes.linewidth'] = 0.5
+
 
 with open(in_file, 'r') as text_file:
     files = text_file.read().strip().split()
@@ -57,18 +63,20 @@ for i in range(0, len(files), 30):
 
 
             x_range = [x for x in range(len(df.keys()[:-3]))]
-            y_range = df.mean()[:-3]
+            y_mean = df.mean()[:-3]
             top = df.max()[:-3]
             bottom = df.min()[:-3]
 
 
-            plt.plot(x_range, y_range, color='purple')
+            plt.plot(x_range, y_mean, color='purple')
+
             plt.fill_between(x_range, top, bottom, facecolor='grey', alpha=0.5)
 
             plt.semilogy()
 
             x1,x2,y1,y2 = plt.axis()
             plt.axis((x1,x2,0.00001,10))
+
 
             plt.axhline(y=0.01, ls='--', lw = 0.25, c = 'black')
 
@@ -85,9 +93,11 @@ for i in range(0, len(files), 30):
             plt.text(0.5, 4, na, fontsize = 2, fontweight='bold')
             plt.text(0.5, 1, nu+' cov:'+av_cov+'+/-'+sd_cov + ', ' + tot_len +'kb', fontsize=2)
             plt.text(0.5, 0.4, 'GC% '+ av_gc +'+/-'+ sd_gc, fontsize=2)
-            plt.tick_params(axis='both', labelsize=2, pad=0, direction='out', length=1, width=0.25, right=False, top=False)
+            plt.tick_params(axis='x', labelsize=2, pad=0, direction='out', length=1, width=0.25)
+            plt.tick_params(axis = 'y', labelsize=2, pad=0, direction='out', length=1)
+            plt.tick_params(right=False, top=False)
             gsplace += 1
 #    plt.show()
-    plt.savefig("output/plots/" + str(counter) + '_' + prefix + '_plot.pdf', type='pdf', dpi=300)
+    plt.savefig('output/plots/' + str(counter) + '_' + prefix + '_plot.pdf', type='pdf', dpi=300)
     print('Generated plot number ' + str(counter) + ' -> ' + str(counter) + '_' + prefix + '_plot.pdf')
     plt.close('all')
