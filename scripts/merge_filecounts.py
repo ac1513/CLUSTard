@@ -18,11 +18,16 @@ def otherFile(fileName):
 parser = argparse.ArgumentParser(description='')
 parser.add_argument('loc', help='location count files are in', type=str)
 parser.add_argument('jobid', help='location count files are in', type=str)
+parser.add_argument('-l', '--sample-list', dest='samples', nargs='+', default=[])
 args = parser.parse_args()
 loc = str("output/" + args.loc)
 jobid = args.jobid
+samples = args.samples
 
-fname = sorted(glob.glob(loc+'/*.txt'))
+fname = []
+
+for i in samples:
+    fname.append(str('counts_' + i + '.txt')) #change this to read in in the right order
 
 print ('files with data to be merged: '+str(fname))
 # count lines in one file (they should all be the same...)
