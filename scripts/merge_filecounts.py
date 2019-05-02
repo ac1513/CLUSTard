@@ -27,7 +27,7 @@ samples = args.samples
 fname = []
 
 for i in samples:
-    fname.append(str('counts_' + i + '.txt')) #change this to read in in the right order
+    fname.append(str(loc + 'counts_' + i + '.txt')) #change this to read in in the right order
 
 print ('files with data to be merged: '+str(fname))
 # count lines in one file (they should all be the same...)

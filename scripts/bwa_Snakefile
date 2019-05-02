@@ -83,7 +83,7 @@ rule derive:
     benchmark:
         "benchmarks/derive.tsv"
     conda:
-        "../envs/py3.yaml"
+        "../envs/py3.yaml" #change clustering (below) when add counts folder..
     shell:
         """
         python scripts/derive.py clustering {JOBID} {params.thresh}
