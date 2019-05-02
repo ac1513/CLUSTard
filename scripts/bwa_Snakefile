@@ -70,7 +70,7 @@ rule merge_filecounts:
         "benchmarks/merge_files.tsv"
     shell:
         """
-        python scripts/merge_filecounts.py clustering {JOBID}
+        python scripts/merge_filecounts.py clustering {JOBID} -l {samples}
         """
 
 rule derive:
