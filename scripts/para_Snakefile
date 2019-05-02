@@ -96,6 +96,8 @@ rule file_parser:
         csv = expand("output/clustering/{JOBID}_read_counts_derived.csv", JOBID = JOBID),
         wd = "results/",
         header = samples
+    conda:
+        "../envs/py3.yaml"
     shell:
         """
         mkdir -p output/{params.wd}
