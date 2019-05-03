@@ -11,7 +11,6 @@ import pandas as pd
 import argparse
 import re
 
-
 parser = argparse.ArgumentParser(description='usage = python entrez_down.py file_list_of_queries')
 parser.add_argument('in_file', help='the name of the file containing a list of csv files', type=str)
 parser.add_argument('prefix', help='prefix of the jobs', type=str)
@@ -51,7 +50,7 @@ matplotlib.rcParams['ytick.left'] = True
 matplotlib.rcParams['ytick.minor.size'] = 1
 matplotlib.rcParams['ytick.minor.width'] = 0.25
 matplotlib.rcParams['axes.linewidth'] = 0.5
-colours = ["crimson", "seagreen", "darkorange", "purple", "tab:pink", "darkslateblue", "tab:cyan"]
+colours = ["crimson", "purple", "tab:cyan", "seagreen", "darkorange", "tab:pink", "darkslateblue"]
 
 with open(in_file, 'r') as text_file:
     files = text_file.read().strip().split()
@@ -91,7 +90,7 @@ for i in range(0, len(files), 30):
 
             x1,x2,y1,y2 = plt.axis()
             plt.axis((x1,x2,0.00001,10))
-
+            plt.tick_params(labelbottom=False)
 
             plt.axhline(y=0.01, ls='--', lw = 0.25, c = 'black')
 
