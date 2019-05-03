@@ -60,13 +60,14 @@ rule plot:
     output:
         "output/plots/1_{JOBID}_{kraken_level}_plot.pdf"
     params:
-        files = "plot_in_files.txt"
+        files = "plot_in_files.txt",
+        sample_file = config["samples"]
     conda:
         "envs/py3.yaml"
     shell:
         """
         ls -S output/results/Cluster*.fasta > {params.files}
         sed -i "s/.fasta/.csv/g" {params.files}
-        python scripts/plot.py {params.files} {JOBID} -k {input.kraken} -k_l {kraken_level}
+        python scripts/plot.py {params.files} {JOBID} -k {input.kraken} -k_l {kraken_level} {params.sample_file}
         rm {params.files}
         """
