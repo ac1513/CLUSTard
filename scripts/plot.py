@@ -77,7 +77,7 @@ for i in range(0, len(files), 30):
 
             x_start = 0
             for item in list(set_groups):
-                x_end = x_start + dc[item]
+                x_end = x_start + dc[item] + 1
                 x_range = range(x_start, x_end)
                 y_mean = df.mean()[x_start:x_end]
                 top = df.max()[x_start:x_end]
