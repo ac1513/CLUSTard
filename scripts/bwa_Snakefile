@@ -28,8 +28,6 @@ rule bwa_index:
         ref = REFIN
     output:
         '{REFIN}.sa'
-    benchmark:
-        "benchmarks/bwa_in.tsv"
     shell:
         """
         module load bio/BWA
@@ -46,8 +44,6 @@ rule bwa_mem:
         counts = 'output/clustering/counts_{samples}.txt'
     params:
         bam = 'output/alignment/{samples}.bam'
-    benchmark:
-        "benchmarks/bwa.tsv"
     threads: 16
     shell:
         """
@@ -66,8 +62,6 @@ rule merge_filecounts:
         txt = 'output/clustering/{JOBID}_read_counts.out'
     conda:
         "../envs/py3.yaml"
-    benchmark:
-        "benchmarks/merge_files.tsv"
     shell:
         """
         python scripts/merge_filecounts.py clustering {JOBID} -l {samples}
@@ -80,8 +74,6 @@ rule derive:
         csv = "output/clustering/{JOBID}_read_counts_derived.csv"
     params:
         thresh = CONTIG_T
-    benchmark:
-        "benchmarks/derive.tsv"
     conda:
         "../envs/py3.yaml" #change clustering (below) when add counts folder..
     shell:
@@ -97,8 +89,6 @@ rule start_feeder:
         diffs = "output/clustering/{JOBID}_diffs.csv"
     conda:
         "../envs/py3.yaml"
-    benchmark:
-        "benchmarks/start_feeder.tsv"
     shell:
         """
         python scripts/start_feeder.py clustering {JOBID}
