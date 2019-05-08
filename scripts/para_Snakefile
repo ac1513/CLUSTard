@@ -31,8 +31,6 @@ rule bin_feeder:
     params:
         thresh = P_THRESH,
         all_diffs = expand("output/clustering/{JOBID}_diffs.csv", JOBID = JOBID)
-    benchmark:
-        "benchmarks/bin_feeder.tsv"
     conda:
         "../envs/py3.yaml"
     shell:
@@ -47,8 +45,6 @@ rule para_sets:
         "output/clustering/" + JOBID + "_parallel_sets_{PART}.csv"
     params:
         thresh = P_THRESH
-    benchmark:
-        "benchmarks/para_sets.tsv"
     conda:
         "../envs/py3.yaml"
     shell:
@@ -65,8 +61,6 @@ rule para_merge:
         mem_mb = 64000
     conda:
         "../envs/py3.yaml"
-    benchmark:
-        "benchmarks/para_merge.tsv"
     shell:
         """
         python scripts/parallel_merge_step2.py -i {input} -o {output}
@@ -79,8 +73,6 @@ rule non_red_step:
       expand("output/clustering/{JOBID}_non_red_list.out", JOBID = JOBID)
     conda:
       "../envs/py3.yaml"
-    benchmark:
-      "benchmarks/non_red.tsv"
     shell:
       """
       python scripts/step3.py {input} {output}
