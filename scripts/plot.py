@@ -84,7 +84,7 @@ for i in range(0, len(files), 30):
                 bottom = df.min()[x_start:x_end]
                 plt.plot(x_range, y_mean, color=colours[item])
                 plt.fill_between(x_range, top, bottom, facecolor='gray', alpha=0.5)
-                x_start = x_start + dc[item]+1
+                x_start = x_start + dc[item] + 1
 
             plt.semilogy()
 
