@@ -50,7 +50,7 @@ rule tbl2asn:
         cd $(dirname $(which tbl2asn))
         rm tbl2asn
         wget https://github.com/tseemann/prokka/raw/master/binaries/linux/tbl2asn
-        chmod u+x tbl2asn
+        chmod +x tbl2asn
         """
 
 rule prokka:
