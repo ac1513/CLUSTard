@@ -43,16 +43,17 @@ rule prokka:
     output:
         file = "output/prokka/{CLUSTERS}/{JOBID}_{CLUSTERS}.err"
     params:
-        dir = "output/prokka/{CLUSTERS}/"
+        dir = "output/prokka/Cluster_{CLUSTERS}/",
+        prefix = "{JOBID}_{CLUSTERS}"
     shell:
         """
-        prokka {input.clusters} --outdir {params.dir} --prefix {JOBID}_{CLUSTERS}
+        prokka {input.clusters} --outdir {params.dir} --prefix {params.prefix}
         """
 
 rule kraken_merge:
     input:
         report = expand("output/kraken/{JOBID}_Cluster_{CLUSTERS}_report_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS),
-        prokka = expand("output/prokka/{CLUSTERS}/{JOBID}_{CLUSTERS}.err", JOBID = JOBID, CLUSTERS = CLUSTERS)
+        prokka = expand("output/prokka/Cluster_{CLUSTERS}/{JOBID}_{CLUSTERS}.err", JOBID = JOBID, CLUSTERS = CLUSTERS)
     output:
         "output/kraken/{JOBID}_{kraken_level}_top_kraken.out"
     params:
