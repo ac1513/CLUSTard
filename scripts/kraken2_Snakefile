@@ -45,11 +45,9 @@ rule prokka:
     params:
         dir = "output/prokka/{CLUSTERS}/",
         cluster = {CLUSTERS}
-    conda:
-        "../envs/prokka.yaml"
     shell:
         """
-        prokka {input.clusters} --outdir {params.dir} --prefix {JOBID}_{params.cluster}
+        prokka {input.clusters} --outdir {params.dir} --prefix {JOBID}_{CLUSTERS}
         """
 
 rule kraken_merge:
