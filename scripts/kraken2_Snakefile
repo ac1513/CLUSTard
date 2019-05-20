@@ -41,12 +41,13 @@ rule prokka:
     input:
         clusters = "output/results/Cluster_{CLUSTERS}.fasta",
     output:
-        "output/prokka/{CLUSTERS}/{JOBID}_{CLUSTERS}.err"
+        dir = "output/prokka/{CLUSTERS}/",
+        file = "output/prokka/{CLUSTERS}/{JOBID}_{CLUSTERS}.err"
     conda:
         "../envs/prokka.yaml"
     shell:
         """
-        prokka {input.clusters} --outdir output/prokka/{CLUSTERS} --prefix {JOBID}_{CLUSTERS}
+        prokka {input.clusters} --outdir {output.dir} --prefix {JOBID}_{CLUSTERS}
         """
 
 rule kraken_merge:
