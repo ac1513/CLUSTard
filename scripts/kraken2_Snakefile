@@ -14,8 +14,6 @@ kraken_level = str(config["kraken_level"])
 
 (CLUSTERS,) = glob_wildcards("output/results/Cluster_{CLUSTER}.csv")
 
-localrules: kraken_merge
-
 rule all:
     input:
         expand("output/kraken/{JOBID}_Cluster_{CLUSTERS}_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS),
@@ -24,7 +22,7 @@ rule all:
         expand("output/prokka/Cluster_{CLUSTERS}/{JOBID}_{CLUSTERS}.err", JOBID = JOBID, CLUSTERS = CLUSTERS),
         "done.txt"
 
-localrules: tbl2asn
+localrules: kraken_merge, tbl2asn
 
 rule kraken:
     input:
