@@ -56,7 +56,7 @@ rule para_out:
 rule plot:
     input:
          file_out = expand("logs/{JOBID}_para_out.txt", JOBID = JOBID),
-         wait = kraken2("logs/{JOBID}_slurm_prokka.log", JOBID=JOBID)
+         wait = kraken2(expand("logs/{JOBID}_slurm_prokka.log", JOBID = JOBID))
     output:
         "output/plots/1_{JOBID}_{kraken_level}_plot.pdf"
     params:
