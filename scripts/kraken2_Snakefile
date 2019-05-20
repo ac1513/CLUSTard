@@ -85,7 +85,7 @@ rule prokka:
         2
     shell:
         """
-        awk '//^>//{{print substr($1,1,21); next}}{{print}}' < {input.clusters} > {params.prokka}
+        awk '/^>/{{print substr($1,1,21); next}}{{print}}' < {input.clusters} > {params.prokka}
         prokka {params.prokka} --outdir {params.dir} --prefix {params.prefix} --force
         rm {params.prokka}
         """
