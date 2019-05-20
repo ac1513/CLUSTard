@@ -30,7 +30,7 @@ rule kraken:
         "output/results/Cluster_{CLUSTERS}.fasta"
     output:
         report = "output/kraken/{JOBID}_Cluster_{CLUSTERS}_report_kraken.out",
-        wait = touch("tbl2asn_in.out")
+        wait = touch("{JOBID}_tbl2asn_in.out")
     params:
         db = krakendb,
         output = "output/kraken/{JOBID}_Cluster_{CLUSTERS}_kraken.out"
@@ -45,7 +45,7 @@ rule kraken:
 
 rule tbl2asn:
     input:
-        touch("tbl2asn_in.out")
+        "{JOBID_tbl2asn_in.out"
     output:
         touch("tbl2asn_update.out")
     conda:
