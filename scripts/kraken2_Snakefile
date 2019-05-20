@@ -19,7 +19,8 @@ localrules: kraken_merge
 rule all:
     input:
         expand("output/kraken/{JOBID}_Cluster_{CLUSTERS}_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS),
-        expand("output/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
+        expand("output/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level),
+        expand("output/prokka/{CLUSTERS}/PROKKA_{CLUSTERS}.err", CLUSTERS = CLUSTERS)
 
 rule kraken:
     input:
@@ -36,9 +37,22 @@ rule kraken:
         kraken2 -db {params.db} --threads {threads} --report {output.report} --output {params.output} --use-names {input}
         """
 
+rule prokka:
+    input:
+        clusters = "output/results/Cluster_{CLUSTERS}.fasta",
+    output:
+        "output/prokka/{CLUSTERS}/{JOBID}_{CLUSTERS}.err"
+    conda:
+        "../envs/prokka.yaml"
+    shell:
+        """
+        prokka {input.clusters} --outdir output/prokka/{CLUSTERS} --prefix {JOBID}_{CLUSTERS}
+        """
+
 rule kraken_merge:
     input:
-        report = expand("output/kraken/{JOBID}_Cluster_{CLUSTERS}_report_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS)
+        report = expand("output/kraken/{JOBID}_Cluster_{CLUSTERS}_report_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS),
+        prokka = expand("output/prokka/{CLUSTERS}/{JOBID}_{CLUSTERS}.err", CLUSTERS = CLUSTERS)
     output:
         "output/kraken/{JOBID}_{kraken_level}_top_kraken.out"
     params:
