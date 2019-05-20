@@ -21,7 +21,8 @@ rule all:
         expand("output/kraken/{JOBID}_Cluster_{CLUSTERS}_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS),
         expand("output/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level),
         "tbl2asn_update.out",
-        expand("output/prokka/Cluster_{CLUSTERS}/{JOBID}_{CLUSTERS}.err", JOBID = JOBID, CLUSTERS = CLUSTERS)
+        expand("output/prokka/Cluster_{CLUSTERS}/{JOBID}_{CLUSTERS}.err", JOBID = JOBID, CLUSTERS = CLUSTERS),
+        "done.txt"
 
 localrules: tbl2asn
 
@@ -30,7 +31,6 @@ rule kraken:
         "output/results/Cluster_{CLUSTERS}.fasta"
     output:
         report = "output/kraken/{JOBID}_Cluster_{CLUSTERS}_report_kraken.out",
-        wait = touch("{JOBID}_tbl2asn_in.out")
     params:
         db = krakendb,
         output = "output/kraken/{JOBID}_Cluster_{CLUSTERS}_kraken.out"
@@ -43,9 +43,22 @@ rule kraken:
         kraken2 -db {params.db} --threads {threads} --report {output.report} --output {params.output} --use-names {input}
         """
 
+rule kraken_merge:
+    input:
+        report = expand("output/kraken/{JOBID}_Cluster_{CLUSTERS}_report_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS)
+    output:
+        "output/kraken/{JOBID}_{kraken_level}_top_kraken.out"
+    params:
+        level = {kraken_level}
+    shell:
+        """
+        cd output/kraken
+        find -name '{JOBID}*_report_kraken.out' -type f -printf '\\n%p\\t' -exec sh -c 'echo {{}} | sort -k1nr {{}} | grep -P "\\t{params.level}\\t" | head -n1 ' \\; > {JOBID}_{kraken_level}_top_kraken.out
+        """
+
 rule tbl2asn:
     input:
-        "{JOBID_tbl2asn_in.out"
+        expand("output/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
     output:
         touch("tbl2asn_update.out")
     conda:
@@ -73,20 +86,9 @@ rule prokka:
         2
     shell:
         """
-
         prokka {input.clusters} --outdir {params.dir} --prefix {params.prefix} --force
         """
 
-rule kraken_merge:
-    input:
-        report = expand("output/kraken/{JOBID}_Cluster_{CLUSTERS}_report_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS),
-        prokka = expand("output/prokka/Cluster_{CLUSTERS}/{JOBID}_{CLUSTERS}.err", JOBID = JOBID, CLUSTERS = CLUSTERS)
-    output:
-        "output/kraken/{JOBID}_{kraken_level}_top_kraken.out"
-    params:
-        level = {kraken_level}
-    shell:
-        """
-        cd output/kraken
-        find -name '{JOBID}*_report_kraken.out' -type f -printf '\\n%p\\t' -exec sh -c 'echo {{}} | sort -k1nr {{}} | grep -P "\\t{params.level}\\t" | head -n1 ' \\; > {JOBID}_{kraken_level}_top_kraken.out
-        """
+rule output:
+    input: "output/prokka/Cluster_{CLUSTERS}/{JOBID}_{CLUSTERS}.err"
+    output touch("done.txt")

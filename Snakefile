@@ -56,18 +56,19 @@ rule para_out:
 rule plot:
     input:
          file_out = expand("logs/{JOBID}_para_out.txt", JOBID = JOBID),
-         kraken = kraken2(expand("output/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level))
+         wait = kraken2("done.txt")
     output:
         "output/plots/1_{JOBID}_{kraken_level}_plot.pdf"
     params:
         files = "plot_in_files.txt",
-        sample_file = config["samples"]
+        sample_file = config["samples"],
+        kraken = expand("output/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
     conda:
         "envs/py3.yaml"
     shell:
         """
         ls -S output/results/Cluster*.fasta > {params.files}
         sed -i "s/.fasta/.csv/g" {params.files}
-        python scripts/plot.py {params.files} {JOBID} -k {input.kraken} -k_l {kraken_level} {params.sample_file}
+        python scripts/plot.py {params.files} {JOBID} -k {params.kraken} -k_l {kraken_level} {params.sample_file}
         rm {params.files}
         """
