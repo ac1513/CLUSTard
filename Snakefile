@@ -32,6 +32,8 @@ rule all:
         expand("logs/{JOBID}_para_out.txt", JOBID = JOBID),
         expand("output/plots/1_{JOBID}_{kraken_level}_plot.pdf", JOBID = JOBID, kraken_level = kraken_level)
 
+localrules: plot
+
 rule test:
     input:
         bwa_split(expand("output/clustering/{JOBID}_bwa_output.txt", JOBID = JOBID))
