@@ -47,7 +47,7 @@ rule prokka:
         prefix = "{JOBID}_{CLUSTERS}"
     shell:
         """
-        prokka {input.clusters} --outdir {params.dir} --prefix {params.prefix}
+        prokka {input.clusters} --outdir {params.dir} --prefix {params.prefix} --force
         """
 
 rule kraken_merge:
