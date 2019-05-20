@@ -91,4 +91,4 @@ rule prokka:
 
 rule output:
     input: "output/prokka/Cluster_{CLUSTERS}/{JOBID}_{CLUSTERS}.err"
-    output touch("done.txt")
+    output: touch("done.txt")
