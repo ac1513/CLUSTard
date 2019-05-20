@@ -43,8 +43,7 @@ rule prokka:
     output:
         file = "output/prokka/{CLUSTERS}/{JOBID}_{CLUSTERS}.err"
     params:
-        dir = "output/prokka/{CLUSTERS}/",
-        cluster = {CLUSTERS}
+        dir = "output/prokka/{CLUSTERS}/"
     shell:
         """
         prokka {input.clusters} --outdir {params.dir} --prefix {JOBID}_{CLUSTERS}
