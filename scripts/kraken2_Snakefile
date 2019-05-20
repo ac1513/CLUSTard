@@ -90,5 +90,5 @@ rule prokka:
         """
 
 rule output:
-    input: "output/prokka/Cluster_{CLUSTERS}/{JOBID}_{CLUSTERS}.err"
+    input: expand("output/prokka/Cluster_{CLUSTERS}/{JOBID}_{CLUSTERS}.err", CLUSTERS = CLUSTERS, JOBID = JOBID)
     output: touch("done.txt")
