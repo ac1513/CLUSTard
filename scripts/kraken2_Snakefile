@@ -77,14 +77,17 @@ rule prokka:
         file = "output/prokka/Cluster_{CLUSTERS}/{JOBID}_{CLUSTERS}.err"
     params:
         dir = "output/prokka/Cluster_{CLUSTERS}/",
-        prefix = "{JOBID}_{CLUSTERS}"
+        prefix = "{JOBID}_{CLUSTERS}",
+        prokka = "output/results/Cluster_{CLUSTERS}_short.fasta"
     conda:
         "../envs/prokka.yaml"
     threads:
         2
     shell:
         """
-        prokka {input.clusters} --outdir {params.dir} --prefix {params.prefix} --force
+        awk '/^>/{print substr($1,1,21); next}{print}' < {input.clusters} > {params.prokka}
+        prokka {params.prokka} --outdir {params.dir} --prefix {params.prefix} --force
+        rm {params.prokka}
         """
 
 rule output:
