@@ -20,7 +20,7 @@ rule all:
         expand("output/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level),
         "tbl2asn_update.out",
         expand("output/prokka/Cluster_{CLUSTERS}/{JOBID}_{CLUSTERS}.err", JOBID = JOBID, CLUSTERS = CLUSTERS),
-        "done.txt"
+        expand("logs/{JOBID}_slurm_prokka.log", JOBID=JOBID)
 
 localrules: kraken_merge, tbl2asn
 
@@ -92,4 +92,9 @@ rule prokka:
 
 rule output:
     input: expand("output/prokka/Cluster_{CLUSTERS}/{JOBID}_{CLUSTERS}.err", CLUSTERS = CLUSTERS, JOBID = JOBID)
-    output: touch("done.txt")
+    output:
+        "logs/{JOBID}_slurm_prokka.log"
+    shell:
+        """
+        cat *.out > {output}
+        """

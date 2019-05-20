@@ -32,8 +32,6 @@ rule all:
         expand("logs/{JOBID}_para_out.txt", JOBID = JOBID),
         expand("output/plots/1_{JOBID}_{kraken_level}_plot.pdf", JOBID = JOBID, kraken_level = kraken_level)
 
-localrules: plot
-
 rule test:
     input:
         bwa_split(expand("output/clustering/{JOBID}_bwa_output.txt", JOBID = JOBID))
@@ -58,7 +56,7 @@ rule para_out:
 rule plot:
     input:
          file_out = expand("logs/{JOBID}_para_out.txt", JOBID = JOBID),
-         wait = kraken2("done.txt")
+         wait = kraken2("logs/{JOBID}_slurm_prokka.log," JOBID=JOBID)
     output:
         "output/plots/1_{JOBID}_{kraken_level}_plot.pdf"
     params:
