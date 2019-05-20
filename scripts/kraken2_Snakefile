@@ -20,6 +20,7 @@ rule all:
     input:
         expand("output/kraken/{JOBID}_Cluster_{CLUSTERS}_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS),
         expand("output/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level),
+        "tbl2asn_update.out",
         expand("output/prokka/Cluster_{CLUSTERS}/{JOBID}_{CLUSTERS}.err", JOBID = JOBID, CLUSTERS = CLUSTERS)
 
 rule kraken:
@@ -32,14 +33,30 @@ rule kraken:
         output = "output/kraken/{JOBID}_Cluster_{CLUSTERS}_kraken.out"
     conda:
         "../envs/kraken2.yaml"
+    threads:
+        4
     shell:
         """
         kraken2 -db {params.db} --threads {threads} --report {output.report} --output {params.output} --use-names {input}
         """
 
+rule tbl2asn:
+    output:
+        touch("tbl2asn_update.out")
+    conda:
+        "../envs/prokka.yaml"
+    shell:
+        """
+        cd $(dirname $(which tbl2asn))
+        rm tbl2asn
+        wget https://github.com/tseemann/prokka/raw/master/binaries/linux/tbl2asn
+        chmod u+x tbl2asn
+        """
+
 rule prokka:
     input:
         clusters = "output/results/Cluster_{CLUSTERS}.fasta",
+        wait = "tbl2asn_update.out"
     output:
         file = "output/prokka/Cluster_{CLUSTERS}/{JOBID}_{CLUSTERS}.err"
     params:
@@ -47,8 +64,11 @@ rule prokka:
         prefix = "{JOBID}_{CLUSTERS}"
     conda:
         "../envs/prokka.yaml"
+    threads:
+        2
     shell:
         """
+
         prokka {input.clusters} --outdir {params.dir} --prefix {params.prefix} --force
         """
 
