@@ -97,4 +97,5 @@ rule output:
     shell:
         """
         cat *.out > {output}
+        rm *.out
         """

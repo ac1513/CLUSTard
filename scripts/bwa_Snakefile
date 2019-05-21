@@ -44,7 +44,7 @@ rule bwa_mem:
         counts = 'output/clustering/counts_{samples}.txt'
     params:
         bam = 'output/alignment/{samples}.bam'
-    threads: 16
+    threads: 4
     shell:
         """
         module load bio/BWA
