@@ -20,7 +20,8 @@ rule all:
         expand("output/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level),
         "tbl2asn_update.out",
         expand("output/prokka/Cluster_{CLUSTERS}/{JOBID}_{CLUSTERS}.err", JOBID = JOBID, CLUSTERS = CLUSTERS),
-        expand("logs/{JOBID}_slurm_prokka.log", JOBID=JOBID)
+        expand("logs/{JOBID}_slurm_prokka.log", JOBID=JOBID),
+        expand("output/{JOBID}_checkm/{jobID}_checkm.log", jobID=JOBID)
 
 localrules: kraken_merge, tbl2asn, output
 
@@ -98,4 +99,20 @@ rule output:
         """
         cat *.out > {output}
         rm *.out
+        """
+
+rule checkm:
+    input:
+        expand("output/results/Cluster_{CLUSTERS}.fasta")
+    output:
+        expand("output/{JOBID}_checkm/{jobID}_checkm.log", jobID=JOBID)
+    params:
+        out = expand("output/{JOBID}_checkm", JOBID=JOBID),
+        in = expand("output/results/")
+    threads:
+        6
+    shell:
+        """
+        module load bio/CheckM
+        checkm lineage_wf -f {output} -x fasta -t {threads} {params.in} {params.out}
         """
