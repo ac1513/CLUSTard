@@ -103,7 +103,7 @@ rule output:
 
 rule checkm:
     input:
-        expand("output/results/Cluster_{CLUSTERS}.fasta")
+        expand("output/results/Cluster_{CLUSTERS}.fasta", CLUSTERS = CLUSTERS)
     output:
         expand("output/{JOBID}_checkm/{JOBID}_checkm.log", JOBID=JOBID)
     params:
