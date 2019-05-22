@@ -21,7 +21,7 @@ rule all:
         "tbl2asn_update.out",
         expand("output/prokka/Cluster_{CLUSTERS}/{JOBID}_{CLUSTERS}.err", JOBID = JOBID, CLUSTERS = CLUSTERS),
         expand("logs/{JOBID}_slurm_prokka.log", JOBID=JOBID),
-        expand("output/plots/{JOBID}_checkm.log", JOBID=JOBID)
+        expand("output/checkm/{JOBID}_checkm.log", JOBID=JOBID)
 
 localrules: kraken_merge, tbl2asn, output
 
@@ -105,7 +105,7 @@ rule checkm:
     input:
         expand("output/results/Cluster_{CLUSTERS}.fasta", CLUSTERS = CLUSTERS)
     output:
-        expand("output/plots/{JOBID}_checkm.log", JOBID=JOBID)
+        expand("output/checkm/{JOBID}_checkm.log", JOBID=JOBID)
     params:
         out = expand("output/checkm", JOBID=JOBID),
         input = "output/results"
