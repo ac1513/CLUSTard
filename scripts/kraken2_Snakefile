@@ -105,7 +105,7 @@ rule checkm:
     input:
         expand("output/results/Cluster_{CLUSTERS}.fasta")
     output:
-        expand("output/{JOBID}_checkm/{jobID}_checkm.log", jobID=JOBID)
+        expand("output/{JOBID}_checkm/{JOBID}_checkm.log", JOBID=JOBID)
     params:
         out = expand("output/{JOBID}_checkm", JOBID=JOBID),
         in = expand("output/results/")
