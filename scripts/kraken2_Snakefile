@@ -114,5 +114,6 @@ rule checkm:
     shell:
         """
         module load bio/CheckM
+        module load math/numpy
         checkm lineage_wf -f {output} -x fasta -t {threads} {params.input} {params.out}
         """
