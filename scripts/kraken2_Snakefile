@@ -108,11 +108,11 @@ rule checkm:
         expand("output/{JOBID}_checkm/{JOBID}_checkm.log", JOBID=JOBID)
     params:
         out = "output/{JOBID}_checkm",
-        in = "output/results"
+        input = "output/results"
     threads:
         6
     shell:
         """
         module load bio/CheckM
-        checkm lineage_wf -f {output} -x fasta -t {threads} {params.in} {params.out}
+        checkm lineage_wf -f {output} -x fasta -t {threads} {params.input} {params.out}
         """
