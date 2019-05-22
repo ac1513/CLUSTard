@@ -107,7 +107,7 @@ rule checkm:
     output:
         expand("output/checkm/{JOBID}_checkm.log", JOBID=JOBID)
     params:
-        out = expand("output/{checkm", JOBID=JOBID),
+        out = expand("output/checkm", JOBID=JOBID),
         input = "output/results"
     threads:
         6
