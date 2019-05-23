@@ -11,6 +11,7 @@ CONTIG_T = config["CONTIG_T"]
 P_THRESH = config["P_THRESH"]
 krakendb = config["krakendb"]
 kraken_level = str(config["kraken_level"])
+blastdb = config["blastdb"]
 
 (CLUSTERS,) = glob_wildcards("output/results/Cluster_{CLUSTER}.csv")
 
@@ -21,7 +22,8 @@ rule all:
         "tbl2asn_update.out",
         expand("output/prokka/Cluster_{CLUSTERS}/{JOBID}_{CLUSTERS}.err", JOBID = JOBID, CLUSTERS = CLUSTERS),
         expand("logs/{JOBID}_slurm_prokka.log", JOBID=JOBID),
-        expand("output/checkm/{JOBID}_checkm.log", JOBID=JOBID)
+        expand("output/checkm/{JOBID}_checkm.log", JOBID=JOBID),
+        expand("output/blast/{JOBID}_Cluster_{CLUSTERS}_report_blast.out", JOBID=JOBID, CLUSTERS=CLUSTERS)
 
 localrules: kraken_merge, tbl2asn, output
 
@@ -53,6 +55,21 @@ rule kraken_merge:
         """
         cd output/kraken
         find -name '{JOBID}*_report_kraken.out' -type f -printf '\\n%p\\t' -exec sh -c 'echo {{}} | sort -k1nr {{}} | grep -P "\\t{params.level}\\t" | head -n1 ' \\; > {JOBID}_{kraken_level}_top_kraken.out
+        """
+rule blast:
+    input:
+        "output/results/Cluster_{CLUSTERS}.fasta"
+    output:
+        report = "output/blast/{JOBID}_Cluster_{CLUSTERS}_report_blast.out",
+    params:
+        db = blastdb,
+    conda:
+        "../envs/blast.yaml"
+    threads:
+        4
+    shell:
+        """
+        tblastx -db {params.db} -query {input} -out {output.report}
         """
 
 rule tbl2asn:
