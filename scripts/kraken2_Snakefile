@@ -95,7 +95,7 @@ rule prokka:
 
 rule blast:
     input:
-        "output/results/Cluster_{CLUSTERS}.fasta",
+        input = "output/results/Cluster_{CLUSTERS}.fasta",
         wait = expand("output/prokka/Cluster_{CLUSTERS}/{JOBID}_{CLUSTERS}.err", JOBID = JOBID, CLUSTERS=CLUSTERS)
     output:
         report = "output/blast/{JOBID}_Cluster_{CLUSTERS}_report_blast.out",
@@ -107,7 +107,7 @@ rule blast:
         4
     shell:
         """
-        tblastx -db {params.db} -query {input} -out {output.report}
+        tblastx -db {params.db} -query {input.input} -out {output.report}
         """
 
 rule output:
