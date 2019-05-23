@@ -1,4 +1,4 @@
-jobid: "NAB_all"
+jobid: "NAB_new"
 REFIN: "data/yw_polished_anvio.fasta"
 CONTIG_T: "1000"
 P_THRESH: "0.99"
@@ -6,3 +6,5 @@ krakendb: "/mnt/lustre/groups/biol-chong-2019/databases/krakendb/kraken2_samstud
 kraken_level: "F"
 samples: "samples.tsv"
 RAW_SR: "data/"
+date_scale: "y"
+blastdb: "/mnt/lustre/groups/biol-chong-2019/databases/blast/nt/nt"

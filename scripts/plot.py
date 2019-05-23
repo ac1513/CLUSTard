@@ -10,12 +10,18 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import argparse
 import re
+from pandas.plotting import register_matplotlib_converters
+register_matplotlib_converters()
 
+# =============================================================================
+# Command line parsing
+# =============================================================================
 parser = argparse.ArgumentParser(description='usage = python entrez_down.py file_list_of_queries')
 parser.add_argument('in_file', help='the name of the file containing a list of csv files', type=str)
 parser.add_argument('prefix', help='prefix of the jobs', type=str)
 parser.add_argument('-k', '--kraken', help = 'merged kraken input file', type=str)
 parser.add_argument('-k_l', '--kraken_level', help = 'merged kraken input file', type=str)
+parser.add_argument('-cm', '--checkm_file', help = 'checkm output file - in tab format', type = str)
 parser.add_argument('samples', help='samples.tsv file', type=str)
 parser.add_argument('dates', help='plot date scale y/n', type=str)
 args = parser.parse_args()
@@ -33,6 +39,14 @@ if args.kraken_level:
 else:
     prefix = prefix
 
+if args.checkm_file:
+    checkm_file = args.checkm_file
+else:
+    print("Include checkm output if want comp/cont info on the plot")
+
+# =============================================================================
+# Plot global settings
+# =============================================================================
 
 matplotlib.rcParams['lines.linewidth'] = 0.5
 matplotlib.rcParams['ytick.left'] = True
@@ -40,6 +54,10 @@ matplotlib.rcParams['ytick.minor.size'] = 1
 matplotlib.rcParams['ytick.minor.width'] = 0.25
 matplotlib.rcParams['axes.linewidth'] = 0.5
 colours = ["crimson", "purple", "tab:cyan", "seagreen", "darkorange", "tab:pink", "darkslateblue"]
+
+# =============================================================================
+# Read in input file(s)
+# =============================================================================
 
 set_groups = set()
 if "y" in args.dates.lower():
@@ -59,6 +77,10 @@ for i in groups:
 
 with open(in_file, 'r') as text_file:
     files = text_file.read().strip().split()
+
+# =============================================================================
+# Plot
+# =============================================================================
 
 counter = 0
 for i in range(0, len(files), 30):
@@ -98,7 +120,6 @@ for i in range(0, len(files), 30):
                     x_data = range(x_start, x_end)
                 plt.plot(x_data, y_mean, color=colours[item])
                 plt.fill_between(x_data, top, bottom, facecolor='gray', alpha=0.5)
-                print(x_prev_start, x_start, x_end)
                 x_prev_start = x_start
                 x_prev_end = x_end
                 x_start = x_end
@@ -108,7 +129,7 @@ for i in range(0, len(files), 30):
             plt.semilogy()
 
             x1,x2,y1,y2 = plt.axis()
-            plt.axis((x1,x2,0.00001,10))
+            plt.axis((x1,x2,0.0001,100))
             plt.axhline(y=0.01, ls='--', lw = 0.25, c = 'black')
 
             if kraken_file:
@@ -121,18 +142,26 @@ for i in range(0, len(files), 30):
                             per = line.split('\t')[1]
                             per = per.strip()
                         if "y" in args.dates.lower():
-                            plt.text(df_samples["date"][1], 0.15, per+'%:  ' + cont, fontsize=2)
+                            plt.text(df_samples["date"][1], 0.7, per+'%:  ' + cont, fontsize=2)
                         else:
-                            plt.text(0.5, 0.15, per+'%:  ' + cont, fontsize=2)
+                            plt.text(0.5, 0.7, per+'%:  ' + cont, fontsize=2)
+            if checkm_file:
+                checkm_df = pd.read_csv(checkm_file, sep = '\t', index_col = 0)
+                comp = checkm_df["Completeness"][file.split('.')[0]]
+                conta = checkm_df["Contamination"][file.split('.')[0]]
+                if "y" in args.dates.lower():
+                    plt.text(df_samples["date"][1], 1.7, str(comp)+'%: Complete ' + str(conta)+'%: Contamination', fontsize=2)
+                else:
+                    plt.text(0.5, 1.7, str(comp) + '%:  Complete ' + str(conta) + '%:  Contamination', fontsize=2)
 
             if "y" in args.dates.lower():
-                plt.text(df_samples["date"][1], 4, na, fontsize = 2, fontweight='bold')
-                plt.text(df_samples["date"][1], 1, nu+' cov:'+av_cov+'+/-'+sd_cov + ', ' + tot_len +'kb', fontsize=2)
-                plt.text(df_samples["date"][1], 0.4, 'GC% '+ av_gc +'+/-'+ sd_gc, fontsize=2)
+                plt.text(df_samples["date"][1], 40, na, fontsize = 2, fontweight='bold')
+                plt.text(df_samples["date"][1], 9, nu+' cov:'+av_cov+'+/-'+sd_cov + ', ' + tot_len +'kb', fontsize=2)
+                plt.text(df_samples["date"][1], 4, 'GC% '+ av_gc +'+/-'+ sd_gc, fontsize=2)
             else:
-                plt.text(0.5, 4, na, fontsize = 2, fontweight='bold')
-                plt.text(0.5, 1, nu+' cov:'+av_cov+'+/-'+sd_cov + ', ' + tot_len +'kb', fontsize=2)
-                plt.text(0.5, 0.4, 'GC% '+ av_gc +'+/-'+ sd_gc, fontsize=2)
+                plt.text(0.5, 40, na, fontsize = 2, fontweight='bold')
+                plt.text(0.5, 9, nu +', cov:'+av_cov+'+/-'+sd_cov + ', ' + tot_len +'kb', fontsize=2)
+                plt.text(0.5, 4, 'GC% '+ av_gc +'+/-'+ sd_gc, fontsize=2)
             plt.tick_params(axis='x', labelsize=2, pad=0, direction='out', length=1, width=0.25)
             plt.tick_params(axis = 'y', labelsize=2, pad=0, direction='out', length=1)
             plt.tick_params(right=False, top=False)
