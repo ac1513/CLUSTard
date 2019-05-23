@@ -122,7 +122,8 @@ rule output:
 
 rule checkm:
     input:
-        expand("output/results/Cluster_{CLUSTERS}.fasta", CLUSTERS = CLUSTERS)
+        expand("output/results/Cluster_{CLUSTERS}.fasta", CLUSTERS = CLUSTERS),
+        wait = expand("logs/{JOBID}_slurm_kraken2SM.log", JOBID = JOBID)
     output:
         expand("output/checkm/{JOBID}_checkm.log", JOBID=JOBID)
     params:
