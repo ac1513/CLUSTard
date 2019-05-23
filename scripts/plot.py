@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import argparse
 import re
+import datetime
 from pandas.plotting import register_matplotlib_converters
 register_matplotlib_converters()
 
@@ -115,7 +116,7 @@ for i in range(0, len(files), 30):
                     if x_start == 0:
                         x_data = df_samples["date"][x_start:x_end]
                     else:
-                        x_data = df_samples["date"][x_start:x_end] + (x_data[-1:][x_start-1] - df_samples["date"][0])
+                        x_data = df_samples["date"][x_start:x_end] + (x_data[-1:][x_start-1] - df_samples["date"][0] + datetime.timedelta(days=5))
                 else:
                     x_data = range(x_start, x_end)
                 plt.plot(x_data, y_mean, color=colours[item])
