@@ -58,7 +58,8 @@ rule kraken_merge:
         """
 rule blast:
     input:
-        "output/results/Cluster_{CLUSTERS}.fasta"
+        "output/results/Cluster_{CLUSTERS}.fasta",
+        expand("output/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
     output:
         report = "output/blast/{JOBID}_Cluster_{CLUSTERS}_report_blast.out",
     params:
@@ -74,7 +75,7 @@ rule blast:
 
 rule tbl2asn:
     input:
-        expand("output/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
+        expand("output/blast/{JOBID}_Cluster_{CLUSTERS}_report_blast.out", JOBID = JOBID, CLUSTERS = CLUSTERS)
     output:
         touch("tbl2asn_update.out")
     conda:
