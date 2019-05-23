@@ -56,26 +56,10 @@ rule kraken_merge:
         cd output/kraken
         find -name '{JOBID}*_report_kraken.out' -type f -printf '\\n%p\\t' -exec sh -c 'echo {{}} | sort -k1nr {{}} | grep -P "\\t{params.level}\\t" | head -n1 ' \\; > {JOBID}_{kraken_level}_top_kraken.out
         """
-rule blast:
-    input:
-        "output/results/Cluster_{CLUSTERS}.fasta",
-        expand("output/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
-    output:
-        report = "output/blast/{JOBID}_Cluster_{CLUSTERS}_report_blast.out",
-    params:
-        db = blastdb,
-    conda:
-        "../envs/blast.yaml"
-    threads:
-        4
-    shell:
-        """
-        tblastx -db {params.db} -query {input} -out {output.report}
-        """
 
 rule tbl2asn:
     input:
-        expand("output/blast/{JOBID}_Cluster_{CLUSTERS}_report_blast.out", JOBID = JOBID, CLUSTERS = CLUSTERS)
+        expand("output/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
     output:
         touch("tbl2asn_update.out")
     conda:
@@ -109,10 +93,27 @@ rule prokka:
         rm {params.prokka}
         """
 
-rule output:
-    input: expand("output/prokka/Cluster_{CLUSTERS}/{JOBID}_{CLUSTERS}.err", CLUSTERS = CLUSTERS, JOBID = JOBID)
+rule blast:
+    input:
+        "output/results/Cluster_{CLUSTERS}.fasta",
+        expand("output/prokka/Cluster_{CLUSTERS}/{JOBID}_{CLUSTERS}.err", JOBID = JOBID, CLUSTERS=CLUSTERS)
     output:
-        "logs/{JOBID}_slurm_prokka.log"
+        report = "output/blast/{JOBID}_Cluster_{CLUSTERS}_report_blast.out",
+    params:
+        db = blastdb,
+    conda:
+        "../envs/blast.yaml"
+    threads:
+        4
+    shell:
+        """
+        tblastx -db {params.db} -query {input} -out {output.report}
+        """
+
+rule output:
+    input: expand("output/blast/{JOBID}_Cluster_{CLUSTERS}_report_blast.out", CLUSTERS = CLUSTERS, JOBID = JOBID)
+    output:
+        "logs/{JOBID}_slurm_kraken2SM.log"
     shell:
         """
         cat *.out > {output}
