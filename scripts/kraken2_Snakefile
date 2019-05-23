@@ -116,5 +116,5 @@ rule checkm:
     shell:
         """
         module load bio/CheckM
-        checkm lineage_wf -f {output} -x fasta -t {threads} {params.input} {params.out}
+        checkm lineage_wf -f {output} --tab_table -x fasta -t {threads} {params.input} {params.out}
         """
