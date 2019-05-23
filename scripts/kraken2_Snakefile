@@ -110,7 +110,7 @@ rule checkm:
         out = expand("output/checkm", JOBID=JOBID),
         input = "output/results"
     threads:
-        6
+        20
     conda:
         "../envs/checkm.yaml"
     shell:
