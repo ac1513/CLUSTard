@@ -28,6 +28,7 @@ rule bwa_index:
         ref = REFIN
     output:
         '{REFIN}.sa'
+    threads: 20
     shell:
         """
         module load bio/BWA
@@ -44,7 +45,7 @@ rule bwa_mem:
         counts = 'output/clustering/counts_{samples}.txt'
     params:
         bam = 'output/alignment/{samples}.bam'
-    threads: 4
+    threads: 20
     shell:
         """
         module load bio/BWA

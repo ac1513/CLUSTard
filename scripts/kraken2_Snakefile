@@ -39,6 +39,8 @@ rule kraken:
         "../envs/kraken2.yaml"
     threads:
         4
+    resources:
+        mem = 16000mb
     shell:
         """
         kraken2 -db {params.db} --threads {threads} --report {output.report} --output {params.output} --use-names {input}
@@ -85,7 +87,7 @@ rule prokka:
     conda:
         "../envs/prokka.yaml"
     threads:
-        2
+        20
     shell:
         """
         awk '/^>/{{print substr($1,1,21); next}}{{print}}' < {input.clusters} > {params.prokka}
@@ -104,7 +106,7 @@ rule blast:
     conda:
         "../envs/blast.yaml"
     threads:
-        4
+        20
     shell:
         """
         tblastx -db {params.db} -query {input.input} -out {output.report}
@@ -130,7 +132,7 @@ rule checkm:
         out = expand("output/checkm", JOBID=JOBID),
         input = "output/results"
     threads:
-        20
+        40
     conda:
         "../envs/checkm.yaml"
     shell:
