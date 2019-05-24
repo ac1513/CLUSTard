@@ -148,8 +148,8 @@ for i in range(0, len(files), 30):
                             plt.text(0.5, 0.7, per+'%:  ' + cont, fontsize=2)
             if checkm_file:
                 checkm_df = pd.read_csv(checkm_file, sep = '\t', index_col = 0)
-                comp = checkm_df["Completeness"][file.split('/')[-1:][0][:-3]]
-                conta = checkm_df["Contamination"][file.split('/')[-1:][0][:-3]]
+                comp = checkm_df["Completeness"][file.split('/')[-1:][0][:-4]]
+                conta = checkm_df["Contamination"][file.split('/')[-1:][0][:-4]]
                 if "y" in args.dates.lower():
                     plt.text(df_samples["date"][1], 1.7, str(comp)+'%: Complete ' + str(conta)+'%: Contamination', fontsize=2)
                 else:
