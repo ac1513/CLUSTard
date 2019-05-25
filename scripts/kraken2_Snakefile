@@ -109,7 +109,7 @@ rule blast:
         4
     shell:
         """
-        tblastx -db {params.db} -num_threads {threads} -query {input.input} -out {output.report}
+        blastn -db {params.db} -num_threads {threads} -query {input.input} -out {output.report} -outfmt 6
         """
 
 rule output:
