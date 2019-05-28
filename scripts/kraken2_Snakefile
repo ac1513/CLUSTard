@@ -110,7 +110,7 @@ rule blast:
     shell:
         """
         export BLASTDB=$BLASTDB:{params.db}
-        blastn -db {params.db} -num_threads {threads} -query {input.input} -outfmt "7 qseqid sscinames sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore" | awk '/hits found/{getline;print}' | grep -v "#" > {output.report}
+        blastn -db {params.db} -num_threads {threads} -query {input.input} -outfmt "7 qseqid sscinames sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore" | awk '/hits found/{{getline;print}}' | grep -v "#" > {output.report}
         """
 
 rule output:
