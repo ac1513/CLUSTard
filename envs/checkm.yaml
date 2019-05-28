@@ -5,3 +5,4 @@ channels:
 dependencies:
   - numpy=1.16.2=py27h7e9f1db_0
   - numpy-base=1.16.2=py27hde5b4d6_0
+  
