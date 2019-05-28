@@ -102,8 +102,7 @@ rule blast:
     output:
         report = "output/blast/{JOBID}_Cluster_{CLUSTERS}_report_blast.out",
     params:
-        db = blastdb,
-        evalue = 1
+        db = blastdb
     conda:
         "../envs/blast.yaml"
     threads:
@@ -111,7 +110,7 @@ rule blast:
     shell:
         """
         export BLASTDB=$BLASTDB:{params.db}
-        blastn -db {params.db} -num_threads {threads} -query {input.input} -out {output.report} -outfmt "6 qseqid sscinames sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore" -evalue {params.evalue}
+        blastn -db {params.db} -num_threads {threads} -query {input.input} -outfmt "6 qseqid sscinames sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore" | sort -k1,1 -k13,13nr -k12,12n | sort -u -k1,1 --merge > {output.report}
         """
 
 rule output:
