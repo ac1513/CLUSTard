@@ -111,7 +111,7 @@ rule blast:
     shell:
         """
         export BLASTDB=$BLASTDB:{params.db}
-        blastn -db {params.db} -num_threads {threads} -query {input.input} -out {output.report} -outfmt 6 -evalue {params.evalue}
+        blastn -db {params.db} -num_threads {threads} -query {input.input} -out {output.report} -outfmt "6 qseqid staxids sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore" -evalue {params.evalue}
         """
 
 rule output:
