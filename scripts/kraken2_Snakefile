@@ -103,13 +103,15 @@ rule blast:
         report = "output/blast/{JOBID}_Cluster_{CLUSTERS}_report_blast.out",
     params:
         db = blastdb,
+        evalue = 1
     conda:
         "../envs/blast.yaml"
     threads:
         4
     shell:
         """
-        blastn -db {params.db} -num_threads {threads} -query {input.input} -out {output.report} -outfmt 6
+        export BLASTDB=$BLASTDB:blastdb
+        blastn -db {params.db} -num_threads {threads} -query {input.input} -out {output.report} -outfmt 6 -evalue {params.evalue}
         """
 
 rule output:
