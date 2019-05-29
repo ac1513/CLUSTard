@@ -134,10 +134,12 @@ rule checkm:
         input = "output/results"
     threads:
         40
-    conda:
-        "../envs/checkm.yaml"
+    #conda:
+    #    "../envs/checkm.yaml"
     shell:
         """
         module load bio/CheckM
+        module load math/numpy
+        module load lang/Python/2.7.15-foss-2018b
         checkm lineage_wf -f {output} --tab_table -x fasta -t {threads} {params.input} {params.out}
         """
