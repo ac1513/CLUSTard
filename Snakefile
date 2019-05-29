@@ -74,4 +74,5 @@ rule plot:
         ls -S output/results/Cluster*.fasta > {params.files}
         sed -i "s/.fasta/.csv/g" {params.files}
         python scripts/plot.py {params.files} {JOBID} {params.sample_file} {params.date} -k {params.kraken} -k_l {kraken_level} -cm {input.checkm}
+        rm {params.files}
         """
