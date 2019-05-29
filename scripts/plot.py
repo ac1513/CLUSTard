@@ -168,6 +168,6 @@ for i in range(0, len(files), 30):
             plt.tick_params(right=False, top=False)
             gsplace += 1
 #    plt.show()
-    plt.savefig('output/plots/' str(counter) + '_' + prefix + '_plot.pdf', type='pdf', dpi=300)
+    plt.savefig('output/plots/'+ str(counter) + '_' + prefix + '_plot.pdf', type='pdf', dpi=300)
     print('Generated plot number ' + str(counter) + ' -> ' + str(counter) + '_' + prefix + '_plot.pdf')
     plt.close('all')
