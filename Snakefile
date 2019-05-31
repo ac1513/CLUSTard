@@ -67,7 +67,7 @@ rule plot:
         sample_file = config["samples"],
         kraken = expand("output/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level),
         date = date_scale,
-        seqkit = expand("output/results/{JOBID}_seqkit_stats.tsv")
+        seqkit = expand("output/results/{JOBID}_seqkit_stats.tsv", JOBID = JOBID)
     conda:
         "envs/py3.yaml"
     shell:
