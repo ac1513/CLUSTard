@@ -138,7 +138,7 @@ rule seqkit:
 rule checkm:
     input:
         expand("output/results/Cluster_{CLUSTERS}.fasta", CLUSTERS = CLUSTERS),
-        expand(output/{JOBID}_seqkit_stats.tsv", JOBID=JOBID)
+        expand("output/{JOBID}_seqkit_stats.tsv", JOBID=JOBID)
     output:
         expand("output/checkm/{JOBID}_checkm.log", JOBID=JOBID)
     params:
