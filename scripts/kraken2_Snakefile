@@ -127,7 +127,7 @@ rule seqkit:
     output:
           "output/{JOBID}_seqkit_stats.tsv"
     conda:
-        "../envs/py3"
+        "../envs/py3.yaml"
     threads:
         10
     shell:
