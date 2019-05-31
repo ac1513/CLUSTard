@@ -23,32 +23,24 @@ parser.add_argument('prefix', help='prefix of the jobs', type=str)
 parser.add_argument('-k', '--kraken', help = 'merged kraken input file', type=str)
 parser.add_argument('-k_l', '--kraken_level', help = 'merged kraken input file', type=str)
 parser.add_argument('-cm', '--checkm_file', help = 'checkm output file - in tab format', type = str)
+parser.add_argument('-sk', '--seqkit', help = 'seqkit output file - in tab format', type = str)
 parser.add_argument('samples', help='samples.tsv file', type=str)
 parser.add_argument('dates', help='plot date scale y/n', type=str)
+
 args = parser.parse_args()
 in_file = args.in_file
 prefix = args.prefix
 samples = args.samples
-
-if args.kraken:
-    kraken_file = args.kraken
-else:
-    print("Add a merged kraken input file if you want taxonomy info on the plot")
 
 if args.kraken_level:
     prefix = str(prefix + "_" + args.kraken_level)
 else:
     prefix = prefix
 
-if args.checkm_file:
-    checkm_file = args.checkm_file
-else:
-    print("Include checkm output if want comp/cont info on the plot")
-
 # =============================================================================
 # Plot global settings
 # =============================================================================
-
+    
 matplotlib.rcParams['lines.linewidth'] = 0.5
 matplotlib.rcParams['ytick.left'] = True
 matplotlib.rcParams['ytick.minor.size'] = 1
@@ -75,14 +67,14 @@ for item in list(set_groups):
     dc[item] = -1
 for i in groups:
     dc[i] +=1
-
+    
 with open(in_file, 'r') as text_file:
     files = text_file.read().strip().split()
 
 # =============================================================================
 # Plot
 # =============================================================================
-
+    
 counter = 0
 for i in range(0, len(files), 30):
     gs = gsp.GridSpec(5,6)
@@ -110,7 +102,7 @@ for i in range(0, len(files), 30):
                 y_mean = df.mean()[x_start:x_end]
                 top = df.max()[x_start:x_end]
                 bottom = df.min()[x_start:x_end]
-
+                
                 if "y" in args.dates.lower():
                     df_samples["date"] = pd.to_datetime(df_samples["date"])
                     if x_start == 0:
@@ -124,17 +116,36 @@ for i in range(0, len(files), 30):
                 x_prev_start = x_start
                 x_prev_end = x_end
                 x_start = x_end
-
-            plt.tick_params(labelbottom=False)
+        
+            plt.tick_params(labelbottom=False)    
 
             plt.semilogy()
 
             x1,x2,y1,y2 = plt.axis()
             plt.axis((x1,x2,0.0001,100))
             plt.axhline(y=0.01, ls='--', lw = 0.25, c = 'black')
+                                
+            if args.seqkit:
+                seqkit_df = pd.read_csv(args.seqkit, sep = '\t', index_col =0)
+                file_fa = file.replace(".csv",".fasta")
+                n_50 = seqkit_df["N50"][file_fa]
+                if "y" in args.dates.lower():
+                    plt.text(df_samples["date"][1], 1.7, "N50: " + str(n_50), fontsize=2)
+                else:
+                    plt.text(0.5, 1.7, "N50: " + str(n_50), fontsize=2)
+                    
 
+            if args.checkm_file:
+                checkm_df = pd.read_csv(args.checkm_file, sep = '\t', index_col = 0)
+                comp = checkm_df["Completeness"][file.split('/')[-1:][0].split('.')[0]]
+                conta = checkm_df["Contamination"][file.split('/')[-1:][0].split('.')[0]]
+                if "y" in args.dates.lower():
+                    plt.text(df_samples["date"][1], 0.7, str(comp)+'%: Complete ' + str(conta)+'%: Contamination', fontsize=2)
+                else:
+                    plt.text(0.5, 0.7, str(comp) + '%:  Complete ' + str(conta) + '%:  Contamination', fontsize=2)
+            
             if args.kraken:
-                for line in open(kraken_file, 'r'):
+                for line in open(args.kraken, 'r'):
                     if re.search(na, line):
                         cont = line.split('\t')[-1].strip()
                         if './' in cont:
@@ -143,18 +154,12 @@ for i in range(0, len(files), 30):
                             per = line.split('\t')[1]
                             per = per.strip()
                         if "y" in args.dates.lower():
-                            plt.text(df_samples["date"][1], 0.7, per+'%:  ' + cont, fontsize=2)
+                            plt.text(df_samples["date"][1], 0.3, per+'%:  ' + cont, fontsize=2)
                         else:
-                            plt.text(0.5, 0.7, per+'%:  ' + cont, fontsize=2)
-            if args.checkm_file:
-                checkm_df = pd.read_csv(checkm_file, sep = '\t', index_col = 0)
-                comp = checkm_df["Completeness"][file.split('/')[-1:][0][:-4]]
-                conta = checkm_df["Contamination"][file.split('/')[-1:][0][:-4]]
-                if "y" in args.dates.lower():
-                    plt.text(df_samples["date"][1], 1.7, str(comp)+'%: Complete ' + str(conta)+'%: Contamination', fontsize=2)
-                else:
-                    plt.text(0.5, 1.7, str(comp) + '%:  Complete ' + str(conta) + '%:  Contamination', fontsize=2)
+                            plt.text(0.5, 0.3, per+'%:  ' + cont, fontsize=2)
 
+                
+                            
             if "y" in args.dates.lower():
                 plt.text(df_samples["date"][1], 40, na, fontsize = 2, fontweight='bold')
                 plt.text(df_samples["date"][1], 9, nu+' cov:'+av_cov+'+/-'+sd_cov + ', ' + tot_len +'kb', fontsize=2)
@@ -168,6 +173,6 @@ for i in range(0, len(files), 30):
             plt.tick_params(right=False, top=False)
             gsplace += 1
 #    plt.show()
-    plt.savefig('output/plots/'+ str(counter) + '_' + prefix + '_plot.pdf', type='pdf', dpi=300)
+    plt.savefig("output/plots/" + str(counter) + '_' + prefix + '_plot.pdf', type='pdf', dpi=300)
     print('Generated plot number ' + str(counter) + ' -> ' + str(counter) + '_' + prefix + '_plot.pdf')
     plt.close('all')

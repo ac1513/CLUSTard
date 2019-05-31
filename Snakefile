@@ -66,13 +66,14 @@ rule plot:
         files = "plot_in_files.txt",
         sample_file = config["samples"],
         kraken = expand("output/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level),
-        date = date_scale
+        date = date_scale,
+        seqkit = expand("output/results/{JOBID}_seqkit_stats.tsv")
     conda:
         "envs/py3.yaml"
     shell:
         """
         ls -S output/results/Cluster*.fasta > {params.files}
         sed -i "s/.fasta/.csv/g" {params.files}
-        python scripts/plot.py {params.files} {JOBID} {params.sample_file} {params.date} -k {params.kraken} -k_l {kraken_level} -cm {input.checkm}
+        python scripts/plot.py {params.files} {JOBID} {params.sample_file} {params.date} -k {params.kraken} -k_l {kraken_level} -cm {input.checkm} -sk {input.seqkit}
         rm {params.files}
         """
