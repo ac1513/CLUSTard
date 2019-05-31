@@ -132,7 +132,7 @@ rule seqkit:
         10
     shell:
         """
-        seqkit stats -a -j {threads} output/results/*.fasta > {output}
+        seqkit stats -a -T -j {threads} output/results/*.fasta > {output}
         """
 
 rule checkm:
