@@ -133,7 +133,7 @@ for i in range(0, len(files), 30):
             plt.axis((x1,x2,0.0001,100))
             plt.axhline(y=0.01, ls='--', lw = 0.25, c = 'black')
 
-            if kraken_file:
+            if args.kraken:
                 for line in open(kraken_file, 'r'):
                     if re.search(na, line):
                         cont = line.split('\t')[-1].strip()
@@ -146,7 +146,7 @@ for i in range(0, len(files), 30):
                             plt.text(df_samples["date"][1], 0.7, per+'%:  ' + cont, fontsize=2)
                         else:
                             plt.text(0.5, 0.7, per+'%:  ' + cont, fontsize=2)
-            if checkm_file:
+            if args.checkm_file:
                 checkm_df = pd.read_csv(checkm_file, sep = '\t', index_col = 0)
                 comp = checkm_df["Completeness"][file.split('/')[-1:][0][:-4]]
                 conta = checkm_df["Contamination"][file.split('/')[-1:][0][:-4]]
