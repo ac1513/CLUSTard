@@ -25,7 +25,7 @@ rule all:
         expand("output/checkm/{JOBID}_checkm.log", JOBID=JOBID),
         expand("output/blast/{JOBID}_Cluster_{CLUSTERS}_report_blast.out", JOBID=JOBID, CLUSTERS=CLUSTERS)
 
-localrules: kraken_merge, tbl2asn, output
+localrules: kraken_merge, tbl2asn, output, seqkit
 
 rule kraken:
     input:
@@ -122,11 +122,23 @@ rule output:
         cat *.out > {output}
         rm *.out
         """
+rule seqkit:
+    input: wait = expand("logs/{JOBID}_slurm_kraken2SM.log", JOBID = JOBID)
+    output:
+          "output/{JOBID}_seqkit_stats.tsv"
+    conda:
+        "../envs/py3"
+    threads:
+        10
+    shell:
+        """
+        seqkit stats -a -j {threads} output/results/*.fasta > {output}
+        """
 
 rule checkm:
     input:
         expand("output/results/Cluster_{CLUSTERS}.fasta", CLUSTERS = CLUSTERS),
-        wait = expand("logs/{JOBID}_slurm_kraken2SM.log", JOBID = JOBID)
+        expand(output/{JOBID}_seqkit_stats.tsv", JOBID=JOBID)
     output:
         expand("output/checkm/{JOBID}_checkm.log", JOBID=JOBID)
     params:
