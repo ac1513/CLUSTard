@@ -61,7 +61,8 @@ rule plot:
          file_out = expand("logs/{JOBID}_para_out.txt", JOBID = JOBID),
          checkm = kraken2(expand("output/checkm/{JOBID}_checkm.log", JOBID=JOBID))
     output:
-        "output/plots/1_{JOBID}_{kraken_level}_plot.pdf"
+        "output/plots/1_{JOBID}_{kraken_level}_plot.pdf",
+        "output/plots/{JOBID}_bin_contigs.png"
     params:
         files = "plot_in_files.txt",
         sample_file = config["samples"],
@@ -76,4 +77,8 @@ rule plot:
         sed -i "s/.fasta/.csv/g" {params.files}
         python scripts/plot.py {params.files} {JOBID} {params.sample_file} {params.date} -k {params.kraken} -k_l {kraken_level} -cm {input.checkm} -sk {params.seqkit}
         rm {params.files}
+        cd output/results/
+        cat *.fasta | awk '$0 ~ ">" {{print c; c=0;printf substr($0,2,100) "\t"; }} $0 !~ ">" {{c+=length($0);}} END {{ print c; }}' | sort | uniq > {JOBID}_sorted_lengths.tsv
+        cd ../../
+        python scripts/bin_plot.py output/results/{JOBID}_unbinned_contigs_stats.tsv output/results/{JOBID}_sorted_lengths.tsv {JOBID}
         """
