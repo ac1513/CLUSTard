@@ -16,6 +16,8 @@ def summer(x):
 def deriver(x,y):
     answers=[]
     for loop in x:
+        if y == 0:
+            y = 1
         value = int(loop)/y
         answers.append(value)
     return(answers)
