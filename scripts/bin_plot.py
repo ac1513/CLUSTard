@@ -73,7 +73,6 @@ unbin_bars = []
 
 for i in range(len(unbinned)):
     total = unbinned[i] + binned[i]
-    print(total, unbinned[i], binned[i])
     if total > 0:
         if binned[i] > 0 :
             bin_bars.append((binned[i]/total)*100)
