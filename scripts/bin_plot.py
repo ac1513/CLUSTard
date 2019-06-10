@@ -20,7 +20,7 @@ def bins(file, bins):
     x = data.readline()
     x = data.readline()
     while x:
-       a = x.split()
+       a = x.split(sep='\t')
        pos = 0
        for loop in bins:
           if int(a[1]) < loop*100000:
