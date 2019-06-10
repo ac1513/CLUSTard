@@ -42,11 +42,12 @@ parser = argparse.ArgumentParser(description='usage = python entrez_down.py file
 parser.add_argument('unbinned_file', help='output from checkm unbinned', type=str)
 parser.add_argument('binned_file', help='output from bash script', type=str)
 parser.add_argument('prefix', help='prefix of the jobs', type=str)
+
 args = parser.parse_args()
 
-unbinned_file = args.unbinned_file()
-binned_file = args.binned_file()
-prefix = args.prefix()
+unbinned_file = args.unbinned_file
+binned_file = args.binned_file
+prefix = args.prefix
 
 #unbinned_file = "unbinned_stats.tsv"
 #binned_file = "sorted_lengths.tsv"
