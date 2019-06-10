@@ -89,7 +89,7 @@ rule bin_plot:
     shell:
         """
         cd output/results/
-        cat *.fasta | awk '$0 ~ ">" {{print c; c=0;printf substr($0,2,100) "\t"; }} $0 !~ ">" {{c+=length($0);}} END {{ print c; }}' | sort | uniq > {JOBID}_sorted_lengths.tsv
+        cat *.fasta | awk '$0 ~ ">" {{print c; c=0;printf substr($0,2,100) "\\t"; }} $0 !~ ">" {{c+=length($0);}} END {{ print c; }}' | sort | uniq > {JOBID}_sorted_lengths.tsv
         cd ../../
         python scripts/bin_plot.py output/results/{JOBID}_unbinned_contigs_stats.tsv output/results/{JOBID}_sorted_lengths.tsv {JOBID}
         """
