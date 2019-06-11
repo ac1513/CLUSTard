@@ -39,9 +39,9 @@ rule kraken:
     conda:
         "../envs/kraken2.yaml"
     threads:
-        4
+        12
     resources:
-        mem_mb = 64000
+        mem_mb = 4000
     shell:
         """
         kraken2 -db {params.db} --threads {threads} --report {output.report} --output {params.output} --use-names {input}
