@@ -41,7 +41,7 @@ rule kraken:
     threads:
         4
     resources:
-        mem_mb = 16000
+        mem_mb = 64000
     shell:
         """
         kraken2 -db {params.db} --threads {threads} --report {output.report} --output {params.output} --use-names {input}
