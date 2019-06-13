@@ -147,7 +147,7 @@ rule checkm:
         input = "output/results",
         refin = REFIN
     threads:
-        40
+        20
     #conda:
     #    "../envs/checkm.yaml"
     shell:
