@@ -90,7 +90,7 @@ fig = plt.figure(1)
 plt.bar(x, bin_bars, color='forestgreen', edgecolor='white', label='binned', width=0.9)
 plt.bar(x, unbin_bars, bottom=bin_bars, color='purple', edgecolor='white', label='unbinned', width=0.9)
 plt.legend(loc='upper left', bbox_to_anchor=(1,1), ncol=1, frameon=False)
-plt.xlabel('Size (10Kb)', size=8)
+plt.xlabel('Size (100Kb)', size=8)
 plt.ylabel('% Contigs', size=8)
 
 plt.xticks(x, groups)
