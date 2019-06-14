@@ -110,7 +110,7 @@ rule blast:
         4
     shell:
         """
-        export BLASTDB=$BLASTDB:{params.db}
+        export BLASTDB={params.db}
         blastn -db {params.db} -num_threads {threads} -query {input.input} -outfmt "7 qseqid sscinames sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore" | awk '/hits found/{{getline;print}}' | if grep -v '#'; then :; else echo "No Blast matches found for cluster"; fi > {output.report}
         """
 
