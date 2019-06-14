@@ -12,7 +12,6 @@ P_THRESH = config["P_THRESH"]
 krakendb = config["krakendb"]
 kraken_level = config["kraken_level"]
 
-
 rule all:
     input:
         expand("{REFIN}.sa", REFIN=REFIN),
@@ -22,6 +21,9 @@ rule all:
         expand('output/clustering/{jobid}_values.csv', jobid = JOBID),
         expand('output/clustering/{jobid}_diffs.csv', jobid = JOBID),
         expand("output/clustering/{JOBID}_bwa_output.txt", JOBID = JOBID),
+
+
+localrules: merge_filecounts, derive, start_feeder, split_file
 
 rule bwa_index:
     input:
@@ -94,8 +96,6 @@ rule start_feeder:
         """
         python scripts/start_feeder.py clustering {JOBID}
         """
-
-localrules: split_file
 
 rule split_file:
     input:
