@@ -34,7 +34,7 @@ rule all:
         expand("output/plots/1_{JOBID}_{kraken_level}_plot.pdf", JOBID = JOBID, kraken_level = kraken_level),
         expand("output/plots/{JOBID}_bin_contigs.png", JOBID = JOBID)
 
-localrules: plot, bin_plot
+localrules: test, para_out, plot, bin_plot
 
 rule test:
     input:
