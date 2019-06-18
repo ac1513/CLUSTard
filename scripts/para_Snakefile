@@ -23,6 +23,8 @@ rule all:
       expand("output/clustering/{JOBID}_non_red_list.out", JOBID = JOBID),
       expand("logs/{JOBID}_para_done.txt", JOBID=JOBID)
 
+localrules: para_sets, non_red_step, file_parser
+
 rule bin_feeder:
     input:
         diffs = 'output/clustering/' + JOBID + '_diffs{PART}.csv'
