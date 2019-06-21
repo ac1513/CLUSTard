@@ -155,6 +155,6 @@ rule checkm:
         module load bio/CheckM
         module load math/numpy
         module load lang/Python/2.7.15-foss-2018b
-        checkm unbinned -x fasta output/results/ {params.refin} output/results/{JOBID}_unbinned_contigs.fasta output/results/{JOBID}_unbinned_contigs_stats.tsv
+        checkm unbinned -x fasta output/results/ {params.refin} output/results/{JOBID}_unbinned_contigs.fa output/results/{JOBID}_unbinned_contigs_stats.tsv
         checkm lineage_wf -f {output} --tab_table -x fasta -t {threads} {params.input} {params.out}
         """
