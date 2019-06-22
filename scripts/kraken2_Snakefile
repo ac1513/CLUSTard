@@ -123,6 +123,7 @@ rule output:
         cat *.out > {output}
         rm *.out
         """
+
 rule seqkit:
     input: wait = expand("logs/{JOBID}_slurm_kraken2SM.log", JOBID = JOBID)
     output:

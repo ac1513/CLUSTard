@@ -40,7 +40,7 @@ else:
 # =============================================================================
 # Plot global settings
 # =============================================================================
-    
+
 matplotlib.rcParams['lines.linewidth'] = 0.5
 matplotlib.rcParams['ytick.left'] = True
 matplotlib.rcParams['ytick.minor.size'] = 1
@@ -67,20 +67,21 @@ for item in list(set_groups):
     dc[item] = -1
 for i in groups:
     dc[i] +=1
-    
+
 with open(in_file, 'r') as text_file:
     files = text_file.read().strip().split()
 
 # =============================================================================
 # Plot
 # =============================================================================
-    
+
 counter = 0
 for i in range(0, len(files), 30):
     gs = gsp.GridSpec(5,6)
     gsplace = 0
     sub_files = files[i:i+30]
     counter += 1
+    mean_df = pd.DataFrame(columns=df_samples["sample"].to_list())
     for file in sub_files:
         with open(file, 'r') as f:
             file = str(file)
@@ -97,12 +98,17 @@ for i in range(0, len(files), 30):
             x_start = 0
             x_prev_start = 0
             x_prev_end = 0
+
+            mean_list =[]
+
             for item in list(set_groups):
                 x_end = x_start + dc[item] + 1
                 y_mean = df.mean()[x_start:x_end]
+                mean_list.extend(df.mean()[x_start:x_end].to_list())
+                #print(mean_list)
                 top = df.max()[x_start:x_end]
                 bottom = df.min()[x_start:x_end]
-                
+                #print(df.mean()[x_start:x_end])
                 if "y" in args.dates.lower():
                     df_samples["date"] = pd.to_datetime(df_samples["date"])
                     if x_start == 0:
@@ -116,15 +122,16 @@ for i in range(0, len(files), 30):
                 x_prev_start = x_start
                 x_prev_end = x_end
                 x_start = x_end
-        
-            plt.tick_params(labelbottom=False)    
+
+
+            plt.tick_params(labelbottom=False)
 
             plt.semilogy()
 
             x1,x2,y1,y2 = plt.axis()
             plt.axis((x1,x2,0.0001,100))
             plt.axhline(y=0.01, ls='--', lw = 0.25, c = 'black')
-                                
+
             if args.seqkit:
                 seqkit_df = pd.read_csv(args.seqkit, sep = '\t', index_col =0)
                 file_fa = file.replace(".csv",".fasta")
@@ -133,7 +140,7 @@ for i in range(0, len(files), 30):
                     plt.text(df_samples["date"][1], 1.7, "N50: " + str(n_50), fontsize=2)
                 else:
                     plt.text(0.5, 1.7, "N50: " + str(n_50), fontsize=2)
-                    
+
 
             if args.checkm_file:
                 checkm_df = pd.read_csv(args.checkm_file, sep = '\t', index_col = 0)
@@ -143,7 +150,7 @@ for i in range(0, len(files), 30):
                     plt.text(df_samples["date"][1], 0.7, str(comp)+'%: Complete ' + str(conta)+'%: Contamination', fontsize=2)
                 else:
                     plt.text(0.5, 0.7, str(comp) + '%:  Complete ' + str(conta) + '%:  Contamination', fontsize=2)
-            
+
             if args.kraken:
                 for line in open(args.kraken, 'r'):
                     if re.search(na, line):
@@ -158,8 +165,8 @@ for i in range(0, len(files), 30):
                         else:
                             plt.text(0.5, 0.3, per+'%:  ' + cont, fontsize=2)
 
-                
-                            
+
+
             if "y" in args.dates.lower():
                 plt.text(df_samples["date"][1], 40, na, fontsize = 2, fontweight='bold')
                 plt.text(df_samples["date"][1], 9, nu+' cov:'+av_cov+'+/-'+sd_cov + ', ' + tot_len +'kb', fontsize=2)
@@ -172,7 +179,11 @@ for i in range(0, len(files), 30):
             plt.tick_params(axis = 'y', labelsize=2, pad=0, direction='out', length=1)
             plt.tick_params(right=False, top=False)
             gsplace += 1
+        mean_df = mean_df.append(pd.Series(mean_list, name = file, index = df_samples["sample"].to_list()))
+
 #    plt.show()
-    plt.savefig("output/plots/" + str(counter) + '_' + prefix + '_plot.pdf', type='pdf', dpi=300)
+    plt.savefig('output/plots/' + str(counter) + '_' + prefix + '_plot.pdf', type='pdf', dpi=300)
     print('Generated plot number ' + str(counter) + ' -> ' + str(counter) + '_' + prefix + '_plot.pdf')
     plt.close('all')
+
+mean_df.to_csv(prefix + "_clus_means.csv")
