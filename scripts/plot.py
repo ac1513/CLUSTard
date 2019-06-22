@@ -17,7 +17,7 @@ register_matplotlib_converters()
 # =============================================================================
 # Command line parsing
 # =============================================================================
-parser = argparse.ArgumentParser(description='usage = python entrez_down.py file_list_of_queries')
+parser = argparse.ArgumentParser(description='usage = python in_file prefix -k kraken_file -k_l kraken_level -cm checkm -sk seqkit_file samples_file date(y/n)')
 parser.add_argument('in_file', help='the name of the file containing a list of csv files', type=str)
 parser.add_argument('prefix', help='prefix of the jobs', type=str)
 parser.add_argument('-k', '--kraken', help = 'merged kraken input file', type=str)
