@@ -91,7 +91,7 @@ for i in range(0, len(files), 30):
             tot_len = str('{0:.1f}'.format(sum(df['length'].tolist())/1000))
             av_gc =  str('{0:.1f}'.format(statistics.mean(df['GC'].tolist())))
             sd_gc = str('{0:.1f}'.format(statistics.stdev(df['GC'].tolist())))
-            na = str(file.split('/')[-1:][0].split('.')[0][8:])
+            na = df['length'].idxmax() #NAME BASED ON BIGGEST CONTIG! df['length']
             nu = str(len(df))
             axes1 = plt.subplot(gs[gsplace])
 
