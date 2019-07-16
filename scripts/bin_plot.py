@@ -57,7 +57,7 @@ bin_df = pd.read_csv(binned_file, sep = '\t', names = ["Contig", "Length"])
 max_len = max(math.ceil(unbin_df["Length"].max()/100000), math.ceil(bin_df["Length"].max()/100000))
 
 groups = [0.02,0.05,0.1,0.2,0.5]
-for i in range(1, max_len+1):
+for i in range(1, max_len+1): #adds a bin for every 1000 - whilst still keeping lower scale ^
     groups.append(i)
 
 unbinned = bins(unbinned_file, groups)
@@ -97,3 +97,9 @@ plt.xticks(x, groups)
 plt.tick_params(labelsize = 7)
 #plt.show()
 fig.savefig(str('output/plots/' + prefix + '_bin_contigs.png'), bbox_inches='tight', dpi = 400)
+
+counts = pd.DataFrame(index=groups)
+counts["binned"] = binned
+counts["unbinned"] = unbinned
+
+counts.to_csv(prefix + "_bin_group_stats.csv")
