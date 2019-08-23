@@ -37,7 +37,7 @@ rule all:
         expand("logs/{JOBID}_plot_done.log", JOBID = JOBID)
 
 
-localrules: test, para_out, plot, bin_plot
+localrules: test, para_out, plot, bin_plot, abs_derive, abun_plot
 
 rule test:
     input:
