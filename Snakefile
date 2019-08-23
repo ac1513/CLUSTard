@@ -14,7 +14,12 @@ kraken_level = config["kraken_level"]
 #for plotting
 date_scale = config["date_scale"]
 rel_or_abs = "a"
-top20 = "n"
+top20 = "y"
+
+if 'y' in top20:
+    out_abun = rel_or_abs + '_top20'
+else:
+    out_abun = rel_or_abs
 
 subworkflow bwa_split:
     snakefile:
@@ -37,7 +42,7 @@ rule all:
         expand("output/plots/1_{JOBID}_{kraken_level}_plot.pdf", JOBID = JOBID, kraken_level = kraken_level),
         expand("output/plots/{JOBID}_bin_contigs.png", JOBID = JOBID),
         expand("output/clustering/{JOBID}_read_counts_absolute.csv", JOBID = JOBID),
-        expand("logs/{JOBID}_plot_done.log", JOBID = JOBID)
+        expand("output/plots/{JOBID}_{out_abun}_abun_plot.png", JOBID = JOBID, out_abun = out_abun)
 
 
 localrules: test, para_out, plot, bin_plot, abs_derive, abun_plot
@@ -114,11 +119,13 @@ rule abs_derive:
         python scripts/absolute_derive.py clustering {JOBID} {params.thresh}
         """
 
+
+
 rule abun_plot:
     input:
         count_in = expand("output/clustering/{JOBID}_read_counts_absolute.csv", JOBID = JOBID)
     output:
-        touch("logs/{JOBID}_plot_done.log")
+        plot_out = "output/plots/{JOBID}_{out_abun}_abun_plot.png"
     conda:
         "envs/py3.yaml"
     params:
