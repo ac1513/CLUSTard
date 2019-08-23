@@ -11,7 +11,10 @@ CONTIG_T = config["CONTIG_T"]
 P_THRESH = config["P_THRESH"]
 krakendb = config["krakendb"]
 kraken_level = config["kraken_level"]
+#for plotting
 date_scale = config["date_scale"]
+rel_or_abs = "a"
+top20 = "n"
 
 subworkflow bwa_split:
     snakefile:
@@ -119,13 +122,13 @@ rule abun_plot:
     conda:
         "envs/py3.yaml"
     params:
-        rel_or_abs = "r",
-        top20 = "n",
+        roa = rel_or_abs,
+        top_20 = top20,
         kraken_in = expand("output/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
     shell:
         """
         cd output/results/
         for f in C*.fasta; do filename="${{f%%.*}}"; echo ">$f"; seqkit fx2tab -n $f; done > {JOBID}_binned_cluster_contig.txt
         cd ../../
-        python scripts/abun_plot.py {JOBID} {input.count_in} output/results/{JOBID}_binned_cluster_contig.txt {params.rel_or_abs} {params.top20} -s {samples} Coverage -k {params.kraken_in}
+        python scripts/abun_plot.py {JOBID} {input.count_in} output/results/{JOBID}_binned_cluster_contig.txt {params.roa} {params.top_20} -s {samples} Coverage -k {params.kraken_in}
         """
