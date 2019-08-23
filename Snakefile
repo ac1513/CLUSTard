@@ -127,5 +127,5 @@ rule abun_plot:
         cd output/results/
         for f in C*.fasta; do filename="${{f%%.*}}"; echo ">$f"; seqkit fx2tab -n $f; done > {JOBID}_binned_cluster_contig.txt
         cd ../../
-        python scripts/abun_plot.py {JOBID} {input.count_in} output/results/{JOBID}_binned_cluster_contig.txt {params.rel_or_abs} {params.top20} -s {samples} -k {params.kraken_in}
+        python scripts/abun_plot.py {JOBID} {input.count_in} output/results/{JOBID}_binned_cluster_contig.txt {params.rel_or_abs} {params.top20} -s {samples} Coverage -k {params.kraken_in}
         """
