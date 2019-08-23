@@ -35,7 +35,7 @@ with open(in_file, 'r') as text_file:
 # =============================================================================
 # Stats
 # =============================================================================
-stats_df = pd.DataFrame(columns=['av_cov','sd_cov', 'av_gc','sd_gc','n_50','comp', 'contam','no_seq','tot_len'])
+stats_df = pd.DataFrame(columns=['no_seq','tot_len','av_cov','sd_cov', 'av_gc','sd_gc','n_50','comp', 'contam'])
 
 for file in files:
     with open(file, 'r') as f:
@@ -62,4 +62,4 @@ for file in files:
 
         stats_df.loc[na] = [av_cov,nu,tot_len,sd_cov,av_gc,sd_gc,n_50,comp,conta]
 
-stats_df.to_csv("output/" + prefix + "_cluster_summary_stats.csv")
+stats_df.to_csv("output/" + prefix + "_cluster_summary_stats.tsv", sep='\t')
