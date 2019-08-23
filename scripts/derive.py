@@ -28,8 +28,8 @@ import argparse
 
 parser = argparse.ArgumentParser(description='')
 parser.add_argument('loc', help='location count files are in', type=str)
-parser.add_argument('jobid', help='location count files are in', type=str)
-parser.add_argument('thresh', help='location count files are in', type=int)
+parser.add_argument('jobid', help='jobid - to name output', type=str)
+parser.add_argument('thresh', help='minimum size of contig', type=int)
 args = parser.parse_args()
 loc = str("output/" + args.loc)
 jobid = args.jobid
