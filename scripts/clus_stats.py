@@ -47,7 +47,7 @@ for file in files:
         tot_len = str(sum(df['length'].tolist()))
         av_gc =  str('{0:.1f}'.format(statistics.mean(df['GC'].tolist())))
         sd_gc = str('{0:.1f}'.format(statistics.stdev(df['GC'].tolist())))
-        na = str(file.split('/')[-1:][0].split('.')[0][8:])
+        na = str(file.split('/')[-1:][0].split('.')[0])
         nu = str(len(df))
 
         if args.seqkit:
@@ -60,6 +60,6 @@ for file in files:
             comp = checkm_df["Completeness"][file.split('/')[-1:][0].split('.')[0]]
             conta = checkm_df["Contamination"][file.split('/')[-1:][0].split('.')[0]]
 
-        stats_df.loc[na] = [av_cov,sd_cov,av_gc,sd_gc,n_50,comp,conta,nu,tot_len]
+        stats_df.loc[na] = [av_cov,nu,tot_len,sd_cov,av_gc,sd_gc,n_50,comp,conta]
 
 stats_df.to_csv("output/" + prefix + "_cluster_summary_stats.csv")
