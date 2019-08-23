@@ -137,3 +137,20 @@ rule abun_plot:
         cd ../../
         python scripts/abun_plot.py {JOBID} {input.count_in} output/results/{JOBID}_binned_cluster_contig.txt {params.roa} {params.top_20} -s {samples} Coverage -k {params.kraken_in}
         """
+
+rule clus_stats:
+    input:
+        expand("output/plots/{JOBID}_{out_abun}_abun_plot.png", JOBID=JOBID, out_abun = out_abun)
+    output:
+        csv = "output/{JOBID}_cluster_summary_stats.csv"
+    conda:
+        "envs/py3.yaml" #change clustering (below) when add counts folder..
+    params:
+        checkm = expand("output/checkm/{JOBID}_checkm.log", JOBID=JOBID)
+        seqk = expand("output/results/{JOBID}_seqkit_stats.tsv", JOBID=JOBID)
+    shell:
+        """
+        ls output/results/C*.csv > stat_input.txt
+        python scripts/clus_stats.py stat_input.txt {JOBID} -cm {params.checkm} -sk {params.seqk}
+        rm stat_input.txt
+        """
