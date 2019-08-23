@@ -146,7 +146,7 @@ rule clus_stats:
     conda:
         "envs/py3.yaml" #change clustering (below) when add counts folder..
     params:
-        checkm = expand("output/checkm/{JOBID}_checkm.log", JOBID=JOBID)
+        checkm = expand("output/checkm/{JOBID}_checkm.log", JOBID=JOBID),
         seqk = expand("output/results/{JOBID}_seqkit_stats.tsv", JOBID=JOBID)
     shell:
         """
