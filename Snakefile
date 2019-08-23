@@ -43,7 +43,7 @@ rule all:
         expand("output/plots/{JOBID}_bin_contigs.png", JOBID = JOBID),
         expand("output/clustering/{JOBID}_read_counts_absolute.csv", JOBID = JOBID),
         expand("output/plots/{JOBID}_{out_abun}_abun_plot.png", JOBID = JOBID, out_abun = out_abun),
-        expand("output/{JOBID}_cluster_summary_stats.csv", JOBID=JOBID)
+        expand("output/{JOBID}_cluster_summary_stats.tsv", JOBID=JOBID)
 
 
 localrules: test, para_out, plot, bin_plot, abs_derive, abun_plot
@@ -143,7 +143,7 @@ rule clus_stats:
     input:
         expand("output/plots/{JOBID}_{out_abun}_abun_plot.png", JOBID=JOBID, out_abun = out_abun)
     output:
-        csv = "output/{JOBID}_cluster_summary_stats.csv"
+        csv = "output/{JOBID}_cluster_summary_stats.tsv"
     conda:
         "envs/py3.yaml" #change clustering (below) when add counts folder..
     params:
