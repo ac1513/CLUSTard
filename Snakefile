@@ -32,7 +32,10 @@ rule all:
         expand("logs/{JOBID}_all_bwa_output.txt", JOBID=JOBID),
         expand("logs/{JOBID}_para_out.txt", JOBID = JOBID),
         expand("output/plots/1_{JOBID}_{kraken_level}_plot.pdf", JOBID = JOBID, kraken_level = kraken_level),
-        expand("output/plots/{JOBID}_bin_contigs.png", JOBID = JOBID)
+        expand("output/plots/{JOBID}_bin_contigs.png", JOBID = JOBID),
+        expand("output/clustering/{JOBID}_absolute_read_counts_derived.csv", JOBID = JOBID),
+        expand("logs/{JOBID}_plot_done.log", JOBID = JOBID)
+
 
 localrules: test, para_out, plot, bin_plot
 
@@ -92,4 +95,37 @@ rule bin_plot:
         cat Cluster*.fasta | awk '$0 ~ ">" {{print c; c=0;printf substr($0,2,100) "\\t"; }} $0 !~ ">" {{c+=length($0);}} END {{ print c; }}' | sort | uniq > {JOBID}_sorted_lengths.tsv
         cd ../../
         python scripts/bin_plot.py output/results/{JOBID}_unbinned_contigs_stats.tsv output/results/{JOBID}_sorted_lengths.tsv {JOBID}
+        """
+
+rule abs_derive:
+    input:
+        expand("output/plots/{JOBID}_bin_contigs.png", JOBID=JOBID)
+    output:
+        csv = "output/clustering/{JOBID}_absolute_read_counts_derived.csv"
+    params:
+        thresh = CONTIG_T
+    conda:
+        "envs/py3.yaml" #change clustering (below) when add counts folder..
+    shell:
+        """
+        python scripts/absolute_derive.py clustering {JOBID} {params.thresh}
+        """
+
+rule abun_plot:
+    input:
+        count_in = expand("output/clustering/{JOBID}_absolute_read_counts_derived.csv", JOBID = JOBID)
+    output:
+        touch("logs/{JOBID}_plot_done.log")
+    conda:
+        "envs/py3.yaml"
+    params:
+        rel_or_abs = "r",
+        top20 = "n",
+        kraken_in = expand("output/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
+    shell:
+        """
+        cd output/results/
+        for f in C*.fasta; do filename="${{f%%.*}}"; echo ">$f"; seqkit fx2tab -n $f; done > {JOBID}_binned_cluster_contig.txt
+        cd ../../
+        python scripts/abun_plot.py {JOBID} {input.count_in} output/results/{JOBID}_binned_cluster_contig.txt {params.rel_or_abs} {params.top20} -s {samples} -k {params.kraken_in}
         """
