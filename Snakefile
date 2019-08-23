@@ -33,7 +33,7 @@ rule all:
         expand("logs/{JOBID}_para_out.txt", JOBID = JOBID),
         expand("output/plots/1_{JOBID}_{kraken_level}_plot.pdf", JOBID = JOBID, kraken_level = kraken_level),
         expand("output/plots/{JOBID}_bin_contigs.png", JOBID = JOBID),
-        expand("output/clustering/{JOBID}_absolute_read_counts_derived.csv", JOBID = JOBID),
+        expand("output/clustering/{JOBID}_read_counts_absolute.csv", JOBID = JOBID),
         expand("logs/{JOBID}_plot_done.log", JOBID = JOBID)
 
 
@@ -113,7 +113,7 @@ rule abs_derive:
 
 rule abun_plot:
     input:
-        count_in = expand("output/clustering/{JOBID}_absolute_read_counts_derived.csv", JOBID = JOBID)
+        count_in = expand("output/clustering/{JOBID}_read_counts_absolute.csv", JOBID = JOBID)
     output:
         touch("logs/{JOBID}_plot_done.log")
     conda:
