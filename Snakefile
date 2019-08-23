@@ -14,7 +14,7 @@ kraken_level = config["kraken_level"]
 #for plotting
 date_scale = config["date_scale"]
 rel_or_abs = "a"
-top20 = "y"
+top20 = "n"
 
 if 'y' in top20:
     out_abun = rel_or_abs + '_top20'
@@ -118,8 +118,6 @@ rule abs_derive:
         """
         python scripts/absolute_derive.py clustering {JOBID} {params.thresh}
         """
-
-
 
 rule abun_plot:
     input:
