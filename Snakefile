@@ -101,7 +101,7 @@ rule abs_derive:
     input:
         expand("output/plots/{JOBID}_bin_contigs.png", JOBID=JOBID)
     output:
-        csv = "output/clustering/{JOBID}_absolute_read_counts_derived.csv"
+        csv = "output/clustering/{JOBID}_read_counts_absolute.csv"
     params:
         thresh = CONTIG_T
     conda:
