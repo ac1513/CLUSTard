@@ -147,7 +147,7 @@ if 'r' in plot:
 if 'y' in top20:
     plot = plot + '_top20'
 
-fig.savefig(str(prefix + '_' + plot + '_abun_plot.png'), bbox_inches='tight', dpi = 400)
+fig.savefig(str("output/plots/" + prefix + '_' + plot + '_abun_plot.png'), bbox_inches='tight', dpi = 400)
 plt.show()
 
 GenusData = abun
@@ -159,11 +159,11 @@ dendrogram = hc.dendrogram(z, labels=GenusData.columns,  color_threshold=0.04, l
 for key in dendrogram.keys():
     if key == 'ivl':
         DenOrder = dendrogram[key]
-plt.savefig(prefix +'_' + plot +'_'+ LinkMethod + metric +'_dendro.png', bbox_inches='tight', dpi = 400)
+plt.savefig("output/plots/" + prefix +'_' + plot +'_'+ LinkMethod + metric +'_dendro.png', bbox_inches='tight', dpi = 400)
 
 
 GenusData = GenusData[DenOrder]
 GenusData = GenusData.transpose()
 GenusData.plot.bar(stacked=True, legend = None, figsize=(30,20))
 plt.legend(loc='center left', labelspacing=-2.5,  bbox_to_anchor=(1.0, 0.5))
-plt.savefig(prefix +'_' + plot +'_'+ 'ord_abun.png')
+plt.savefig("output/plots/" + prefix +'_' + plot +'_'+ 'ord_abun.png')
