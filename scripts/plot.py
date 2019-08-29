@@ -91,7 +91,7 @@ for i in range(0, len(files), 30):
             tot_len = str('{0:.1f}'.format(sum(df['length'].tolist())/1000))
             av_gc =  str('{0:.1f}'.format(statistics.mean(df['GC'].tolist())))
             sd_gc = str('{0:.1f}'.format(statistics.stdev(df['GC'].tolist())))
-            na = str(file.split('/')[-1:][0].split('.')[0][8:]) #df['length'].idxmax() 
+            na = str(file.split('/')[-1:][0].split('.')[0][8:]) #df['length'].idxmax()
             nu = str(len(df))
             axes1 = plt.subplot(gs[gsplace])
 
@@ -144,8 +144,9 @@ for i in range(0, len(files), 30):
 
             if args.checkm_file:
                 checkm_df = pd.read_csv(args.checkm_file, sep = '\t', index_col = 0)
-                comp = checkm_df["Completeness"][file.split('/')[-1:][0].split('.')[0]]
-                conta = checkm_df["Contamination"][file.split('/')[-1:][0].split('.')[0]]
+                clus = file.split('/')[-1:][0][:-3]
+                comp = checkm_df["Completeness"][clus]
+                conta = checkm_df["Contamination"][clus]
                 if "y" in args.dates.lower():
                     plt.text(df_samples["date"][1], 0.7, str(comp)+'%: Complete ' + str(conta)+'%: Contamination', fontsize=2)
                 else:
