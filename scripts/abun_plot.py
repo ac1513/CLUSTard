@@ -73,7 +73,7 @@ with open(binned_in, 'r') as binned_list:
                             if name =="":
                                 name = 'Unclassified'
             else:
-                line = line.strip()
+                line = line.strip().split(' ')[0] #split may not work with NAB_997 - check
                 if line in df_abun.index:
                     if name in new_df_abun.index:
                         new_df_abun.loc[name] = new_df_abun.loc[name].add(df_abun.loc[line]) #need to add this not just equal... #This isn't working???
@@ -88,7 +88,7 @@ with open(binned_in, 'r') as binned_list:
                 cluster = line.strip('>').strip()[:-6] #strip things
                 name = cluster
             else:
-                line = line.strip()
+                line = line.strip().split(' ')[0]#split may not work with NAB_997 - check
                 if line in df_abun.index:
                     if name in new_df_abun.index:
                         new_df_abun.loc[name] = new_df_abun.loc[name].add(df_abun.loc[line]) #need to add this not just equal... #This isn't working???
