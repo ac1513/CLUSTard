@@ -65,7 +65,7 @@ with open(binned_in, 'r') as binned_list:
     for line in binned_list:
         if taxo == "y":
             if line.startswith(">"): #get cluster info
-                cluster = line.strip('>').strip()[-6] #strip things
+                cluster = line.strip('>').strip()[:-6] #strip things
                 with open(kraken, 'r') as kraken_f:
                     for line2 in kraken_f:
                         if re.search(cluster, line2):
