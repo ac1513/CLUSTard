@@ -46,7 +46,7 @@ matplotlib.rcParams['ytick.left'] = True
 matplotlib.rcParams['ytick.minor.size'] = 1
 matplotlib.rcParams['ytick.minor.width'] = 0.25
 matplotlib.rcParams['axes.linewidth'] = 0.5
-colours = ["crimson", "purple", "tab:cyan", "seagreen", "darkorange", "tab:pink", "darkslateblue"]
+colours = ["crimson", "purple", "tab:cyan", "seagreen", "darkorange", "tab:pink", "darkslateblue", "darkgoldenrod", "teal", "darkolivegreen"]
 
 # =============================================================================
 # Read in input file(s)
@@ -144,7 +144,7 @@ for i in range(0, len(files), 30):
 
             if args.checkm_file:
                 checkm_df = pd.read_csv(args.checkm_file, sep = '\t', index_col = 0)
-                clus = file.split('/')[-1:][0][:-3]
+                clus = file.split('/')[-1:][0][:-4]
                 comp = checkm_df["Completeness"][clus]
                 conta = checkm_df["Contamination"][clus]
                 if "y" in args.dates.lower():
