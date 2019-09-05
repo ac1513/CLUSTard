@@ -57,7 +57,7 @@ for file in files:
 
         if args.checkm_file:
             checkm_df = pd.read_csv(args.checkm_file, sep = '\t', index_col = 0)
-            clus = file.split('/')[-1:][0][:-3]
+            clus = file.split('/')[-1:][0][:-4]
             comp = checkm_df["Completeness"][clus]
             conta = checkm_df["Contamination"][clus]
 
