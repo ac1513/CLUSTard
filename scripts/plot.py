@@ -185,7 +185,7 @@ for i in range(0, len(files), 30):
 
 #    plt.show()
     plt.savefig('output/plots/' + str(counter) + '_' + prefix + '_plot.png', type='png', dpi=600)
-    print('Generated plot number ' + str(counter) + ' -> ' + str(counter) + '_' + prefix + '_plot.pdf')
+    print('Generated plot number ' + str(counter) + ' -> ' + str(counter) + '_' + prefix + '_plot.png')
     plt.close('all')
 
 mean_df.to_csv(prefix + "_clus_means.csv")

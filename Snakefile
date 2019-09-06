@@ -74,7 +74,7 @@ rule plot:
         file_out = expand("logs/{JOBID}_para_out.txt", JOBID = JOBID),
         checkm = kraken2(expand("output/checkm/{JOBID}_checkm.log", JOBID=JOBID))
     output:
-        cluster_plot = "output/plots/1_{JOBID}_{kraken_level}_plot.pdf"
+        cluster_plot = "output/plots/1_{JOBID}_{kraken_level}_plot.png"
     params:
         files = "plot_in_files.txt",
         sample_file = config["samples"],
@@ -93,7 +93,7 @@ rule plot:
 
 rule bin_plot:
     input:
-        file_out = expand("output/plots/1_{JOBID}_{kraken_level}_plot.pdf", JOBID = JOBID, kraken_level = kraken_level)
+        file_out = expand("output/plots/1_{JOBID}_{kraken_level}_plot.png", JOBID = JOBID, kraken_level = kraken_level)
     output:
         contig_plot = "output/plots/{JOBID}_bin_contigs.png"
     conda:
