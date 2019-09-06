@@ -92,7 +92,7 @@ for i in range(0, len(files), 30):
             av_gc =  str('{0:.1f}'.format(statistics.mean(df['GC'].tolist())))
             sd_gc = str('{0:.1f}'.format(statistics.stdev(df['GC'].tolist())))
             na = str(df['length'].idxmax())
-            #na = str(file.split('/')[-1:][0].split('.')[0][8:]) #df['length'].idxmax()
+            file_na = str(file.split('/')[-1:][0].split('.')[0][8:]) #df['length'].idxmax()
             nu = str(len(df))
             axes1 = plt.subplot(gs[gsplace])
 
@@ -155,7 +155,7 @@ for i in range(0, len(files), 30):
 
             if args.kraken:
                 for line in open(args.kraken, 'r'):
-                    if re.search(na, line):
+                    if re.search(file_na, line):
                         cont = line.split('\t')[-1].strip()
                         if './' in cont:
                             cont = ' '
