@@ -39,7 +39,7 @@ rule all:
     input:
         expand("logs/{JOBID}_all_bwa_output.txt", JOBID=JOBID),
         expand("logs/{JOBID}_para_out.txt", JOBID = JOBID),
-        expand("output/plots/1_{JOBID}_{kraken_level}_plot.pdf", JOBID = JOBID, kraken_level = kraken_level),
+        expand("output/plots/1_{JOBID}_{kraken_level}_plot.png", JOBID = JOBID, kraken_level = kraken_level),
         expand("output/plots/{JOBID}_bin_contigs.png", JOBID = JOBID),
         expand("output/clustering/{JOBID}_read_counts_absolute.csv", JOBID = JOBID),
         expand("output/plots/{JOBID}_{out_abun}_abun_plot.png", JOBID = JOBID, out_abun = out_abun),
