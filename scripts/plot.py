@@ -91,7 +91,8 @@ for i in range(0, len(files), 30):
             tot_len = str('{0:.1f}'.format(sum(df['length'].tolist())/1000))
             av_gc =  str('{0:.1f}'.format(statistics.mean(df['GC'].tolist())))
             sd_gc = str('{0:.1f}'.format(statistics.stdev(df['GC'].tolist())))
-            na = str(file.split('/')[-1:][0].split('.')[0][8:]) #df['length'].idxmax()
+            na = str(df['length'].idxmax())
+            #na = str(file.split('/')[-1:][0].split('.')[0][8:]) #df['length'].idxmax()
             nu = str(len(df))
             axes1 = plt.subplot(gs[gsplace])
 
@@ -183,7 +184,7 @@ for i in range(0, len(files), 30):
         mean_df = mean_df.append(pd.Series(mean_list, name = file, index = df_samples["sample"].to_list()))
 
 #    plt.show()
-    plt.savefig('output/plots/' + str(counter) + '_' + prefix + '_plot.pdf', type='pdf', dpi=300)
+    plt.savefig('output/plots/' + str(counter) + '_' + prefix + '_plot.png', type='png', dpi=600)
     print('Generated plot number ' + str(counter) + ' -> ' + str(counter) + '_' + prefix + '_plot.pdf')
     plt.close('all')
 
