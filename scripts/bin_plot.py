@@ -87,8 +87,8 @@ for i in range(len(unbinned)):
         unbin_bars.append(0)
 
 fig = plt.figure(1)
-plt.bar(x, bin_bars, color='forestgreen', edgecolor='white', label='binned', width=1)
-plt.bar(x, unbin_bars, bottom=bin_bars, color='purple', edgecolor='white', label='unbinned', width=1)
+plt.bar(x, bin_bars, color='#25335d', edgecolor='none', label='binned', width=1)
+plt.bar(x, unbin_bars, bottom=bin_bars, color='#abb9e3', edgecolor='none', label='unbinned', width=1)
 plt.legend(loc='upper left', bbox_to_anchor=(1,1), ncol=1, frameon=False)
 plt.xlabel('Size (100Kb)', size=8)
 plt.ylabel('% Contigs', size=8)
