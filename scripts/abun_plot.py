@@ -158,6 +158,8 @@ if 'y' in top20:
     plt.legend(loc='center left', labelspacing=-2.5, bbox_to_anchor=(1.0, 0.5), frameon=False)
     plt.ylim(0,100)
     plt.tight_layout()
+    plt.gcf().subplots_adjust(bottom=0.15)
+    plt.gcf().subplots_adjust(right=0.15)
     plt.savefig(prefix +'_' + plot +'_'+ 'abun.png')
 
 GenusData = abun
