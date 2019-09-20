@@ -101,7 +101,7 @@ if 'y' in top20:
     new_df_abun["sum"]=new_df_abun.sum(axis=1)
     top_df_abun = new_df_abun.sort_values('sum', axis=0, ascending=False).head(19).drop(columns = "sum")
     other_df_abun = new_df_abun.sort_values('sum', axis=0, ascending=False).iloc[19:,]
-    top_df_abun.loc["other"] = other_df_abun.sum(axis=0).drop(columns="sum")
+    top_df_abun.loc["Other"] = other_df_abun.sum(axis=0).drop(columns="sum")
     new_df_abun = top_df_abun
 
 for column in new_df_abun: #iterate over columns
