@@ -154,7 +154,7 @@ if 'y' in top20:
     colours = ['#502db3', '#008080', '#c200f2', '#f2c200','#36a3d9', '#e6beff','#8c0025', '#f58231', '#bf0080', '#cad900','#911eb4','#e5001f','#0066bf', '#000075','#338000', '#f032e6','#1bca00','#1d4010','#9a6324','#a9a9a9']
 
     abun_flip = abun.transpose()
-    abun_flip.plot.bar(stacked=True, legend = None, figsize=(20,15), color=colours, width=0.9)
+    abun_flip.plot.bar(stacked=True, legend = None, figsize=(30,20), color=colours, width=0.9)
     plt.legend(loc='center left', labelspacing=-2.5, bbox_to_anchor=(1.0, 0.5), frameon=False)
     plt.ylim(0,100)
     plt.savefig(prefix +'_' + plot +'_'+ 'abun.png')
