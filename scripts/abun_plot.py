@@ -157,6 +157,7 @@ if 'y' in top20:
     abun_flip.plot.bar(stacked=True, legend = None, figsize=(30,20), color=colours, width=0.9)
     plt.legend(loc='center left', labelspacing=-2.5, bbox_to_anchor=(1.0, 0.5), frameon=False)
     plt.ylim(0,100)
+    plt.tight_layout()
     plt.savefig(prefix +'_' + plot +'_'+ 'abun.png')
 
 GenusData = abun
