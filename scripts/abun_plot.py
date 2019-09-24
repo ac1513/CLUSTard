@@ -117,6 +117,8 @@ for column in new_df_abun: #iterate over columns
 abun_sum = abun.cumsum()
 
 abun.index = new_df_abun.index.values.tolist()
+if 'r' in plot:
+    abun.to_csv(prefix + "_relative_counts.csv")
 
 prev = ""
 previous = pd.Series()
