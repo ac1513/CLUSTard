@@ -178,4 +178,4 @@ GenusData = GenusData[DenOrder]
 GenusData = GenusData.transpose()
 GenusData.plot.bar(stacked=True, legend = None, figsize=(30,20), width=0.9)
 plt.legend(loc='center left', labelspacing=-2.5,  bbox_to_anchor=(1.0, 0.5))
-plt.savefig("output/plots/" + prefix +'_' + plot +'_'+ 'ord_abun.png', , bbox_inches='tight')
+plt.savefig("output/plots/" + prefix +'_' + plot +'_'+ 'ord_abun.png', bbox_inches='tight')
