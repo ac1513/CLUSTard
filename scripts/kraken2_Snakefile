@@ -23,8 +23,7 @@ rule all:
         expand("output/prokka/Cluster_{CLUSTERS}/{JOBID}_{CLUSTERS}.err", JOBID = JOBID, CLUSTERS = CLUSTERS),
         expand("logs/{JOBID}_slurm_prokka.log", JOBID=JOBID),
         "output/results/{JOBID}_seqkit_stats.tsv",
-        expand("output/checkm/{JOBID}_checkm.log", JOBID=JOBID),
-        expand("output/blast/{JOBID}_Cluster_{CLUSTERS}_report_blast.out", JOBID=JOBID, CLUSTERS=CLUSTERS)
+        expand("output/checkm/{JOBID}_checkm.log", JOBID=JOBID)
 
 localrules: kraken_merge, tbl2asn, output, seqkit
 
@@ -96,26 +95,8 @@ rule prokka:
         rm {params.prokka}
         """
 
-rule blast:
-    input:
-        input = "output/results/Cluster_{CLUSTERS}.fasta",
-        wait = expand("output/prokka/Cluster_{CLUSTERS}/{JOBID}_{CLUSTERS}.err", JOBID = JOBID, CLUSTERS=CLUSTERS)
-    output:
-        report = "output/blast/{JOBID}_Cluster_{CLUSTERS}_report_blast.out",
-    params:
-        db = blastdb
-    conda:
-        "../envs/blast.yaml"
-    threads:
-        4
-    shell:
-        """
-        export BLASTDB={params.db}
-        blastn -db {params.db} -num_threads {threads} -query {input.input} -outfmt "7 qseqid sscinames sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore" | awk '/hits found/{{getline;print}}' | if grep -v '#'; then :; else echo "No Blast matches found for cluster"; fi > {output.report}
-        """
-
 rule output:
-    input: expand("output/blast/{JOBID}_Cluster_{CLUSTERS}_report_blast.out", CLUSTERS = CLUSTERS, JOBID = JOBID)
+    input: expand("output/prokka/Cluster_{CLUSTERS}/{JOBID}_{CLUSTERS}.err", JOBID = JOBID, CLUSTERS=CLUSTERS)
     output:
         "logs/{JOBID}_slurm_kraken2SM.log"
     shell:
