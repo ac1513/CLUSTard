@@ -11,7 +11,6 @@ CONTIG_T = config["CONTIG_T"]
 P_THRESH = config["P_THRESH"]
 krakendb = config["krakendb"]
 kraken_level = str(config["kraken_level"])
-blastdb = config["blastdb"]
 
 (CLUSTERS,) = glob_wildcards("output/results/Cluster_{CLUSTER}.csv")
 
