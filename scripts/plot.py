@@ -53,12 +53,19 @@ colours = ["crimson", "purple", "tab:cyan", "seagreen", "darkorange", "tab:pink"
 # =============================================================================
 
 set_groups = set()
-if "y" in args.dates.lower():
-    df_samples = pd.read_csv(samples, sep ='\t', parse_dates = ["date"])
-else:
-    df_samples = pd.read_csv(samples, sep ='\t')
 
-groups = df_samples["group"].tolist() #get rid of header
+df_samples = pd.read_csv(samples, sep ='\t')
+
+if "y" in args.dates.lower(): #if want to plot on date scale
+    if "date" in df_samples.columns: # and if a date column is present
+        df_samples = pd.read_csv(samples, sep ='\t', parse_dates = ["date"])
+    else:
+        "Not date column present - please include if want to plot using time"
+
+if "group" in df_samples.columns:
+    groups = df_samples["group"].tolist() #get rid of header
+else:
+    groups = [1] * len(df_samples.index)
 
 for item in groups:
     set_groups.add(item)
@@ -110,7 +117,7 @@ for i in range(0, len(files), 30):
                 top = df.max()[x_start:x_end]
                 bottom = df.min()[x_start:x_end]
                 #print(df.mean()[x_start:x_end])
-                if "y" in args.dates.lower():
+                if "date" in df_samples.columns:
                     df_samples["date"] = pd.to_datetime(df_samples["date"])
                     if x_start == 0:
                         x_data = df_samples["date"][x_start:x_end]
@@ -137,7 +144,7 @@ for i in range(0, len(files), 30):
                 seqkit_df = pd.read_csv(args.seqkit, sep = '\t', index_col =0)
                 file_fa = file.replace(".csv",".fasta")
                 n_50 = seqkit_df["N50"][file_fa]
-                if "y" in args.dates.lower():
+                if "date" in df_samples.columns:
                     plt.text(df_samples["date"][1], 1.7, "N50: " + str(n_50), fontsize=2)
                 else:
                     plt.text(0.5, 1.7, "N50: " + str(n_50), fontsize=2)
@@ -148,7 +155,7 @@ for i in range(0, len(files), 30):
                 clus = file.split('/')[-1:][0][:-4]
                 comp = checkm_df["Completeness"][clus]
                 conta = checkm_df["Contamination"][clus]
-                if "y" in args.dates.lower():
+                if "date" in df_samples.columns:
                     plt.text(df_samples["date"][1], 0.7, str(comp)+'%: Complete ' + str(conta)+'%: Contamination', fontsize=2)
                 else:
                     plt.text(0.5, 0.7, str(comp) + '%:  Complete ' + str(conta) + '%:  Contamination', fontsize=2)
@@ -162,14 +169,14 @@ for i in range(0, len(files), 30):
                         else:
                             per = line.split('\t')[1]
                             per = per.strip()
-                        if "y" in args.dates.lower():
+                        if "date" in df_samples.columns:
                             plt.text(df_samples["date"][1], 0.3, per+'%:  ' + cont, fontsize=2)
                         else:
                             plt.text(0.5, 0.3, per+'%:  ' + cont, fontsize=2)
 
 
 
-            if "y" in args.dates.lower():
+            if "date" in df_samples.columns:
                 plt.text(df_samples["date"][1], 40, na, fontsize = 2, fontweight='bold')
                 plt.text(df_samples["date"][1], 9, nu+' cov:'+av_cov+'+/-'+sd_cov + ', ' + tot_len +'kb', fontsize=2)
                 plt.text(df_samples["date"][1], 4, 'GC% '+ av_gc +'+/-'+ sd_gc, fontsize=2)
