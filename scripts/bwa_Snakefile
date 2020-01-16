@@ -11,6 +11,7 @@ CONTIG_T = config["CONTIG_T"]
 P_THRESH = config["P_THRESH"]
 krakendb = config["krakendb"]
 kraken_level = config["kraken_level"]
+extension = config["in_file_extension"].strip('.') #this may not work - check
 
 rule all:
     input:
@@ -39,8 +40,8 @@ rule bwa_index:
 
 rule bwa_mem:
     input:
-        fq1 = 'data/{samples}_R1.fastq.gz',
-        fq2 = 'data/{samples}_R2.fastq.gz',
+        fq1 = 'data/{samples}_R1.{extension}',
+        fq2 = 'data/{samples}_R2.{extension}',
         ref = REFIN,
         ref_ind = expand("{reference}.sa", reference=REFIN) #waits for indexed reference
     output:

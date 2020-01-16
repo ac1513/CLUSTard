@@ -13,8 +13,8 @@ krakendb = config["krakendb"]
 kraken_level = config["kraken_level"]
 #for plotting
 date_scale = config["date_scale"]
-rel_or_abs = "a"
-top20 = "n"
+rel_or_abs = "r"
+top20 = "y"
 
 if 'y' in top20:
     out_abun = rel_or_abs + '_top20'
