@@ -67,14 +67,19 @@ print('Loading cluster details')
 with open(cluster_file, 'r') as clusters:
     working_cluster = json.load(clusters)
     for current_cluster in working_cluster:
-        cluster_filename = (wd+'Cluster_'+str(current_cluster[0])+'.csv')
-        fasta_cluster_filename = (wd+'Cluster_'+str(current_cluster[0])+'.fasta')
         fasta_entry = []
+        top_len = 0
+        for cluster_name in current_cluster:
+            fasta_entry.append(contig_dict[cluster_name])
+            if len(contig_dict[cluster_name]) > top_len:
+                top_len = len(contig_dict[cluster_name])
+                top_cluster = cluster_name
+            fasta_cluster_filename = (wd+'Cluster_'+str(top_cluster)+'.fasta')
+            SeqIO.write(fasta_entry, fasta_cluster_filename, 'fasta')
+        cluster_filename = (wd+'Cluster_'+str(top_cluster)+'.csv')
         with open(cluster_filename, 'w', newline='') as csvfile:
             csv_writer = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_NONE, escapechar=' ')
             csv_writer.writerow(header)
             for cluster_name in current_cluster:
                 csv_string = cluster_name, ', '.join(map(str, bun_dict[cluster_name])), len(contig_dict[cluster_name]),su.GC(contig_dict[cluster_name].seq)
                 csv_writer.writerow(csv_string)
-                fasta_entry.append(contig_dict[cluster_name])
-            SeqIO.write(fasta_entry, fasta_cluster_filename, 'fasta')
