@@ -55,7 +55,7 @@ rule kraken_merge:
     shell:
         """
         cd output/kraken
-        find -name '{JOBID}*_report_kraken.out' -type f -printf '\\n%p\\t' -exec sh -c 'echo {{}} | sort -k1nr {{}} | grep -P "\\t{params.level}\\t" | head -n1 ' \\; > {JOBID}_{kraken_level}_top_kraken.out
+        find -name '{JOBID}*_report_kraken.out' -type f -printf '\\n%p\\t' -exec sh -c 'echo {{}} | sort -k1nr {{}} | grep -P "\\t{params.level}\\t" | head -n1 ' \\; > {JOBID}_{params.level}_top_kraken.out
         """
 
 rule tbl2asn:
@@ -71,7 +71,7 @@ rule tbl2asn:
         rm tbl2asn
         wget ftp://ftp.ncbi.nih.gov/toolbox/ncbi_tools/converters/by_program/tbl2asn/linux64*
 	gunzip linux64.tbl2asn.gz
-	mv linux64.tbl2asn tbl2asn 
+	mv linux64.tbl2asn tbl2asn
         chmod +x tbl2asn
         """
 
@@ -129,15 +129,15 @@ rule checkm:
         out = expand("output/checkm", JOBID=JOBID),
         input = "output/results",
         refin = REFIN,
-	checkmdb = config["checkm_db_root"]
+        checkmdb = config["checkm_db_root"]
     threads:
         20
     conda:
         "../envs/checkm.yaml"
     shell:
         """
-	checkm_db={params.checkmdb}
-	echo ${{checkm_db}} | checkm data setRoot ${{checkm_db}}
+	      checkm_db={params.checkmdb}
+        echo ${{checkm_db}} | checkm data setRoot ${{checkm_db}}
         checkm unbinned -x fasta output/results/ {params.refin} output/results/{JOBID}_unbinned_contigs.fa output/results/{JOBID}_unbinned_contigs_stats.tsv
         checkm lineage_wf -f {output} --tab_table -x fasta -t {threads} {params.input} {params.out}
         """
