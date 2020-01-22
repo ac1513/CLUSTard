@@ -69,7 +69,9 @@ rule tbl2asn:
         """
         cd $(dirname $(which tbl2asn))
         rm tbl2asn
-        wget https://github.com/tseemann/prokka/raw/master/binaries/linux/tbl2asn
+        wget ftp://ftp.ncbi.nih.gov/toolbox/ncbi_tools/converters/by_program/tbl2asn/linux64*
+	gunzip linux64.tbl2asn.gz
+	mv linux64.tbl2asn tbl2asn 
         chmod +x tbl2asn
         """
 
@@ -126,16 +128,16 @@ rule checkm:
     params:
         out = expand("output/checkm", JOBID=JOBID),
         input = "output/results",
-        refin = REFIN
+        refin = REFIN,
+	checkmdb = config["checkm_db_root"]
     threads:
         20
-    #conda:
-    #    "../envs/checkm.yaml"
+    conda:
+        "../envs/checkm.yaml"
     shell:
         """
-        module load bio/CheckM
-        module load math/numpy
-        module load lang/Python/2.7.15-foss-2018b
+	checkm_db={params.checkmdb}
+	echo ${{checkm_db}} | checkm data setRoot ${{checkm_db}}
         checkm unbinned -x fasta output/results/ {params.refin} output/results/{JOBID}_unbinned_contigs.fa output/results/{JOBID}_unbinned_contigs_stats.tsv
         checkm lineage_wf -f {output} --tab_table -x fasta -t {threads} {params.input} {params.out}
         """
