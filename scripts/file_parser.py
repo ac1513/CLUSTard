@@ -72,7 +72,7 @@ with open(cluster_file, 'r') as clusters:
         for cluster_name in current_cluster:
             fasta_entry.append(contig_dict[cluster_name])
             if len(contig_dict[cluster_name]) > top_len:
-                top_len = len(contig_dict[cluster_nam e])
+                top_len = len(contig_dict[cluster_name])
                 top_cluster = cluster_name
             fasta_cluster_filename = (wd+'Cluster_'+str(top_cluster)+'.fasta')
             SeqIO.write(fasta_entry, fasta_cluster_filename, 'fasta')
