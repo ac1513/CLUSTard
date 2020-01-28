@@ -76,7 +76,7 @@ with open(cluster_file, 'r') as clusters:
                 top_cluster = cluster_name
             fasta_cluster_filename = (wd+'Cluster_'+str(top_cluster)+'.fasta')
             SeqIO.write(fasta_entry, fasta_cluster_filename, 'fasta')
-        cluster_filename = (wd+'Cluster_'+str(top_cluster)+'.csv')
+            cluster_filename = (wd+'Cluster_'+str(top_cluster)+'.csv')
         with open(cluster_filename, 'w', newline='') as csvfile:
             csv_writer = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_NONE, escapechar=' ')
             csv_writer.writerow(header)
