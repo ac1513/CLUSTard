@@ -29,6 +29,9 @@ subworkflow para:
     snakefile:
         "scripts/para_Snakefile"
 
+subworkflow singleton:
+    snakefile:
+        "scripts/singleton_Snakefile"
 
 subworkflow kraken2:
     snakefile:
@@ -39,6 +42,7 @@ rule all:
     input:
         expand("logs/{JOBID}_all_bwa_output.txt", JOBID=JOBID),
         expand("logs/{JOBID}_para_out.txt", JOBID = JOBID),
+        expand("logs/{JOBID}_singleton_out.txt", JOBID=JOBID),
         expand("output/plots/1_{JOBID}_{kraken_level}_plot.png", JOBID = JOBID, kraken_level = kraken_level),
         expand("output/plots/{JOBID}_bin_contigs.png", JOBID = JOBID),
         expand("output/clustering/{JOBID}_read_counts_absolute.csv", JOBID = JOBID),
@@ -61,7 +65,7 @@ rule test:
 
 rule para_out:
     input:
-        clusters = para(expand("logs/{JOBID}_para_done.txt", JOBID = JOBID))
+        clusters = para(expand("logs/{JOBID}_singleton_step1.txt", JOBID=JOBID))
     output:
         "logs/{JOBID}_para_out.txt"
     shell:
@@ -69,10 +73,20 @@ rule para_out:
         echo "Done" >> {output}
         """
 
+rule singleton_out:
+    input:
+        singleton(expand("logs/{JOBID}_singleton_done.txt", JOBID=JOBID))
+    output:
+        touch("logs/{JOBID}_singleton_out.txt")
+    shell:
+        """
+        echo "singleton analysis done"
+        """
+
 rule plot:
     input:
-        file_out = expand("logs/{JOBID}_para_out.txt", JOBID = JOBID),
-        checkm = kraken2(expand("output/checkm/{JOBID}_checkm.log", JOBID=JOBID))
+        file_out = expand("logs/{JOBID}_singleton_out.txt", JOBID = JOBID),
+        checkm = kraken2(expand("output/{JOBID}_checkm/{JOBID}_checkm.log", JOBID=JOBID))
     output:
         cluster_plot = "output/plots/1_{JOBID}_{kraken_level}_plot.png"
     params:
@@ -147,7 +161,7 @@ rule clus_stats:
     conda:
         "envs/py3.yaml" #change clustering (below) when add counts folder..
     params:
-        checkm = expand("output/checkm/{JOBID}_checkm.log", JOBID=JOBID),
+        checkm = expand("output/{JOBID}_checkm/{JOBID}_checkm.log", JOBID=JOBID),
         seqk = expand("output/results/{JOBID}_seqkit_stats.tsv", JOBID=JOBID)
     shell:
         """

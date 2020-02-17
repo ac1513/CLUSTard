@@ -12,7 +12,6 @@ P_THRESH = config["P_THRESH"]
 krakendb = config["krakendb"]
 kraken_level = config["kraken_level"]
 
-
 (job, part) = glob_wildcards('output/clustering/{JOBID}_diffs{PART}.csv')
 
 rule all:
@@ -21,9 +20,13 @@ rule all:
       expand("output/clustering/{JOBID}_parallel_sets_{PART}.csv", JOBID = JOBID, PART = part),
       expand("output/clustering/{JOBID}_parallel_merged.out", JOBID = JOBID),
       expand("output/clustering/{JOBID}_non_red_list.out", JOBID = JOBID),
-      expand("logs/{JOBID}_para_done.txt", JOBID=JOBID)
+      expand("logs/{JOBID}_para_done.txt", JOBID=JOBID),
+      expand("logs/{JOBID}_checkm_unbinned", JOBID=JOBID),
+      expand("output/results/{JOBID}_singleton.fa", JOBID=JOBID),
+      expand("logs/{JOBID}_singleton_step1.txt", JOBID=JOBID)
 
-localrules: para_sets, non_red_step, file_parser
+
+localrules: para_sets, non_red_step, file_parser, singleton, singleton_split
 
 rule bin_feeder:
     input:
@@ -97,3 +100,59 @@ rule file_parser:
         mkdir -p output/{params.wd}
         python scripts/file_parser.py {params.contigs} {params.csv} {input} {params.wd} -l {params.header}
         """
+
+rule checkm_unbin:
+    input:
+        expand("logs/{JOBID}_para_done.txt", JOBID = JOBID)
+    output:
+        touch("logs/{JOBID}_checkm_unbinned")
+    params:
+        input = "output/results",
+        refin = REFIN,
+        checkmdb = config["checkm_db_root"]
+    threads:
+        20
+    conda:
+        "../envs/checkm.yaml"
+    shell:
+        """
+	      checkm_db={params.checkmdb}
+        echo ${{checkm_db}} | checkm data setRoot ${{checkm_db}}
+        checkm unbinned -x fasta output/results/ {params.refin} output/results/{JOBID}_unbinned_contigs.fa output/results/{JOBID}_unbinned_contigs_stats.tsv
+        """
+
+rule singleton:
+    input:
+        expand("logs/{JOBID}_checkm_unbinned", JOBID = JOBID)
+    output:
+        expand("output/results/{JOBID}_singleton.fa", JOBID=JOBID)
+    params:
+        min_size = 500000
+    conda:
+        "../envs/py3.yaml"
+    shell:
+        """
+        seqkit seq -m {params.min_size} output/results/*unbinned_contigs.fa > output/results/{JOBID}_singleton.fa
+        """
+
+rule singleton_split:
+    input:
+        "output/results/{JOBID}_singleton.fa"
+    output:
+        touch("logs/{JOBID}_singleton_step1.txt")
+    shell:
+        """
+        count=0
+        while read line
+        do
+            if [[ ${{line:0:1}} == '>' ]]
+            then
+                outfile=output/results/Cluster_singleton${{count}}.fasta
+                echo ${{line}} > ${{outfile}}
+                count=$((count+1))
+            else
+                echo ${{line}} >> ${{outfile}}
+            fi
+        done < {input}
+        """
+

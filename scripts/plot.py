@@ -94,10 +94,16 @@ for i in range(0, len(files), 30):
             file = str(file)
             df = pd.read_csv(f, index_col='contig')
             av_cov = str('{0:.1f}'.format(statistics.mean(df['cover'].tolist())))
-            sd_cov = str('{0:.1f}'.format(statistics.stdev(df['cover'].tolist())))
+            if len(df['cover']) > 1:
+                sd_cov = str('{0:.1f}'.format(statistics.stdev(df['cover'].tolist())))
+            else:
+                sd_cov = "NaN"
             tot_len = str('{0:.1f}'.format(sum(df['length'].tolist())/1000))
             av_gc =  str('{0:.1f}'.format(statistics.mean(df['GC'].tolist())))
-            sd_gc = str('{0:.1f}'.format(statistics.stdev(df['GC'].tolist())))
+            if len(df['GC']) > 1:
+                sd_gc = str('{0:.1f}'.format(statistics.stdev(df['GC'].tolist())))
+            else:
+                sd_gc = "NaN"
             na = str(file.split('/')[-1:][0].split('.')[0][8:])
             file_na = str(file.split('/')[-1:][0].split('.')[0][8:]) #df['length'].idxmax()
             nu = str(len(df))
@@ -196,3 +202,4 @@ for i in range(0, len(files), 30):
     plt.close('all')
 
 mean_df.to_csv(prefix + "_clus_means.csv")
+

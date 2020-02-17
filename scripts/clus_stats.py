@@ -43,10 +43,16 @@ for file in files:
         df = pd.read_csv(f, index_col='contig')
 
         av_cov = str('{0:.1f}'.format(statistics.mean(df['cover'].tolist())))
-        sd_cov = str('{0:.1f}'.format(statistics.stdev(df['cover'].tolist())))
+        if len(df['cover']) > 1:
+                  sd_cov = str('{0:.1f}'.format(statistics.stdev(df['cover'].tolist())))
+        else:
+                  sd_cov = 0
         tot_len = str(sum(df['length'].tolist()))
         av_gc =  str('{0:.1f}'.format(statistics.mean(df['GC'].tolist())))
-        sd_gc = str('{0:.1f}'.format(statistics.stdev(df['GC'].tolist())))
+        if len(df['GC']) > 1:
+                  sd_gc = str('{0:.1f}'.format(statistics.stdev(df['GC'].tolist())))
+        else:
+                  sd_gc = 0
         na = str(file.split('/')[-1:][0].split('.')[0])
         nu = str(len(df))
 

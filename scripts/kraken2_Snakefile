@@ -1,3 +1,4 @@
+
 configfile: "config.yaml"
 
 import pandas as pd
@@ -21,8 +22,8 @@ rule all:
         "tbl2asn_update.out",
         expand("output/prokka/Cluster_{CLUSTERS}/{JOBID}_{CLUSTERS}.err", JOBID = JOBID, CLUSTERS = CLUSTERS),
         expand("logs/{JOBID}_slurm_prokka.log", JOBID=JOBID),
-        "output/results/{JOBID}_seqkit_stats.tsv",
-        expand("output/checkm/{JOBID}_checkm.log", JOBID=JOBID)
+        expand("output/results/{JOBID}_seqkit_stats.tsv", JOBID=JOBID),
+        expand("output/{JOBID}_checkm/{JOBID}_checkm.log", JOBID=JOBID)
 
 localrules: kraken_merge, tbl2asn, output, seqkit
 
@@ -68,7 +69,7 @@ rule tbl2asn:
     shell:
         """
         cd $(dirname $(which tbl2asn))
-        rm tbl2asn
+        rm tbl2asn 2> /dev/null
         wget ftp://ftp.ncbi.nih.gov/toolbox/ncbi_tools/converters/by_program/tbl2asn/linux64*
 	gunzip linux64.tbl2asn.gz
 	mv linux64.tbl2asn tbl2asn
@@ -80,9 +81,9 @@ rule prokka:
         clusters = "output/results/Cluster_{CLUSTERS}.fasta",
         wait = "tbl2asn_update.out"
     output:
-        file = "output/prokka/Cluster_{CLUSTERS}/{JOBID}_{CLUSTERS}.err"
+        file = "output/{JOBID}_prokka/Cluster_{CLUSTERS}/{JOBID}_{CLUSTERS}.err"
     params:
-        dir = "output/prokka/Cluster_{CLUSTERS}/",
+        dir = "output/{JOBID}_prokka/Cluster_{CLUSTERS}/",
         prefix = "{JOBID}_{CLUSTERS}",
         prokka = "output/results/Cluster_{CLUSTERS}_short.fasta"
     conda:
@@ -97,13 +98,13 @@ rule prokka:
         """
 
 rule output:
-    input: expand("output/prokka/Cluster_{CLUSTERS}/{JOBID}_{CLUSTERS}.err", JOBID = JOBID, CLUSTERS=CLUSTERS)
+    input: expand("output/{JOBID}_prokka/Cluster_{CLUSTERS}/{JOBID}_{CLUSTERS}.err", JOBID = JOBID, CLUSTERS=CLUSTERS)
     output:
         "logs/{JOBID}_slurm_kraken2SM.log"
     shell:
         """
         cat *.out > {output}
-        rm *.out
+        rm *.out 2> /dev/null
         """
 
 rule seqkit:
@@ -124,9 +125,9 @@ rule checkm:
         expand("output/results/Cluster_{CLUSTERS}.fasta", CLUSTERS = CLUSTERS),
         expand("output/results/{JOBID}_seqkit_stats.tsv", JOBID=JOBID)
     output:
-        expand("output/checkm/{JOBID}_checkm.log", JOBID=JOBID)
+        expand("output/{JOBID}_checkm/{JOBID}_checkm.log", JOBID=JOBID)
     params:
-        out = expand("output/checkm", JOBID=JOBID),
+        out = expand("output/{JOBID}_checkm", JOBID=JOBID),
         input = "output/results",
         refin = REFIN,
         checkmdb = config["checkm_db_root"]
@@ -136,8 +137,9 @@ rule checkm:
         "../envs/checkm.yaml"
     shell:
         """
-	      checkm_db={params.checkmdb}
+	checkm_db={params.checkmdb}
         echo ${{checkm_db}} | checkm data setRoot ${{checkm_db}}
         checkm unbinned -x fasta output/results/ {params.refin} output/results/{JOBID}_unbinned_contigs.fa output/results/{JOBID}_unbinned_contigs_stats.tsv
         checkm lineage_wf -f {output} --tab_table -x fasta -t {threads} {params.input} {params.out}
         """
+

@@ -41,8 +41,7 @@ rule bwa_index:
 
 rule bwa_mem:
     input:
-        fq1 = expand('data/{{samples}}_R1.{extension}', extension=extension),
-        fq2 = expand('data/{{samples}}_R2.{extension}', extension=extension),
+        fq = expand('timepoints/{{samples}}.{extension}', extension=extension),
         ref = REFIN,
         ref_ind = expand("{reference}.sa", reference=REFIN) #waits for indexed reference
     output:
@@ -50,11 +49,11 @@ rule bwa_mem:
     conda: "../envs/bwasam.yaml"
     params:
         bam = 'output/alignment/{samples}.bam'
-    threads: 20
+    threads: 6
     shell:
         """
         mkdir -p output/alignment
-        bwa mem -M -t {threads} {input.ref} {input.fq1} {input.fq2} | samtools view -buS - | samtools sort -o {params.bam}
+        bwa mem -M -t {threads} {input.ref} {input.fq} | samtools view -buS - | samtools sort -o {params.bam}
         samtools index {params.bam}
         samtools idxstats {params.bam} > {output.counts}
         """

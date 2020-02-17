@@ -1,0 +1,46 @@
+configfile: "config.yaml"
+
+import pandas as pd
+df_samples = pd.read_csv(config["samples"], sep ='\t', index_col = 0)
+samples = df_samples["sample"].to_list()
+
+JOBID = config["jobid"]
+RAW_SR = config["RAW_SR"]
+REFIN = config["REFIN"]
+CONTIG_T = config["CONTIG_T"]
+P_THRESH = config["P_THRESH"]
+krakendb = config["krakendb"]
+kraken_level = config["kraken_level"]
+
+(SINGLETONS,) = glob_wildcards("output/results/Cluster_singleton{no}.fasta")
+
+rule all:
+    input:
+      expand("output/results/Cluster_singleton{SINGLETONS}.csv", SINGLETONS=SINGLETONS),
+      expand("logs/{JOBID}_singleton_done.txt", JOBID=JOBID)
+
+localrules: singleton_csv, singleton_done
+
+
+rule singleton_csv:
+  input:
+      "output/results/Cluster_singleton{SINGLETONS}.fasta"
+  output:
+      "output/results/Cluster_singleton{SINGLETONS}.csv"
+  params:
+      csv = expand("output/clustering/{JOBID}_read_counts_derived.csv", JOBID = JOBID),
+      header = samples
+  conda:
+      "../envs/py3.yaml"
+  shell:
+      """
+      seqkit head -n 1 -w 0 {input} > output/results/Cluster_singleoneline.fasta
+      mv output/results/Cluster_singleoneline.fasta {input}
+      python scripts/singleton.py {params.csv} -l {params.header}
+      """
+
+rule singleton_done:
+    input:
+        expand("output/results/Cluster_singleton{SINGLETONS}.csv", SINGLETONS=SINGLETONS)
+    output:
+        touch("logs/{JOBID}_singleton_done.txt")
