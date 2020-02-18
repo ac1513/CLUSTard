@@ -29,13 +29,13 @@ rule singleton_csv:
       "output/results/Cluster_singleton{SINGLETONS}.csv"
   params:
       csv = expand("output/clustering/{JOBID}_read_counts_derived.csv", JOBID = JOBID),
-      header = samples
+      header = samples,
   conda:
       "../envs/py3.yaml"
   shell:
       """
-      seqkit head -n 1 -w 0 {input} > output/results/Cluster_singleoneline.fasta
-      mv output/results/Cluster_singleoneline.fasta {input}
+      seqkit head -n 1 -w 0 {input} > {input}.test
+      mv {input}.test {input}
       python scripts/singleton.py {params.csv} -l {params.header}
       """
 
