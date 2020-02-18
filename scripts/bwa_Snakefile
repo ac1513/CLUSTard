@@ -41,7 +41,9 @@ rule bwa_index:
 
 rule bwa_mem:
     input:
-        fq = expand('timepoints/{{samples}}.{extension}', extension=extension),
+        fq1 = expand('data/{{samples}}_R1.{extension}', extension=extension),
+        fq2 = expand('data/{{samples}}_R2.{extension}', extension=extension),
+        #fq = expand('timepoints/{{samples}}.{extension}', extension=extension),
         ref = REFIN,
         ref_ind = expand("{reference}.sa", reference=REFIN) #waits for indexed reference
     output:
