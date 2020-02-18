@@ -44,3 +44,7 @@ rule singleton_done:
         expand("output/results/Cluster_singleton{SINGLETONS}.csv", SINGLETONS=SINGLETONS)
     output:
         touch("logs/{JOBID}_singleton_done.txt")
+    shell:
+        """
+        echo "Singleton analysis done"
+        """
