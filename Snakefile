@@ -59,18 +59,19 @@ rule test:
         "logs/{JOBID}_all_bwa_output.txt"
     shell:
         """
+        echo "Alignment completed" > {output}
         more *.out > {output} 2> /dev/null
-        rm *.out
+        rm *.out || true
         """
 
 rule para_out:
     input:
         clusters = para(expand("logs/{JOBID}_singleton_step1.txt", JOBID=JOBID))
     output:
-        "logs/{JOBID}_para_out.txt"
+        touch("logs/{JOBID}_para_out.txt")
     shell:
         """
-        echo "Done" >> {output}
+        echo "Clustering completed"
         """
 
 rule singleton_out:

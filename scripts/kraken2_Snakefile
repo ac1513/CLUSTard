@@ -71,8 +71,8 @@ rule tbl2asn:
         cd $(dirname $(which tbl2asn))
         rm tbl2asn 2> /dev/null
         wget ftp://ftp.ncbi.nih.gov/toolbox/ncbi_tools/converters/by_program/tbl2asn/linux64*
-	gunzip linux64.tbl2asn.gz
-	mv linux64.tbl2asn tbl2asn
+	      gunzip linux64.tbl2asn.gz
+	      mv linux64.tbl2asn tbl2asn
         chmod +x tbl2asn
         """
 
