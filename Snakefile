@@ -56,12 +56,10 @@ rule test:
     input:
         bwa_split(expand("output/clustering/{JOBID}_bwa_output.txt", JOBID = JOBID))
     output:
-        "logs/{JOBID}_all_bwa_output.txt"
+        touch("logs/{JOBID}_all_bwa_output.txt")
     shell:
         """
-        echo "Alignment completed" > {output}
-        more *.out > {output} 2> /dev/null
-        rm *.out || true
+        echo "Done with BWA"
         """
 
 rule para_out:

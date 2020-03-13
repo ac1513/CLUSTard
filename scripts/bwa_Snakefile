@@ -47,7 +47,7 @@ rule bwa_mem:
         ref = REFIN,
         ref_ind = expand("{reference}.sa", reference=REFIN) #waits for indexed reference
     output:
-        counts = 'output/clustering/counts_{samples}.txt'
+        counts = 'output/alignment/counts_{samples}.txt'
     conda: "../envs/bwasam.yaml"
     params:
         bam = 'output/alignment/{samples}.bam'
@@ -62,14 +62,14 @@ rule bwa_mem:
 
 rule merge_filecounts:
     input:
-        test = expand('output/clustering/counts_{SAMPLES}.txt', SAMPLES = samples)
+        test = expand('output/alignment/counts_{SAMPLES}.txt', SAMPLES = samples)
     output:
         txt = 'output/clustering/{JOBID}_read_counts.out'
     conda:
         "../envs/py3.yaml"
     shell:
         """
-        python scripts/merge_filecounts.py clustering {JOBID} -l {samples}
+        python scripts/merge_filecounts.py alignment {JOBID} -l {samples}
         """
 
 rule derive:
