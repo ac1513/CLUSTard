@@ -1,0 +1,45 @@
+{
+    "__default__" :
+    {
+        "account" : "BIOL-CHONG-2019",
+        "time" : "04:00:00",
+        "threads" : 1,
+        "partition" : "nodes",
+        "mem" : "4g"
+    },
+    "bwa_index" :
+    {
+        "time" : "1-23:00:00",
+        "threads" : 20
+    },
+    "bwa_mem" :
+    {
+        "time" : "1-23:00:00",
+        "threads" : 6
+    },
+    "bin_feeder" :
+    {
+        "time" : "6-23:00:00",
+        "partition" : "week"
+    },
+    "checkm_unbin" :
+    {
+        "time" : "08:00:00",
+        "threads" : 20
+    },
+    "kraken" :
+    {
+        "threads" : 16,
+        "mem" : "32g"
+    },
+    "prokka" :
+    {
+        "threads" : 10,
+        "mem" : "8g"
+    },
+    "checkm" :
+    {
+        "time" : "08:00:00",
+        "threads" : 20
+    }
+}
