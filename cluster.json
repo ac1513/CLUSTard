@@ -10,7 +10,8 @@
     "bwa_index" :
     {
         "time" : "1-23:00:00",
-        "threads" : 20
+        "threads" : 20,
+        "mem" : "2g"
     },
     "bwa_mem" :
     {
@@ -25,17 +26,18 @@
     "checkm_unbin" :
     {
         "time" : "08:00:00",
-        "threads" : 20
+        "threads" : 20,
+        "mem" : "2g"
     },
     "kraken" :
     {
         "threads" : 16,
-        "mem" : "32g"
+        "mem" : "2g"
     },
     "prokka" :
     {
         "threads" : 10,
-        "mem" : "8g"
+        "mem" : "1g"
     },
     "checkm" :
     {
