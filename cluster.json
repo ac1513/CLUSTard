@@ -9,18 +9,18 @@
     },
     "bwa_index" :
     {
-        "time" : "1-23:00:00",
+        "time" : "2-00:00:00",
         "threads" : 20,
         "mem" : "2g"
     },
     "bwa_mem" :
     {
-        "time" : "1-23:00:00",
+        "time" : "2-00:00:00",
         "threads" : 6
     },
     "bin_feeder" :
     {
-        "time" : "6-23:00:00",
+        "time" : "6-23:59:00",
         "partition" : "week"
     },
     "checkm_unbin" :

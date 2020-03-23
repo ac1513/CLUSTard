@@ -50,7 +50,7 @@ rule all:
         expand("output/{JOBID}_cluster_summary_stats.tsv", JOBID=JOBID)
 
 
-localrules: test, para_out, plot, bin_plot, abs_derive, abun_plot, clus_stats
+localrules: test, para_out, singleton_out, plot, bin_plot, abs_derive, abun_plot, clus_stats
 
 rule test:
     input:
