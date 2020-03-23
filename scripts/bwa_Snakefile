@@ -69,7 +69,7 @@ rule merge_filecounts:
         "../envs/py3.yaml"
     shell:
         """
-        python scripts/merge_filecounts.py alignment {JOBID} -l {samples}
+        python scripts/merge_filecounts.py alignment clustering {JOBID} -l {samples}
         """
 
 rule derive:

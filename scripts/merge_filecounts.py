@@ -17,12 +17,15 @@ def otherFile(fileName):
 
 parser = argparse.ArgumentParser(description='')
 parser.add_argument('loc', help='location count files are in', type=str)
+parser.add_argument('out', help='location to save file to', type=str)
 parser.add_argument('jobid', help='location count files are in', type=str)
 parser.add_argument('-l', '--sample-list', dest='samples', nargs='+', default=[])
 args = parser.parse_args()
 loc = str("output/" + args.loc)
 jobid = args.jobid
 samples = args.samples
+out = str("output/" + args.out)
+
 
 fname = []
 
@@ -45,7 +48,7 @@ print ('number of entries per file: '+str(count))
 # now need to read in all files
 
 filedata = [open(file_name, 'r') for file_name in fname]
-oo = open(str(loc + '/' + jobid + '_read_counts.out'), 'w')
+oo = open(str(out + '/' + jobid + '_read_counts.out'), 'w')
 
 for runthrough in range (0,count):
         start_marker = filedata[0]
