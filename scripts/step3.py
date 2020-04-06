@@ -20,7 +20,12 @@ with open(input_file ,'r') as in_file:
 	master_list = json.load(in_file)
 
 while True:
-	test = master_list[0]
+	try:
+		test = master_list[0]
+		break
+	except IndexError:
+		print("No clusters identified - your Pcc threshold is probably too high. Decrease it in the config file, remove the clustering directory and try again.")
+		exit()
 	working_list = test
 	for test_list in master_list[1:]:
 		if not (set(test_list).intersection(test)):
