@@ -22,7 +22,6 @@ with open(input_file ,'r') as in_file:
 while True:
 	try:
 		test = master_list[0]
-		break
 	except IndexError:
 		print("No clusters identified - your Pcc threshold is probably too high. Decrease it in the config file, remove the clustering directory and try again.")
 		exit()
