@@ -168,7 +168,7 @@ for i in range(0, len(files), 30):
 
             if args.kraken:
                 for line in open(args.kraken, 'r'):
-                    if re.search(file_na, line):
+                    if re.search(file_na+'_', line):
                         cont = line.split('\t')[-1].strip()
                         if './' in cont:
                             cont = ' '
@@ -202,4 +202,3 @@ for i in range(0, len(files), 30):
     plt.close('all')
 
 mean_df.to_csv(prefix + "_clus_means.csv")
-

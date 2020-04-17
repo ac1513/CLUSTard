@@ -68,7 +68,7 @@ with open(binned_in, 'r') as binned_list:
                 cluster = line.strip('>').strip()[:-6] #strip things
                 with open(kraken, 'r') as kraken_f:
                     for line2 in kraken_f:
-                        if re.search(cluster, line2):
+                        if re.search(cluster+'_', line2):
                             name = line2.split('\t')[-1].strip()
                             if name =="":
                                 name = 'Unclassified'
