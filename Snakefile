@@ -121,17 +121,17 @@ rule bin_plot:
 
 rule abs_derive:
     input:
-        plots = expand("output/plots/{JOBID}_bin_contigs.png", JOBID=JOBID),
-        counts = expand('output/clustering/{JOBID}_merged_counts.tsv', JOBID=JOBID)
+        plots = expand("output/plots/{JOBID}_bin_contigs.png", JOBID=JOBID)
     output:
         csv = "output/clustering/{JOBID}_read_counts_absolute.csv"
     params:
-        thresh = CONTIG_T
+        thresh = CONTIG_T,
+        counts = expand('output/clustering/{JOBID}_merged_counts.tsv', JOBID=JOBID)
     conda:
         "envs/py3.yaml" #change clustering (below) when add counts folder..
     shell:
         """
-        python scripts/absolute_derive.py {input.counts} {JOBID} {params.thresh}
+        python scripts/absolute_derive.py {params.counts} {JOBID} {params.thresh}
         """
 
 rule abun_plot:

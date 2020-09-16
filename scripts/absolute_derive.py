@@ -35,7 +35,6 @@ file_name = args.loc
 jobid = args.jobid
 thresh = args.thresh
 
-
 new_record=[[]]
 nr=False
 

@@ -34,17 +34,6 @@ rule all:
 localrules: contig_list, norm_counts, merge_filecounts, derive, start_feeder, split_file
 
 
-rule contig_list:
-    input:
-        ref = REFIN
-    output:
-        contig_lengths = "output/clustering/{JOBID}_contig_lengths.tsv"
-    conda: "../envs/py3.yaml"
-    shell:
-      """
-      seqkit fx2tab -n {REFIN} | tr -s ' ' | cut -d ' ' -f 1 > {output.contig_lengths}
-      """
-
 rule bwa_index:
     input:
         ref = REFIN
@@ -56,8 +45,6 @@ rule bwa_index:
         """
         bwa index {input.ref}
         """
-
-
 
 rule bwa_mem:
     input:
@@ -123,6 +110,17 @@ rule count_files:
         samtools view {input.bam} | awk '{{if ($2!=4 && $2!=133 && $2!=165 && $2!=181 && $2!=101 && $2!=117 && $2!=69 && $2!=77 && $2!=141) print $1 "\t" $3}}' > {output.counts}
         """
 
+rule contig_len:
+    input:
+        ref = REFIN
+    output:
+        contig_lengths = "output/clustering/{JOBID}_contig_lengths.tsv"
+    conda: "../envs/py3.yaml"
+    shell:
+      """
+      bioawk -c fastx '{{ print $name, length($seq) }}' < {input.ref} > {output.contig_lengths}
+      """
+
 rule norm_counts:
       input:
           counts = 'output/clustering/{samples}_counts.tsv',
@@ -142,7 +140,8 @@ rule merge_filecounts:
     output:
         tsv = 'output/clustering/{JOBID}_merged_counts.tsv'
     params:
-        method = meth_counts
+        method = meth_counts,
+        ref = REFIN
     conda:
         "../envs/py3.yaml"
     shell:

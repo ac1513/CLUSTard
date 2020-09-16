@@ -22,7 +22,7 @@ lengths = pd.read_csv(read_len_file, sep='\t', names=["read", "length"])
 lengths = lengths.drop_duplicates(subset=['read'])
 con_read = con_read.merge(lengths, 'left')
 con_read['length'] = con_read['length'].apply(lambda x: x/norm_length).astype(np.float64)
-contigs = pd.read_csv(contigs_file, sep = '\t', header = None, names = ['contigs'])
+contigs = pd.read_csv(contigs_file, sep = '\t', header = None, names = ['contigs', 'lengths'])
 
 norm_counts = con_read.groupby('contigs',sort=False)[['length']].agg(['sum', 'count'])
 norm_counts = norm_counts['length'].apply(lambda x: round(x))
@@ -33,7 +33,7 @@ merged = pd.merge(contigs, norm_counts, on='contigs', how ='left', sort=False)
 merged = merged.fillna(value=0)
 merged['count'] = merged['count'].astype(np.int64)
 merged['sum'] = merged['sum'].astype(np.int64)
-merged.columns = ["contigs", "raw", "normalised"]
+merged.columns = ["contigs", "length", "raw", "normalised"]
 
 #Outputs file in format -> contig, count, length normalised count
 merged.to_csv(file_out, sep='\t', index = False, header = True)

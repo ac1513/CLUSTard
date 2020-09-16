@@ -55,6 +55,7 @@ metric = 'correlation'
 
 df_abun = pd.read_csv(csv_in, index_col = 0, names = sample)
 df_abun = df_abun.drop(columns='Coverage')
+print(df_abun)
 tot = df_abun.sum(axis = 0)
 cluster_abun = pd.DataFrame(columns=df_abun.columns)
 new_df_abun = pd.DataFrame(columns = sample).drop(columns='Coverage')
@@ -139,8 +140,6 @@ for i in range(0, len(abun.index.values.tolist())): #for each cluster i.e list o
         previous = abun.iloc[i, :] + abun_sum.iloc[i-1, :]
     else:
         previous = abun.iloc[i, :]
-
-
 
 plt.xticks(abun.keys(), abun.keys(), rotation='vertical', fontsize = 4, verticalalignment='center_baseline')
 plt.legend(loc='upper left', bbox_to_anchor=(1,1), ncol=1, frameon=False, fontsize = 5)
