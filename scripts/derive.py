@@ -27,21 +27,18 @@ import os
 import argparse
 
 parser = argparse.ArgumentParser(description='')
-parser.add_argument('loc', help='location count files are in', type=str)
+parser.add_argument('loc', help='name of count file', type=str)
 parser.add_argument('jobid', help='jobid - to name output', type=str)
 parser.add_argument('thresh', help='minimum size of contig', type=int)
 args = parser.parse_args()
-loc = str("output/" + args.loc)
+file_name = args.loc
 jobid = args.jobid
 thresh = args.thresh
-
-dir_name = str(loc + '/')
-file_name = str(jobid + '_read_counts.out')
 
 new_record=[[]]
 nr=False
 
-with open(dir_name+file_name, 'r') as data_store:
+with open(file_name, 'r') as data_store:
     line = csv.reader(data_store, delimiter='\t')
     for i in line:
         if int(i[1]) >= thresh:
@@ -56,6 +53,6 @@ with open(dir_name+file_name, 'r') as data_store:
                 new_record = [values]
                 nr = True
 
-with open(dir_name + '/' +  jobid + '_read_counts_derived.csv', 'w') as f:
+with open('output/clustering/' +  jobid + '_read_counts_derived.csv', 'w') as f:
     writer = csv.writer(f)
     writer.writerows(new_record)

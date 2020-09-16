@@ -43,7 +43,7 @@ dependencies:
   - ncurses=6.1=hf484d3e_1002
   - numpy=1.16.4=py37h95a1406_0
   - openblas=0.3.6=h6e990d7_4
-  - openssl=1.1.1=h7b6447c_0
+  - openssl=1.1.1
   - pandas=0.24.2=py37hb3f55d8_0
   - pcre=8.41=hf484d3e_1003
   - pip=19.1.1=py37_0

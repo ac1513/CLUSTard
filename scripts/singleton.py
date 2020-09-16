@@ -23,7 +23,6 @@ for singleton in input:
     with open(counts_file) as counts:
       for line in counts:
         if name in line:
-                print(line)
                 count_line = line.strip('\n').split(',')
                 break
     filename = str(singleton[:-6] + ".csv")
@@ -33,4 +32,3 @@ for singleton in input:
         count_line.append(len(faseq))
         count_line.append(su.GC(faseq))
         writer.writerow(count_line)
-
