@@ -108,7 +108,7 @@ rule count_files:
         counts = 'output/clustering/{samples}_counts.tsv',
     params:
         map = mapping,
-    conda: "../envs/py3.yaml"
+    conda: "../envs/minimap2.yaml"
     shell:
         """
         samtools view {input.bam} | awk '{{if ($2!=4 && $2!=133 && $2!=165 && $2!=181 && $2!=101 && $2!=117 && $2!=69 && $2!=77 && $2!=141) print $1 "\t" $3}}' > {output.counts}
