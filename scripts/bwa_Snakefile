@@ -94,7 +94,7 @@ elif mapping == "LR":
         threads: 6
         shell:
             """
-            minimap2 -ax map-ont -o {samples}.sam -t {threads} {input.ref} {fq}
+            minimap2 -ax map-ont -o {samples}.sam -t {threads} {input.ref} {input.fq}
             samtools view -buS {samples}.sam | samtools sort -o {output.bam}
             bioawk -c fastx '{{ print $name, length($seq) }}' < {input.fq} > {output.read_len}
             """
