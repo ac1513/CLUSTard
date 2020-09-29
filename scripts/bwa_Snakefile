@@ -12,7 +12,7 @@ P_THRESH = config["P_THRESH"]
 krakendb = config["krakendb"]
 kraken_level = config["kraken_level"]
 extension = config["in_file_extension"].strip('.')
-mapping = "single_SR"
+mapping = "LR"
 meth_counts = "norm"
 
 rule all:
@@ -46,23 +46,24 @@ rule bwa_index:
         bwa index {input.ref}
         """
 
-rule bwa_mem:
-    input:
-        fq = expand('data/{{samples}}.{extension}', extension = extension),
-        ref = REFIN,
-        ref_ind = expand("{reference}.sa", reference=REFIN) #waits for indexed reference
-    output:
-        bam = 'output/alignment/{samples}.bam',
-        read_len = 'output/clustering/{samples}_read_len.tsv'
-    conda: "../envs/bwasam.yaml"
-    threads: 6
-    shell:
-        """
-        bwa mem -M -t {threads} {input.ref} {input.fq} | samtools view -buS - | samtools sort -o {output.bam}
-        bioawk -c fastx '{{ print $name, length($seq) }}' < {input.fq} > {output.read_len}
-        """
+if mapping == "SR":
+  rule bwa_mem:
+      input:
+          fq = expand('data/{{samples}}.{extension}', extension = extension),
+          ref = REFIN,
+          ref_ind = expand("{reference}.sa", reference=REFIN) #waits for indexed reference
+      output:
+          bam = 'output/alignment/{samples}.bam',
+          read_len = 'output/clustering/{samples}_read_len.tsv'
+      conda: "../envs/bwasam.yaml"
+      threads: 6
+      shell:
+          """
+          bwa mem -M -t {threads} {input.ref} {input.fq} | samtools view -buS - | samtools sort -o {output.bam}
+          bioawk -c fastx '{{ print $name, length($seq) }}' < {input.fq} > {output.read_len}
+          """
 
-if mapping == "paired_SR":
+elif mapping == "paired_SR":
   rule bwa_mem_pair:
       input:
           fq1 = expand('data/{{samples}}_R1.{extension}', extension=extension),
