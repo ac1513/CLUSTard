@@ -114,6 +114,19 @@ rule count_files:
         samtools view {input.bam} | awk '{{if ($2!=4 && $2!=133 && $2!=165 && $2!=181 && $2!=101 && $2!=117 && $2!=69 && $2!=77 && $2!=141) print $1 "\t" $3}}' > {output.counts}
         """
 
+
+rule contig_len:
+    input:
+        ref = REFIN
+    output:
+        contig_lengths = "output/clustering/{JOBID}_contig_lengths.tsv"
+    conda: "../envs/minimap2.yaml"
+    shell:
+      """
+      bioawk -c fastx '{{ print $name, length($seq) }}' < {input.ref} > {output.contig_lengths}
+      """
+
+
 rule norm_counts:
       input:
           counts = 'output/clustering/{samples}_counts.tsv',
