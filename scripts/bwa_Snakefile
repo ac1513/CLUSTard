@@ -90,12 +90,14 @@ elif mapping == "LR":
         output:
             bam = 'output/alignment/{samples}.bam',
             read_len = 'output/clustering/{samples}_read_len.tsv'
+        params:
+            output = 'output/alignment/{samples}.sam'
         conda: "../envs/minimap2.yaml"
         threads: 6
         shell:
             """
-            minimap2 -ax map-ont -o {samples}.sam -t {threads} {input.ref} {input.fq}
-            samtools view -buS {samples}.sam | samtools sort -o {output.bam}
+            minimap2 -ax map-ont -o {params.output} -t {threads} {input.ref} {input.fq}
+            samtools view -buS {params.output} | samtools sort -o {output.bam}
             bioawk -c fastx '{{ print $name, length($seq) }}' < {input.fq} > {output.read_len}
             """
 
