@@ -12,8 +12,8 @@ P_THRESH = config["P_THRESH"]
 krakendb = config["krakendb"]
 kraken_level = config["kraken_level"]
 extension = config["in_file_extension"].strip('.')
-mapping = "LR"
-meth_counts = "norm"
+mapping = config["mapping"]
+meth_counts = config["meth_counts"]
 
 rule all:
     input:
