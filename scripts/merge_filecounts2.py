@@ -32,14 +32,14 @@ else:
 
 base_df = pd.read_csv(counts[0], sep = '\t')
 base_df = base_df.set_index("contigs")
-initial_file = str(counts[0].split('/')[2].split('.')[0])
+initial_file = str(counts[0].replace('/','-'))
 base_df = base_df.drop(to_drop, axis = 1)
 base_df.columns = ['length', initial_file]
 
 for file in counts[1:]:
     new_df = pd.read_csv(file, sep = '\t')
     new_df = new_df.set_index('contigs')
-    col = file.split('.')[0]
+    col = str(file.replace('/','-'))
     base_df[col] = new_df[column]
 
 base_df.to_csv(out, sep='\t', header=False)
