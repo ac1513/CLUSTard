@@ -55,7 +55,6 @@ metric = 'correlation'
 
 df_abun = pd.read_csv(csv_in, index_col = 0, names = sample)
 df_abun = df_abun.drop(columns='Coverage')
-print(df_abun)
 tot = df_abun.sum(axis = 0)
 cluster_abun = pd.DataFrame(columns=df_abun.columns)
 new_df_abun = pd.DataFrame(columns = sample).drop(columns='Coverage')
@@ -162,21 +161,3 @@ if 'y' in top20:
     plt.ylim(0,100)
     plt.tight_layout()
     plt.savefig('output/plots/' + prefix +'_' + plot +'_'+ 'abun.png', bbox_inches='tight')
-
-GenusData = abun
-
-z = hc.linkage(GenusData.values.T, method=LinkMethod, metric=metric)
-
-plt.figure(num=None, figsize=(20, 10),  facecolor='w', edgecolor='k')
-dendrogram = hc.dendrogram(z, labels=GenusData.columns,  color_threshold=0.04, leaf_font_size=10, leaf_rotation=90)
-for key in dendrogram.keys():
-    if key == 'ivl':
-        DenOrder = dendrogram[key]
-plt.savefig("output/plots/" + prefix +'_' + plot +'_'+ LinkMethod + metric +'_dendro.png', bbox_inches='tight', dpi = 400)
-
-
-GenusData = GenusData[DenOrder]
-GenusData = GenusData.transpose()
-GenusData.plot.bar(stacked=True, legend = None, figsize=(30,20), width=0.9)
-plt.legend(loc='center left', labelspacing=-2.5,  bbox_to_anchor=(1.0, 0.5))
-plt.savefig("output/plots/" + prefix +'_' + plot +'_'+ 'ord_abun.png', bbox_inches='tight')
