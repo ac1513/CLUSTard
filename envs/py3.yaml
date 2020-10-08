@@ -9,8 +9,8 @@ dependencies:
   - biopython=1.73=py37h14c3975_0
   - blas=2.10=openblas
   - bzip2=1.0.6=h14c3975_1002
-  - ca-certificates=2019.5.15=1
-  - certifi=2019.6.16=py37_1
+  - ca-certificates=2020.7.22=0
+  - certifi=2020.6.20=py37_0
   - cycler=0.10.0=py_1
   - dbus=1.13.6=he372182_0
   - expat=2.2.5=he1b5a44_1003
@@ -44,7 +44,7 @@ dependencies:
   - numpy=1.16.4=py37h95a1406_0
   - openblas=0.3.6=h6e990d7_4
   - openssl=1.1.1
-  - pandas=0.24.2=py37hb3f55d8_0
+  - pandas=1.1.1=py37he6710b0_0
   - pcre=8.41=hf484d3e_1003
   - pip=19.1.1=py37_0
   - pthread-stubs=0.4=h14c3975_1001
