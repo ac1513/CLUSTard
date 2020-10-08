@@ -173,8 +173,8 @@ rule clus_stats:
 
 rule high_mags:
     input:
-        checkm = expand("output/{JOBID}_checkm/{JOBID}_checkm.log"),
-        prokka = expand("output/{JOBID}_prokka/")
+        checkm = expand("output/{JOBID}_checkm/{JOBID}_checkm.log", JOBID = JOBID),
+        prokka = expand("output/{JOBID}_prokka/", JOBID = JOBID)
     output:
         txt = "output/{JOBID}_qual_MAGs.txt"
     shell:
