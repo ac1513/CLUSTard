@@ -174,10 +174,11 @@ rule clus_stats:
 rule high_mags:
     input:
         checkm = expand("output/{JOBID}_checkm/{JOBID}_checkm.log", JOBID = JOBID),
-        prokka = expand("output/{JOBID}_prokka/", JOBID = JOBID)
     output:
         txt = "output/{JOBID}_qual_MAGs.txt"
+    params:
+            prokka = expand("output/{JOBID}_prokka/", JOBID = JOBID)
     shell:
         """
-        python scripts/qual_parse.py {input.checkm} {input.prokka} > {output.txt}
+        python scripts/qual_parse.py {input.checkm} {params.prokka} > {output.txt}
         """
