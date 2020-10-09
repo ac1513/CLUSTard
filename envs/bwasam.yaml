@@ -1,4 +1,4 @@
-name: bwasam 
+name: bwasam
 channels:
   - conda-forge
   - bioconda
@@ -6,9 +6,10 @@ channels:
 dependencies:
   - _libgcc_mutex=0.1=conda_forge
   - _openmp_mutex=4.5=0_gnu
+  - bioawk=1.0=hed695b0_5
   - bwa=0.7.17=hed695b0_7
   - bzip2=1.0.8=h516909a_2
-  - ca-certificates=2019.11.28=hecc5488_0
+  - ca-certificates=2020.6.20=hecda079_0
   - curl=7.65.3=hf8cf82a_0
   - htslib=1.9=h4da6232_3
   - krb5=1.16.4=h2fd8d38_0
@@ -20,7 +21,7 @@ dependencies:
   - libssh2=1.8.2=h22169c7_2
   - libstdcxx-ng=9.2.0=hdf63c60_2
   - ncurses=6.1=hf484d3e_1002
-  - openssl=1.1.1d=h516909a_0
+  - openssl=1.1.1h=h516909a_0
   - perl=5.26.2=h516909a_1006
   - samtools=1.9=h10a08f8_12
   - tk=8.6.10=hed695b0_0
