@@ -13,19 +13,18 @@ P_THRESH = config["P_THRESH"]
 krakendb = config["krakendb"]
 kraken_level = str(config["kraken_level"])
 
-(CLUSTERS,) = glob_wildcards("output/results/Cluster_{CLUSTER}.csv")
+(CLUSTERS,) = glob_wildcards("output/results/Cluster_{CLUSTER}.fasta")
 
 rule all:
     input:
         expand("output/kraken/{JOBID}_Cluster_{CLUSTERS}_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS),
         expand("output/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level),
-        "tbl2asn_update.out",
         expand("output/prokka/Cluster_{CLUSTERS}/{JOBID}_{CLUSTERS}.err", JOBID = JOBID, CLUSTERS = CLUSTERS),
         expand("logs/{JOBID}_slurm_prokka.log", JOBID=JOBID),
         expand("output/results/{JOBID}_seqkit_stats.tsv", JOBID=JOBID),
         expand("output/{JOBID}_checkm/{JOBID}_checkm.log", JOBID=JOBID)
 
-localrules: kraken_merge, tbl2asn, output, seqkit
+localrules: kraken_merge, output, seqkit
 
 rule kraken:
     input:
@@ -59,27 +58,9 @@ rule kraken_merge:
         find -name '{JOBID}*_report_kraken.out' -type f -printf '\\n%p\\t' -exec sh -c 'echo {{}} | sort -k1nr {{}} | grep -P "\\t{params.level}\\t" | head -n1 ' \\; > {JOBID}_{params.level}_top_kraken.out
         """
 
-rule tbl2asn:
-    input:
-        expand("output/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
-    output:
-        touch("tbl2asn_update.out")
-    conda:
-        "../envs/prokka.yaml"
-    shell:
-        """
-        cd $(dirname $(which tbl2asn))
-        rm tbl2asn 2> /dev/null
-        wget ftp://ftp.ncbi.nih.gov/toolbox/ncbi_tools/converters/by_program/tbl2asn/linux64*
-	      gunzip linux64.tbl2asn.gz
-	      mv linux64.tbl2asn tbl2asn
-        chmod +x tbl2asn
-        """
-
 rule prokka:
     input:
         clusters = "output/results/Cluster_{CLUSTERS}.fasta",
-        wait = "tbl2asn_update.out"
     output:
         file = "output/{JOBID}_prokka/Cluster_{CLUSTERS}/{JOBID}_{CLUSTERS}.err"
     params:
