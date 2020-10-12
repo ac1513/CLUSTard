@@ -83,9 +83,28 @@ rule singleton_out:
         echo "singleton analysis done"
         """
 
-rule plot:
+rule clus_stats:
     input:
         file_out = expand("logs/{JOBID}_singleton_out.txt", JOBID = JOBID),
+        checkm = kraken2(expand("output/{JOBID}_checkm/{JOBID}_checkm.log", JOBID=JOBID)),
+    output:
+        csv = "output/{JOBID}_cluster_summary_stats.tsv"
+    conda:
+        "envs/py3.yaml" #change clustering (below) when add counts folder..
+    params:
+        checkm = expand("output/{JOBID}_checkm/{JOBID}_checkm.log", JOBID=JOBID),
+        seqk = expand("output/results/{JOBID}_seqkit_stats.tsv", JOBID=JOBID)
+        kraken = expand("output/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
+    shell:
+        """
+        ls output/results/C*.csv > stat_input.txt
+        python scripts/clus_stats.py stat_input.txt {JOBID} -cm {params.checkm} -sk {params.seqk} -k {params.kraken}
+        rm stat_input.txt
+        """
+
+rule plot:
+    input:
+        stats_in = expand("output/{JOBID}_cluster_summary_stats.tsv", JOBID = JOBID),
         checkm = kraken2(expand("output/{JOBID}_checkm/{JOBID}_checkm.log", JOBID=JOBID))
     output:
         cluster_plot = "output/plots/1_{JOBID}_{kraken_level}_plot.png"
@@ -154,26 +173,9 @@ rule abun_plot:
         python scripts/abun_plot.py {JOBID} {input.count_in} output/results/{JOBID}_binned_cluster_contig.txt {params.roa} {params.top_20} -s {samples} Coverage -k {params.kraken_in}
         """
 
-rule clus_stats:
-    input:
-        expand("output/plots/{JOBID}_{out_abun}_abun_plot.png", JOBID=JOBID, out_abun = out_abun)
-    output:
-        csv = "output/{JOBID}_cluster_summary_stats.tsv"
-    conda:
-        "envs/py3.yaml" #change clustering (below) when add counts folder..
-    params:
-        checkm = expand("output/{JOBID}_checkm/{JOBID}_checkm.log", JOBID=JOBID),
-        seqk = expand("output/results/{JOBID}_seqkit_stats.tsv", JOBID=JOBID)
-    shell:
-        """
-        ls output/results/C*.csv > stat_input.txt
-        python scripts/clus_stats.py stat_input.txt {JOBID} -cm {params.checkm} -sk {params.seqk}
-        rm stat_input.txt
-        """
-
 rule high_mags:
     input:
-        expand("output/{JOBID}_cluster_summary_stats.tsv", JOBID = JOBID)
+        expand("output/plots/{JOBID}_{out_abun}_abun_plot.png", JOBID=JOBID, out_abun = out_abun)
     output:
         txt = "output/{JOBID}_qual_MAGs.txt"
     params:
