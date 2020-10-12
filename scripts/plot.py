@@ -114,7 +114,7 @@ for i in range(0, len(files), 30):
         n_50 = sorted_stats.loc[cluster]["n_50"]
         nu = sorted_stats.loc[cluster]["no_seq"]
 
-        file = "output/results/" + cluster + ".csv" #change this in final one
+        file = "output/results/" + cluster + ".csv"
 
         with open(file, 'r') as f:
             file = str(file)
