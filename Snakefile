@@ -94,7 +94,7 @@ rule clus_stats:
         "envs/py3.yaml" #change clustering (below) when add counts folder..
     params:
         checkm = expand("output/{JOBID}_checkm/{JOBID}_checkm.log", JOBID=JOBID),
-        seqk = expand("output/results/{JOBID}_seqkit_stats.tsv", JOBID=JOBID)
+        seqk = expand("output/results/{JOBID}_seqkit_stats.tsv", JOBID=JOBID),
         kraken = expand("output/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
     shell:
         """
