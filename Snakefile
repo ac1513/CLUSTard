@@ -11,6 +11,7 @@ CONTIG_T = config["CONTIG_T"]
 P_THRESH = config["P_THRESH"]
 krakendb = config["krakendb"]
 kraken_level = config["kraken_level"]
+plot_order = config["plot_order"]
 #for plotting
 date_scale = config["date_scale"]
 rel_or_abs = "r"
@@ -105,23 +106,17 @@ rule clus_stats:
 rule plot:
     input:
         stats_in = expand("output/{JOBID}_cluster_summary_stats.tsv", JOBID = JOBID),
-        checkm = kraken2(expand("output/{JOBID}_checkm/{JOBID}_checkm.log", JOBID=JOBID))
     output:
         cluster_plot = "output/plots/1_{JOBID}_{kraken_level}_plot.png"
     params:
-        files = "plot_in_files.txt",
-        sample_file = config["samples"],
-        kraken = expand("output/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level),
         date = date_scale,
-        seqkit = expand("output/results/{JOBID}_seqkit_stats.tsv", JOBID = JOBID)
+        sample_list = config["samples"]
+        out_order = plot_order
     conda:
         "envs/py3.yaml"
     shell:
         """
-        ls -S output/results/Cluster*.fasta > {params.files}
-        sed -i "s/.fasta/.csv/g" {params.files}
-        python scripts/plot.py {params.files} {JOBID} {params.sample_file} {params.date} -k {params.kraken} -k_l {kraken_level} -cm {input.checkm} -sk {params.seqkit}
-        rm {params.files}
+        python scripts/plot.py {input.stats_in} {JOBID} {params.sample_list} {params.date} -k_l {kraken_level} -s {params.out_order}
         """
 
 rule bin_plot:
