@@ -110,7 +110,7 @@ rule plot:
         cluster_plot = "output/plots/1_{JOBID}_{kraken_level}_plot.png"
     params:
         date = date_scale,
-        sample_list = config["samples"]
+        sample_list = config["samples"],
         out_order = plot_order
     conda:
         "envs/py3.yaml"
