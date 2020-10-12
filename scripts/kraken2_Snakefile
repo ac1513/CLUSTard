@@ -79,13 +79,14 @@ rule prokka:
         """
 
 rule output:
-    input: expand("output/{JOBID}_prokka/Cluster_{CLUSTERS}/{JOBID}_{CLUSTERS}.err", JOBID = JOBID, CLUSTERS=CLUSTERS)
+    input:
+        prokka = expand("output/{JOBID}_prokka/Cluster_{CLUSTERS}/{JOBID}_{CLUSTERS}.err", JOBID = JOBID, CLUSTERS=CLUSTERS),
+        kraken = expand("output/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
     output:
         "logs/{JOBID}_slurm_kraken2SM.log"
     shell:
         """
-        cat *.out > {output}
-        rm *.out 2> /dev/null
+        touch {output}
         """
 
 rule seqkit:
@@ -104,7 +105,8 @@ rule seqkit:
 rule checkm:
     input:
         expand("output/results/Cluster_{CLUSTERS}.fasta", CLUSTERS = CLUSTERS),
-        expand("output/results/{JOBID}_seqkit_stats.tsv", JOBID=JOBID)
+        expand("output/results/{JOBID}_seqkit_stats.tsv", JOBID=JOBID),
+
     output:
         expand("output/{JOBID}_checkm/{JOBID}_checkm.log", JOBID=JOBID)
     params:

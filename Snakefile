@@ -170,7 +170,7 @@ rule abun_plot:
 
 rule high_mags:
     input:
-        expand("output/plots/{JOBID}_{out_abun}_abun_plot.png", JOBID=JOBID, out_abun = out_abun)
+        expand("output/{JOBID}_cluster_summary_stats.tsv", JOBID = JOBID)
     output:
         txt = "output/{JOBID}_qual_MAGs.txt"
     params:
