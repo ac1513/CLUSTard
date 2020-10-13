@@ -81,13 +81,15 @@ for i in groups:
 ascending = ["kraken_id", "contam", "sd_gc", "sd_cov", "no_seq"]
 descending = ["tot_len", "av_cov", "av_gc",	"n_50",	"comp",	"kraken_per"]
 order = []
+sort_copy = sort_order.copy()
 for sort in sort_order:
     if sort in ascending:
         order.append(True)
     elif sort in descending:
         order.append(False)
     else:
-        sort_order.remove(sort)
+        sort_copy.remove(sort)
+sort_order = sort_copy.copy()
 
 input_stats = pd.read_csv(in_file, sep = '\t', index_col = 0, na_values ="NaN")
 sorted_stats = input_stats.sort_values(sort_order, ascending = order)
