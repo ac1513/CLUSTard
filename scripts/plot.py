@@ -105,6 +105,7 @@ for i in range(0, len(files), 30):
         av_cov = sorted_stats.loc[cluster]["av_cov"]
         sd_cov = sorted_stats.loc[cluster]["sd_cov"]
         tot_len = sorted_stats.loc[cluster]["tot_len"]
+        tot_len_kb = tot_len / 1000
         av_gc = sorted_stats.loc[cluster]["av_gc"]
         sd_gc = sorted_stats.loc[cluster]["sd_gc"]
         kraken_id = sorted_stats.loc[cluster]["kraken_id"]
@@ -161,14 +162,14 @@ for i in range(0, len(files), 30):
                 plt.text(df_samples["date"][1], 0.7, str(comp)+'%: Complete ' + str(conta)+'%: Contamination', fontsize=2)
                 plt.text(df_samples["date"][1], 0.3, str(kraken_per)+'%:  ' + str(kraken_id), fontsize=2)
                 plt.text(df_samples["date"][1], 40, cluster, fontsize = 2, fontweight='bold')
-                plt.text(df_samples["date"][1], 9, str(nu)+' cov:'+str(av_cov)+'+/-'+str(sd_cov) + ', ' + str(tot_len) +'kb', fontsize=2)
+                plt.text(df_samples["date"][1], 9, str(nu)+' cov:'+str(av_cov)+'+/-'+str(sd_cov) + ', ' + str(tot_len_kb) +'kb', fontsize=2)
                 plt.text(df_samples["date"][1], 4, 'GC% '+ str(av_gc) +'+/-'+ str(sd_gc), fontsize=2)
             else:
                 plt.text(0.5, 1.7, "N50: " + str(n_50), fontsize=2)
                 plt.text(0.5, 0.7, str(comp) + '%:  Complete ' + str(conta) + '%:  Contamination', fontsize=2)
                 plt.text(0.5, 0.3, str(kraken_per)+'%:  ' + str(kraken_id), fontsize=2)
                 plt.text(0.5, 40, cluster, fontsize = 2, fontweight='bold')
-                plt.text(0.5, 9, str(nu) +', cov:'+str(av_cov)+'+/-'+str(sd_cov) + ', ' + str(tot_len) +'kb', fontsize=2)
+                plt.text(0.5, 9, str(nu) +', cov:'+str(av_cov)+'+/-'+str(sd_cov) + ', ' + str(tot_len_kb) +'kb', fontsize=2)
                 plt.text(0.5, 4, 'GC% '+ str(av_gc) +'+/-'+ str(sd_gc), fontsize=2)
 
             plt.tick_params(axis='x', labelsize=2, pad=0, direction='out', length=1, width=0.25)
