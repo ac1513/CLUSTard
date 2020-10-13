@@ -78,13 +78,16 @@ for i in groups:
     dc[i] +=1
 
 
-ascending = ["kraken_id", "contam", "sd_gc", "sd_cov"]
+ascending = ["kraken_id", "contam", "sd_gc", "sd_cov", "no_seq"]
+descending = ["tot_len", "av_cov", "av_gc",	"n_50",	"comp",	"kraken_per"]
 order = []
 for sort in sort_order:
     if sort in ascending:
         order.append(True)
-    else:
+    elif sort in descending:
         order.append(False)
+    else:
+        sort_order.remove(sort)
 
 input_stats = pd.read_csv(in_file, sep = '\t', index_col = 0, na_values ="NaN")
 sorted_stats = input_stats.sort_values(sort_order, ascending = order)
@@ -105,7 +108,7 @@ for i in range(0, len(files), 30):
         av_cov = sorted_stats.loc[cluster]["av_cov"]
         sd_cov = sorted_stats.loc[cluster]["sd_cov"]
         tot_len = sorted_stats.loc[cluster]["tot_len"]
-        tot_len_kb = tot_len / 1000
+        tot_len_kb = round(tot_len / 1000, 2)
         av_gc = sorted_stats.loc[cluster]["av_gc"]
         sd_gc = sorted_stats.loc[cluster]["sd_gc"]
         kraken_id = sorted_stats.loc[cluster]["kraken_id"]
