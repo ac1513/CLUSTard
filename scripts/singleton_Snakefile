@@ -19,7 +19,7 @@ rule all:
       expand("output/results/Cluster_singleton{SINGLETONS}.csv", SINGLETONS=SINGLETONS),
       expand("logs/{JOBID}_singleton_done.txt", JOBID=JOBID)
 
-localrules: singleton_csv, singleton_done
+localrules: singleton_done
 
 
 rule singleton_csv:

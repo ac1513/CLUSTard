@@ -31,7 +31,7 @@ rule all:
         expand("output/clustering/{JOBID}_bwa_output.txt", JOBID = JOBID)
 
 
-localrules: contig_list, norm_counts, merge_filecounts, derive, start_feeder, split_file
+localrules: split_file
 
 
 rule bwa_index:

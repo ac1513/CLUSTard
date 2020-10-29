@@ -26,8 +26,6 @@ rule all:
       expand("logs/{JOBID}_singleton_step1.txt", JOBID=JOBID)
 
 
-localrules: para_sets, non_red_step, file_parser, singleton, singleton_split
-
 rule bin_feeder:
     input:
         diffs = 'output/clustering/' + JOBID + '_diffs{PART}.csv'
@@ -155,4 +153,3 @@ rule singleton_split:
             fi
         done < {input}
         """
-
