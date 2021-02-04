@@ -139,7 +139,7 @@ for i in range(0, len(files), 30):
                 mean_list.extend(df.mean()[x_start:x_end].to_list())
                 top = df.max()[x_start:x_end]
                 bottom = df.min()[x_start:x_end]
-                if "date" in df_samples.columns:
+                if ("date" in df_samples.columns) and ("y" in args.dates.lower()):
                     df_samples["date"] = pd.to_datetime(df_samples["date"])
                     if x_start == 0:
                         x_data = df_samples["date"][x_start:x_end]
@@ -162,7 +162,7 @@ for i in range(0, len(files), 30):
             plt.axis((x1,x2,0.0001,100))
             plt.axhline(y=0.01, ls='--', lw = 0.25, c = 'black')
 
-            if "date" in df_samples.columns:
+            if ("date" in df_samples.columns) and ("y" in args.dates.lower()):
                 plt.text(df_samples["date"][1], 1.7, "N50: " + str(n_50), fontsize=2)
                 plt.text(df_samples["date"][1], 0.7, str(comp)+'%: Complete ' + str(conta)+'%: Contamination', fontsize=2)
                 plt.text(df_samples["date"][1], 0.3, str(kraken_per)+'%:  ' + str(kraken_id), fontsize=2)

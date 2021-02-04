@@ -22,4 +22,4 @@ meth_counts: "norm" # norm or raw
 # Output plot properties
 kraken_level: "F" # Taxonomic level used in output plots (F, G, S etc.)
 date_scale: "n" # Plot timepoints in plot using date scale (if provided)
-plot_order: "kraken_id kraken_per tot_len"
+plot_order: "tot_len" # Priority 

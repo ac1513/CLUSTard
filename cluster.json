@@ -39,9 +39,14 @@
         "threads" : 20,
         "mem" : "2g"
     },
+    "file_parser" :
+    {
+        "time" : "02:00:00",
+        "threads" : 8
+    },
     "kraken" :
     {
-        "threads" : 16,
+        "threads" : 20,
         "mem" : "2g"
     },
     "prokka" :
