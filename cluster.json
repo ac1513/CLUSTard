@@ -18,6 +18,11 @@
         "time" : "2-00:00:00",
         "threads" : 6
     },
+    "bwa_mem_pair" :
+    {
+        "time" : "2-00:00:00",
+        "threads" : 6
+    },
     "bin_feeder" :
     {
         "time" : "6-23:59:00",
