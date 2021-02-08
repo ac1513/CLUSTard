@@ -12,6 +12,7 @@ CONTIG_T = config["CONTIG_T"]
 P_THRESH = config["P_THRESH"]
 krakendb = config["krakendb"]
 kraken_level = str(config["kraken_level"])
+GTDB = "Y"
 
 (CLUSTERS,) = glob_wildcards("output/results/Cluster_{CLUSTER}.fasta")
 
@@ -20,7 +21,7 @@ rule all:
         expand("output/kraken/{JOBID}_Cluster_{CLUSTERS}_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS),
         expand("output/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level),
         expand("output/prokka/Cluster_{CLUSTERS}/{JOBID}_{CLUSTERS}.err", JOBID = JOBID, CLUSTERS = CLUSTERS),
-        expand("logs/{JOBID}_slurm_prokka.log", JOBID=JOBID),
+        expand("output/kraken/{JOBID}_{kraken_level}_GTDB_lookup.json", JOBID=JOBID, kraken_level = kraken_level),
         expand("output/results/{JOBID}_seqkit_stats.tsv", JOBID=JOBID),
         expand("output/{JOBID}_checkm/{JOBID}_checkm.log", JOBID=JOBID)
 
@@ -78,49 +79,85 @@ rule prokka:
         rm {params.prokka}
         """
 
-rule output:
-    input:
-        prokka = expand("output/{JOBID}_prokka/Cluster_{CLUSTERS}/{JOBID}_{CLUSTERS}.err", JOBID = JOBID, CLUSTERS=CLUSTERS),
-        kraken = expand("output/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
-    output:
-        "logs/{JOBID}_slurm_kraken2SM.log"
-    shell:
+if GTDB == "Y":
+    rule GTDB_download:
+      input:
+        kraken_top = expand("output/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
+      output:
+        bac120_gtdb_r95 = "tmp/gtdb/bac120_metadata_r95.tsv",
+        ar122_gtdb_r95 = "tmp/gtdb/ar122_metadata_r95.tsv"
+      params:
+        loc = "tmp/gtdb/"
+      shell:
+        """
+        if wget -q --spider https://data.ace.uq.edu.au/public/gtdb/data/releases/release95/95.0/bac120_metadata_r95.tar.gz; then
+          wget -O {params.loc}bac120_metadata_r95.tar.gz https://data.ace.uq.edu.au/public/gtdb/data/releases/release95/95.0/bac120_metadata_r95.tar.gz
+          tar -xf {params.loc}bac120_metadata_r95.tar.gz -C {params.loc}
+        fi
+
+        if wget -q --spider https://data.ace.uq.edu.au/public/gtdb/data/releases/release95/95.0/ar122_metadata_r95.tar.gz; then
+          wget -O {params.loc}ar122_metadata_r95.tar.gz https://data.ace.uq.edu.au/public/gtdb/data/releases/release95/95.0/ar122_metadata_r95.tar.gz
+          tar -xf {params.loc}ar122_metadata_r95.tar.gz -C {params.loc}
+        fi
+        """
+    rule gtdb_lookup:
+      input:
+        bac120_gtdb_r95 = "tmp/gtdb/bac120_metadata_r95.tsv",
+        ar122_gtdb_r95 = "tmp/gtdb/ar122_metadata_r95.tsv",
+        kraken_top = expand("output/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
+      output:
+        json_lookup = "output/kraken/{JOBID}_{kraken_level}_GTDB_lookup.json"
+      params:
+        level = {kraken_level}
+      shell:
+        """
+        python scripts/gtdb_lookup.py {input.kraken_top} {params.level} {input.bac120_gtdb_r95} {input.ar122_gtdb_r95} {output.json_lookup}
+        """
+
+elif GTDB == "N":
+    rule empty_lookup:
+      input:
+        kraken_top = expand("output/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
+      output:
+        "output/kraken/{JOBID}_{kraken_level}_GTDB_lookup.json"
+      shell:
         """
         touch {output}
         """
 
 rule seqkit:
-    input: wait = expand("logs/{JOBID}_slurm_kraken2SM.log", JOBID = JOBID)
-    output:
-          "output/results/{JOBID}_seqkit_stats.tsv"
-    conda:
-        "../envs/py3.yaml"
-    threads:
-        10
-    shell:
-        """
-        seqkit stats -a -T -j {threads} output/results/*.fasta > {output}
-        """
+  input:
+      wait_for = expand("output/kraken/{JOBID}_{kraken_level}_GTDB_lookup.json", JOBID = JOBID, kraken_level = kraken_level)
+  output:
+      "output/results/{JOBID}_seqkit_stats.tsv"
+  conda:
+      "../envs/py3.yaml"
+  threads:
+      10
+  shell:
+      """
+      seqkit stats -a -T -j {threads} output/results/*.fasta > {output}
+      """
 
 rule checkm:
-    input:
-        expand("output/results/Cluster_{CLUSTERS}.fasta", CLUSTERS = CLUSTERS),
-        expand("output/results/{JOBID}_seqkit_stats.tsv", JOBID=JOBID),
-    output:
-        expand("output/{JOBID}_checkm/{JOBID}_checkm.log", JOBID=JOBID)
-    params:
-        out = expand("output/{JOBID}_checkm", JOBID=JOBID),
-        input = "output/results",
-        refin = REFIN,
-        checkmdb = config["checkm_db_root"]
-    threads:
-        20
-    conda:
-        "../envs/checkm.yaml"
-    shell:
-        """
-	      checkm_db={params.checkmdb}
-        echo ${{checkm_db}} | checkm data setRoot ${{checkm_db}}
-        checkm unbinned -x fasta output/results/ {params.refin} output/results/{JOBID}_unbinned_contigs.fa output/results/{JOBID}_unbinned_contigs_stats.tsv
-        checkm lineage_wf -f {output} --tab_table -x fasta -t {threads} {params.input} {params.out}
-        """
+  input:
+      expand("output/results/Cluster_{CLUSTERS}.fasta", CLUSTERS = CLUSTERS),
+      expand("output/results/{JOBID}_seqkit_stats.tsv", JOBID=JOBID),
+  output:
+      expand("output/{JOBID}_checkm/{JOBID}_checkm.log", JOBID=JOBID)
+  params:
+      out = expand("output/{JOBID}_checkm", JOBID=JOBID),
+      input = "output/results",
+      refin = REFIN,
+      checkmdb = config["checkm_db_root"]
+  threads:
+      20
+  conda:
+      "../envs/checkm.yaml"
+  shell:
+      """
+      checkm_db={params.checkmdb}
+      echo ${{checkm_db}} | checkm data setRoot ${{checkm_db}}
+      checkm unbinned -x fasta output/results/ {params.refin} output/results/{JOBID}_unbinned_contigs.fa output/results/{JOBID}_unbinned_contigs_stats.tsv
+      checkm lineage_wf -f {output} --tab_table -x fasta -t {threads} {params.input} {params.out}
+      """
