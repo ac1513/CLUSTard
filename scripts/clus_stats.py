@@ -1,14 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Mon Oct 12 11:49:55 2020
-
-@author: ac1513
-"""
-
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
 Created on Fri Jul 12 19:48:34 2019
 
 @author: ac1513
@@ -18,6 +10,7 @@ import statistics
 import pandas as pd
 import argparse
 import re
+import json
 
 # =============================================================================
 # Command line parsing
@@ -28,6 +21,7 @@ parser.add_argument('prefix', help='prefix of the jobs', type=str)
 parser.add_argument('-cm', '--checkm_file', help = 'checkm output file - in tab format', type = str)
 parser.add_argument('-sk', '--seqkit', help = 'seqkit output file - in tab format', type = str)
 parser.add_argument('-k', '--kraken', help = 'kraken output file at selected genus level', type = str)
+parser.add_argument('-g', '--gtdb', help = 'json file of GTDB lookup', type = str)
 
 args = parser.parse_args()
 in_file = args.in_file
@@ -42,10 +36,20 @@ set_groups = set()
 with open(in_file, 'r') as text_file:
     files = text_file.read().strip().split()
 
+if args.gtdb:
+    with open(args.gtdb, 'r') as read_file:
+        empty_test = read_file.read(1)
+        if empty_test:
+            read_file.seek(0)
+            gtdb_lookup = json.load(read_file)
+    if len(gtdb_lookup) == 0:
+        gtdb_ncbi = " "
+
 # =============================================================================
 # Stats
 # =============================================================================
-stats_df = pd.DataFrame(columns=['no_seq','tot_len','av_cov','sd_cov', 'av_gc','sd_gc','n_50','comp', 'contam', 'kraken_id', 'kraken_per'])
+stats_df = pd.DataFrame(columns=['no_seq','tot_len','av_cov','sd_cov', 'av_gc','sd_gc','n_50','comp', 'contam', 'kraken_id', 'kraken_per', 'gtdb_ncbi'])
+
 
 for file in files:
     with open(file, 'r') as f:
@@ -86,8 +90,13 @@ for file in files:
                     else:
                         krak_per = line.split('\t')[1]
                         krak_per = krak_per.strip()
+                        if len(gtdb_lookup) > 0:
+                            if krak_id in gtdb_lookup:
+                                gtdb_ncbi = gtdb_lookup[krak_id]
+                            else:
+                                gtdb_ncbi = "Missing"
 
 
-        stats_df.loc[na] = [nu,tot_len,av_cov,sd_cov,av_gc,sd_gc,n_50,comp,conta,krak_id,krak_per]
+        stats_df.loc[na] = [nu,tot_len,av_cov,sd_cov,av_gc,sd_gc,n_50,comp,conta,krak_id,krak_per,gtdb_ncbi]
 
 stats_df.to_csv("output/" + prefix + "_cluster_summary_stats.tsv", sep='\t')

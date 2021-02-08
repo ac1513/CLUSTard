@@ -95,11 +95,12 @@ rule clus_stats:
     params:
         checkm = expand("output/{JOBID}_checkm/{JOBID}_checkm.log", JOBID=JOBID),
         seqk = expand("output/results/{JOBID}_seqkit_stats.tsv", JOBID=JOBID),
-        kraken = expand("output/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
+        kraken = expand("output/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level),
+        gtdb_ncbi = expand("output/kraken/{JOBID}_{kraken_level}_GTDB_lookup.json", JOBID = JOBID, kraken_level = kraken_level)
     shell:
         """
         ls output/results/C*.csv > stat_input.txt
-        python scripts/clus_stats.py stat_input.txt {JOBID} -cm {params.checkm} -sk {params.seqk} -k {params.kraken}
+        python scripts/clus_stats.py stat_input.txt {JOBID} -cm {params.checkm} -sk {params.seqk} -k {params.kraken} -g {params.gtdb_ncbi}
         rm stat_input.txt
         """
 

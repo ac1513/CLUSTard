@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Mon Oct 12 12:20:46 2020
+Created on Mon Feb  8 16:27:50 2021
 
 @author: ac1513
 """
@@ -115,6 +115,7 @@ for i in range(0, len(files), 30):
         sd_gc = sorted_stats.loc[cluster]["sd_gc"]
         kraken_id = sorted_stats.loc[cluster]["kraken_id"]
         kraken_per = sorted_stats.loc[cluster]["kraken_per"]
+        gtdb_ncbi = sorted_stats.loc[cluster]["gtdb_ncbi"]
         comp = sorted_stats.loc[cluster]["comp"]
         conta = sorted_stats.loc[cluster]["contam"]
         n_50 = sorted_stats.loc[cluster]["n_50"]
@@ -173,6 +174,7 @@ for i in range(0, len(files), 30):
                 plt.text(0.5, 1.7, "N50: " + str(n_50), fontsize=2)
                 plt.text(0.5, 0.7, str(comp) + '%:  Complete ' + str(conta) + '%:  Contamination', fontsize=2)
                 plt.text(0.5, 0.3, str(kraken_per)+'%:  ' + str(kraken_id), fontsize=2)
+                plt.text(0.5, 0.15, str(gtdb_ncbi), fontsize=2)
                 plt.text(0.5, 40, cluster, fontsize = 2, fontweight='bold')
                 plt.text(0.5, 9, str(nu) +', cov:'+str(av_cov)+'+/-'+str(sd_cov) + ', ' + str(tot_len_kb) +'kb', fontsize=2)
                 plt.text(0.5, 4, 'GC% '+ str(av_gc) +'+/-'+ str(sd_gc), fontsize=2)
