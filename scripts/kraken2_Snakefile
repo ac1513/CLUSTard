@@ -12,7 +12,7 @@ CONTIG_T = config["CONTIG_T"]
 P_THRESH = config["P_THRESH"]
 krakendb = config["krakendb"]
 kraken_level = str(config["kraken_level"])
-GTDB = "Y"
+GTDB = config["GTDB"]
 
 (CLUSTERS,) = glob_wildcards("output/results/Cluster_{CLUSTER}.fasta")
 
