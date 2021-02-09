@@ -7,15 +7,9 @@ Created on Sat Jun 22 19:38:16 2019
 """
 
 import matplotlib.pyplot as plt
-import matplotlib as mpl
-from matplotlib import rc
 import argparse
 import pandas as pd
-import math
-from scipy.cluster import hierarchy as hc
 import re
-import matplotlib.cm as cm
-import numpy as np
 
 # =============================================================================
 # Command line parsing
@@ -45,12 +39,9 @@ if args.kraken:
 else:
     taxo = "n"
 
-#Dendogram options
-LinkMethod = "weighted"
-metric = 'correlation'
 
 # =============================================================================
-#
+# Read in files
 # =============================================================================
 
 df_abun = pd.read_csv(csv_in, index_col = 0, names = sample)
@@ -60,10 +51,13 @@ cluster_abun = pd.DataFrame(columns=df_abun.columns)
 new_df_abun = pd.DataFrame(columns = sample).drop(columns='Coverage')
 abun = pd.DataFrame(columns = sample).drop(columns='Coverage')
 
+# =============================================================================
+# Parse count and taxonomy files
+# =============================================================================
 
 with open(binned_in, 'r') as binned_list:
     for line in binned_list:
-        if taxo == "y":
+        if taxo == "y": #parse the kraken info if it's supplied
             if line.startswith(">"): #get cluster info
                 cluster = line.strip('>').strip()[:-6] #strip things
                 with open(kraken, 'r') as kraken_f:
@@ -76,72 +70,105 @@ with open(binned_in, 'r') as binned_list:
                 line = line.strip().split(' ')[0] #split may not work with NAB_997 - check
                 if line in df_abun.index:
                     if name in new_df_abun.index:
-                        new_df_abun.loc[name] = new_df_abun.loc[name].add(df_abun.loc[line]) #need to add this not just equal... #This isn't working???
+                        new_df_abun.loc[name] = new_df_abun.loc[name].add(df_abun.loc[line])
                     else:
                         new_df_abun.loc[name] = df_abun.loc[line]
-                else:
-                    print("something wrong here")
-
 
         else:
             if line.startswith(">"): #get cluster info
                 cluster = line.strip('>').strip()[:-6] #strip things
                 name = cluster
             else:
-                line = line.strip().split(' ')[0]#split may not work with NAB_997 - check
+                line = line.strip().split(' ')[0] #split may not work with NAB_997 - check
                 if line in df_abun.index:
                     if name in new_df_abun.index:
-                        new_df_abun.loc[name] = new_df_abun.loc[name].add(df_abun.loc[line]) #need to add this not just equal... #This isn't working???
+                        new_df_abun.loc[name] = new_df_abun.loc[name].add(df_abun.loc[line])
                     else:
                         new_df_abun.loc[name] = df_abun.loc[line]
-                else:
-                    print("something wrong here")
 
-if 'y' in top20:
-    new_df_abun["sum"]=new_df_abun.sum(axis=1)
-    top_df_abun = new_df_abun.sort_values('sum', axis=0, ascending=False).head(19).drop(columns = "sum")
-    other_df_abun = new_df_abun.sort_values('sum', axis=0, ascending=False).iloc[19:,]
-    top_df_abun.loc["Other"] = other_df_abun.sum(axis=0).drop(columns="sum")
-    new_df_abun = top_df_abun
+# =============================================================================
+# Save absolute counts to file
+# =============================================================================
+
+absolute_abun = new_df_abun.copy()
+absolute_abun.to_csv(prefix + "_absolute_counts.csv")
+
+# =============================================================================
+# Save relative counts to file
+# =============================================================================
+
+relative_abun = new_df_abun.copy()
 
 for column in new_df_abun: #iterate over columns
     per = []
     for val in new_df_abun.loc[:, column]:
-        if 'a' in plot:
-            per.append(val)
-        if 'r' in plot:
-            per.append(((val/new_df_abun[column].sum())*100))
+        per.append((val/new_df_abun[column].sum())*100)
+    relative_abun[column] = per
+abun_sum = relative_abun.cumsum()
+relative_abun.index = new_df_abun.index.values.tolist()
+relative_abun.to_csv(prefix + "_relative_counts.csv")
 
-    abun[column] = pd.Series(per, name = column) #sort name out
+# =============================================================================
+# Calculate top 20 species
+# =============================================================================
 
-abun_sum = abun.cumsum()
+if top20 == 'y':
 
-abun.index = new_df_abun.index.values.tolist()
-if 'r' in plot:
-    abun.to_csv(prefix + "_relative_counts.csv")
-if 'a' in plot:
-    abun.to_csv(prefix + "_absolute_counts.csv")
+    if 'a' in plot:
+
+        absolute_abun["sum"] = absolute_abun.sum(axis=1)
+        top_df_abun = absolute_abun.sort_values('sum', axis=0, ascending=False).head(19).drop(columns = "sum")
+        other_df_abun = absolute_abun.sort_values('sum', axis=0, ascending=False).iloc[19:,]
+        top_df_abun.loc["Other"] = other_df_abun.sum(axis=0).drop(columns="sum")
+        abun = top_df_abun.copy()
+        abun_sum = abun.cumsum()
+        abun.to_csv(prefix + "_top20_absolute_counts.csv")
+
+
+    elif 'r' in plot:
+
+        new_df_abun["sum"] = new_df_abun.sum(axis=1)
+        top_df_abun = new_df_abun.sort_values('sum', axis=0, ascending=False).head(19).drop(columns = "sum")
+        other_df_abun = new_df_abun.sort_values('sum', axis=0, ascending=False).iloc[19:,]
+        top_df_abun.loc["Other"] = other_df_abun.sum(axis=0).drop(columns="sum")
+        top_relative_abun = top_df_abun.copy()
+        for column in top_df_abun: #iterate over columns
+            per = []
+            for val in top_df_abun.loc[:, column]:
+                per.append(((val/top_df_abun[column].sum())*100))
+            top_relative_abun[column] = per
+        abun_sum = top_relative_abun.cumsum()
+        top_relative_abun.index = top_df_abun.index.values.tolist()
+        abun = top_relative_abun.copy()
+        abun.to_csv(prefix + "_top20_relative_counts.csv")
+
+
+
+
+# =============================================================================
+# Plot
+# =============================================================================
 
 prev = ""
-previous = pd.Series()
+previous = pd.Series(dtype=float)
 
 fig = plt.figure(1)
 
 for i in range(0, len(abun.index.values.tolist())): #for each cluster i.e list of abun index
     if not prev:
         plt.bar(abun.keys(), abun.iloc[i, :], label=abun.index.values.tolist()[i], width=0.9)
-        #print(abun.keys())
     else:
         plt.bar(abun.keys(), abun.iloc[i, :], bottom=previous, label=abun.index.values.tolist()[i],  width=0.9)
-        #print(abun.keys())
     prev = 'y'
     if i != 0:
         previous = abun.iloc[i, :] + abun_sum.iloc[i-1, :]
     else:
         previous = abun.iloc[i, :]
 
-plt.xticks(abun.keys(), abun.keys(), rotation='vertical', fontsize = 4, verticalalignment='center_baseline')
+plt.xticks( rotation='vertical', fontsize = 4, verticalalignment='center_baseline')
+
 plt.legend(loc='upper left', bbox_to_anchor=(1,1), ncol=1, frameon=False, fontsize = 5)
+
 if 'a' in plot:
     plt.margins(x = 0.01, y=0.05)
 if 'r' in plot:
@@ -149,7 +176,7 @@ if 'r' in plot:
 if 'y' in top20:
     plot = plot + '_top20'
 
-fig.savefig(str("output/plots/" + prefix + '_' + plot + '_abun_plot.png'), bbox_inches='tight', dpi = 400)
+#fig.savefig(str("plots/" + prefix + '_' + plot + '_abun_plot.png'), bbox_inches='tight', dpi = 400)
 plt.show()
 
 if 'y' in top20:
@@ -158,6 +185,7 @@ if 'y' in top20:
     abun_flip = abun.transpose()
     abun_flip.plot.bar(stacked=True, legend = None, figsize=(15,10), color=colours, width=0.9)
     plt.legend(loc='center left', labelspacing=-2.5, bbox_to_anchor=(1.0, 0.5), frameon=False)
-    plt.ylim(0,100)
+    if 'r' in plot:
+        plt.ylim(0,100)
     plt.tight_layout()
-    plt.savefig('output/plots/' + prefix +'_' + plot +'_'+ 'abun.png', bbox_inches='tight')
+    plt.savefig('plots/' + prefix +'_' + plot +'_'+ 'abun.png', bbox_inches='tight', dpi = 300)
