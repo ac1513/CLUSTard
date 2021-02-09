@@ -188,4 +188,4 @@ if 'y' in top20:
     if 'r' in plot:
         plt.ylim(0,100)
     plt.tight_layout()
-    plt.savefig('output/plots/' + prefix +'_' + plot +'_'+ 'abun.png', bbox_inches='tight', dpi = 300)
+    plt.savefig('output/plots/' + prefix +'_' + plot +'_'+ 'top20_abun_plot.png', bbox_inches='tight', dpi = 300)
