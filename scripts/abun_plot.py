@@ -91,7 +91,7 @@ with open(binned_in, 'r') as binned_list:
 # =============================================================================
 
 absolute_abun = new_df_abun.copy()
-absolute_abun.to_csv(prefix + "_absolute_counts.csv")
+absolute_abun.to_csv("output/plots/" + prefix + "_absolute_counts.csv")
 
 # =============================================================================
 # Save relative counts to file
@@ -106,7 +106,7 @@ for column in new_df_abun: #iterate over columns
     relative_abun[column] = per
 abun_sum = relative_abun.cumsum()
 relative_abun.index = new_df_abun.index.values.tolist()
-relative_abun.to_csv(prefix + "_relative_counts.csv")
+relative_abun.to_csv("output/plots/" + prefix + "_relative_counts.csv")
 
 # =============================================================================
 # Calculate top 20 species
@@ -122,7 +122,7 @@ if top20 == 'y':
         top_df_abun.loc["Other"] = other_df_abun.sum(axis=0).drop(columns="sum")
         abun = top_df_abun.copy()
         abun_sum = abun.cumsum()
-        abun.to_csv(prefix + "_top20_absolute_counts.csv")
+        abun.to_csv("output/plots/" + prefix + "_top20_absolute_counts.csv")
 
 
     elif 'r' in plot:
@@ -140,7 +140,7 @@ if top20 == 'y':
         abun_sum = top_relative_abun.cumsum()
         top_relative_abun.index = top_df_abun.index.values.tolist()
         abun = top_relative_abun.copy()
-        abun.to_csv(prefix + "_top20_relative_counts.csv")
+        abun.to_csv("output/plots/" + prefix + "_top20_relative_counts.csv")
 
 
 
@@ -188,4 +188,4 @@ if 'y' in top20:
     if 'r' in plot:
         plt.ylim(0,100)
     plt.tight_layout()
-    plt.savefig('plots/' + prefix +'_' + plot +'_'+ 'abun.png', bbox_inches='tight', dpi = 300)
+    plt.savefig('output/plots/' + prefix +'_' + plot +'_'+ 'abun.png', bbox_inches='tight', dpi = 300)
