@@ -80,6 +80,7 @@ rule prokka:
         """
 
 if GTDB == "Y":
+
     rule GTDB_download:
       input:
         kraken_top = expand("output/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
@@ -100,6 +101,7 @@ if GTDB == "Y":
           tar -xf {params.loc}ar122_metadata_r95.tar.gz -C {params.loc}
         fi
         """
+
     rule gtdb_lookup:
       input:
         bac120_gtdb_r95 = "tmp/gtdb/bac120_metadata_r95.tsv",

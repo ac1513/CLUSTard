@@ -180,4 +180,5 @@ rule high_mags:
     shell:
         """
         python scripts/qual_parse.py {params.checkm} {params.prokka} > {output.txt}
+        rm -r tmp/
         """
