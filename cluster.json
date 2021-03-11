@@ -52,7 +52,7 @@
     "kraken" :
     {
         "threads" : 20,
-        "mem" : "2g"
+        "mem" : "4g"
     },
     "prokka" :
     {

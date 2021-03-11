@@ -21,6 +21,7 @@ rule all:
         expand("output/kraken/{JOBID}_Cluster_{CLUSTERS}_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS),
         expand("output/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level),
         expand("output/prokka/Cluster_{CLUSTERS}/{JOBID}_{CLUSTERS}.err", JOBID = JOBID, CLUSTERS = CLUSTERS),
+        expand("logs/{JOBID}_prokka_done.txt", JOBID = JOBID),
         expand("output/kraken/{JOBID}_{kraken_level}_GTDB_lookup.json", JOBID=JOBID, kraken_level = kraken_level),
         expand("output/results/{JOBID}_seqkit_stats.tsv", JOBID=JOBID),
         expand("output/{JOBID}_checkm/{JOBID}_checkm.log", JOBID=JOBID)
@@ -79,8 +80,13 @@ rule prokka:
         rm {params.prokka}
         """
 
-if GTDB == "Y":
+rule prokka_force:
+    input:
+        prokka_all = expand("output/{JOBID}_prokka/Cluster_{CLUSTERS}/{JOBID}_{CLUSTERS}.err", JOBID = JOBID, CLUSTERS = CLUSTERS)
+    output:
+        touch("logs/{JOBID}_prokka_done.txt")
 
+if GTDB == "Y":
     rule GTDB_download:
       input:
         kraken_top = expand("output/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
@@ -129,7 +135,8 @@ elif GTDB == "N":
 
 rule seqkit:
   input:
-      wait_for = expand("output/kraken/{JOBID}_{kraken_level}_GTDB_lookup.json", JOBID = JOBID, kraken_level = kraken_level)
+      wait_for = expand("output/kraken/{JOBID}_{kraken_level}_GTDB_lookup.json", JOBID = JOBID, kraken_level = kraken_level),
+      prokka_out = expand("logs/{JOBID}_prokka_done.txt", JOBID=JOBID)
   output:
       "output/results/{JOBID}_seqkit_stats.tsv"
   conda:
