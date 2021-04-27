@@ -36,6 +36,7 @@ set_groups = set()
 with open(in_file, 'r') as text_file:
     files = text_file.read().strip().split()
 
+gtdb_lookup = ""
 if args.gtdb:
     with open(args.gtdb, 'r') as read_file:
         empty_test = read_file.read(1)
