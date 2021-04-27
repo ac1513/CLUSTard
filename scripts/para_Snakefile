@@ -5,7 +5,7 @@ df_samples = pd.read_csv(config["samples"], sep ='\t', index_col = 0)
 samples = df_samples["sample"].to_list()
 
 JOBID = config["jobid"]
-RAW_SR = config["RAW_SR"]
+RAW_SR = config["RAW_DIR"]
 REFIN = config["REFIN"]
 CONTIG_T = config["CONTIG_T"]
 P_THRESH = config["P_THRESH"]
