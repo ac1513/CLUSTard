@@ -16,6 +16,7 @@ plot_order = config["plot_order"]
 date_scale = config["date_scale"]
 rel_or_abs = "r"
 top20 = "y"
+gtdb = config["GTDB"]
 
 if 'y' in top20:
     out_abun = rel_or_abs + '_top20'
@@ -180,5 +181,8 @@ rule high_mags:
     shell:
         """
         python scripts/qual_parse.py {params.checkm} {params.prokka} > {output.txt}
-        rm -r tmp/
+        if [ {gtdb} = "Y" ]
+        then
+            rm tmp/
+        fi
         """
