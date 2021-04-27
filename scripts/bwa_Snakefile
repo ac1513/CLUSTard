@@ -20,7 +20,7 @@ rule all:
         expand("{REFIN}.sa", REFIN=REFIN),
         expand("output/clustering/{JOBID}_contig_lengths.tsv", JOBID = JOBID),
         expand('output/alignment/{SAMPLES}.bam', SAMPLES = samples),
-        expand('output/clustering/{SAMPLES}_read_len.tsv', SAMPLES = samples),
+        expand('output/alignment/{SAMPLES}_read_len.tsv', SAMPLES = samples),
         expand('output/clustering/{SAMPLES}_counts.tsv', SAMPLES = samples),
         expand('output/clustering/{SAMPLES}_counts.tsv', SAMPLES=samples),
         expand('output/clustering/{SAMPLES}_proc_counts_out.tsv', SAMPLES = samples),
@@ -54,7 +54,7 @@ if mapping == "SR":
           ref_ind = expand("{reference}.sa", reference=REFIN) #waits for indexed reference
       output:
           bam = 'output/alignment/{samples}.bam',
-          read_len = 'output/clustering/{samples}_read_len.tsv'
+          read_len = 'output/alignment/{samples}_read_len.tsv'
       conda: "../envs/bwasam.yaml"
       threads: 6
       shell:
@@ -72,7 +72,7 @@ elif mapping == "paired_SR":
           ref_ind = expand("{reference}.sa", reference=REFIN) #waits for indexed reference
       output:
           bam = 'output/alignment/{samples}.bam',
-          read_len = 'output/clustering/{samples}_read_len.tsv'
+          read_len = 'output/alignment/{samples}_read_len.tsv'
       conda: "../envs/bwasam.yaml"
       threads: 6
       shell:
@@ -89,7 +89,7 @@ elif mapping == "LR":
           ref_ind = expand("{reference}.sa", reference=REFIN) #waits for indexed reference
         output:
             bam = 'output/alignment/{samples}.bam',
-            read_len = 'output/clustering/{samples}_read_len.tsv'
+            read_len = 'output/alignment/{samples}_read_len.tsv'
         params:
             output = 'output/alignment/{samples}.sam'
         conda: "../envs/minimap2.yaml"
@@ -130,7 +130,7 @@ rule contig_len:
 rule norm_counts:
       input:
           counts = 'output/clustering/{samples}_counts.tsv',
-          read_len = 'output/clustering/{samples}_read_len.tsv',
+          read_len = 'output/alignment/{samples}_read_len.tsv',
           contig_list = expand("output/clustering/{JOBID}_contig_lengths.tsv", JOBID = JOBID)
       output:
           norm_count = 'output/clustering/{samples}_proc_counts_out.tsv'
