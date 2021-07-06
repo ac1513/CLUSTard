@@ -183,6 +183,6 @@ rule high_mags:
         python scripts/qual_parse.py {params.checkm} {params.prokka} > {output.txt}
         if [ {gtdb} = "Y" ]
         then
-            rm tmp/
+            rm -r tmp/
         fi
         """
