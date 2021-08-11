@@ -4,9 +4,7 @@
 # a modification of the
 # new code used to produce output files from clustered contigs
 # JC 30/12/15  modified 13/05/16
-# 19/2/17 added files from 2k analysis
-
-# code requirements
+# Generates sequence files for each cluster
 
 import json
 import re
@@ -46,7 +44,7 @@ print('Opening contig sequence file')
 contig_dict = SeqIO.to_dict(SeqIO.parse(contig_file, "fasta"))
 print(str(len(contig_dict))+' sequences loaded')
 
-# open .csv file and store as list(?)
+# open .csv file and store as list
 
 print('Loading abundance data from .csv file')
 
@@ -55,12 +53,6 @@ with open(csv_file, 'r') as abundance:
     bun_list = list(bun_entry)
     for bun_record in bun_list:
         bun_dict[bun_record[0]] = bun_record[1:]
-
-# open .list file of contig i.d.s, loop over this list then
-# generate separate .csv and .fasta files for each cluster
-# .csv file should contain contig names and lengths as well as GC content
-#	NOTE: the structure of these files has changed
-#	      it's better, but different!
 
 print('Loading cluster details')
 

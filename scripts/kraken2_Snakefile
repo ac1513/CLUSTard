@@ -119,7 +119,7 @@ if GTDB == "Y":
         level = {kraken_level}
       shell:
         """
-        python scripts/gtdb_lookup.py {input.kraken_top} {params.level} {input.bac120_gtdb_r95} {input.ar122_gtdb_r95} {output.json_lookup}
+        python scripts/python/gtdb_lookup.py {input.kraken_top} {params.level} {input.bac120_gtdb_r95} {input.ar122_gtdb_r95} {output.json_lookup}
         """
 
 elif GTDB == "N":

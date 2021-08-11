@@ -36,7 +36,7 @@ rule singleton_csv:
       """
       seqkit head -n 1 -w 0 {input} > {input}.test
       mv {input}.test {input}
-      python scripts/singleton.py {params.csv} -l {params.header}
+      python scripts/python/singleton.py {params.csv} -l {params.header}
       """
 
 rule singleton_done:
