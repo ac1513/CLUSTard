@@ -9,6 +9,9 @@ Created on Tue Oct  6 11:58:34 2020
 import pandas as pd
 import glob
 import argparse
+import os
+from shutil import copyfile
+
 
 def qual_cluster(comp, cont):
     if (comp >90) and (cont<5):
@@ -103,6 +106,32 @@ for cluster in high_clusters:
         high_qual_clusters.append(cluster)
     else:
         med_clusters.append(cluster) # adds high qual that fail trna/rna
+# =============================================================================
+# COPYING FILES INTO QUAL DIRECTORIES
+# =============================================================================
+
+location = "../../output/results/"
+new_loc = "../../output/genome_bins/"
+os.makedirs("../../output/genome_bins/high_qual")
+os.mkdir("../../output/genome_bins/med_qual")
+os.mkdir("../../output/genome_bins/low_qual")
+
+for high in high_qual_clusters:
+    file = high + ".fasta"
+    copyfile(file, "../../output/genome_bins/high_qual/")
+
+for med in med_qual_clusters:
+    file = med + ".fasta"
+    copyfile(file, "../../output/genome_bins/med_qual/")
+
+for low in low_qual_clusters:
+    file = low + ".fasta"
+    copyfile(file, "../../output/genome_bins/low_qual/")
+
+# =============================================================================
+# OUTPUT CREATED HERE
+# =============================================================================
+
 print("-" * 12)
 print(" NUMBER MAGs")
 print("-" * 12)
