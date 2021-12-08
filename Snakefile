@@ -53,9 +53,9 @@ rule all:
         expand("output/{JOBID}_qual_MAGs.txt", JOBID=JOBID)
 
 
-localrules: test, para_out, singleton_out, plot, bin_plot, abs_derive, abun_plot, clus_stats, high_mags
+localrules: bwa_sub, para_out, singleton_out, plot, bin_plot, abs_derive, abun_plot, clus_stats, high_mags
 
-rule test:
+rule bwa_sub:
     input:
         bwa_split(expand("output/clustering/{JOBID}_bwa_output.txt", JOBID = JOBID))
     output:
