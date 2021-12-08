@@ -178,6 +178,8 @@ rule high_mags:
     params:
         checkm = expand("output/{JOBID}_checkm/{JOBID}_checkm.log", JOBID = JOBID),
         prokka = expand("output/{JOBID}_prokka/", JOBID = JOBID)
+    conda:
+        "envs/py3.yaml"
     shell:
         """
         python scripts/python/qual_parse.py {params.checkm} {params.prokka} > {output.txt}
