@@ -9,6 +9,9 @@ Created on Tue Oct  6 11:58:34 2020
 import pandas as pd
 import glob
 import argparse
+import os
+from shutil import copyfile
+
 
 def qual_cluster(comp, cont):
     if (comp >90) and (cont<5):
@@ -36,8 +39,8 @@ checkm_df = pd.read_csv(checkm_log, sep = "\t", index_col = 0)
 checkm_df['qual'] = checkm_df.apply(lambda x: qual_cluster(x['Completeness'], x['Contamination']), axis=1)
 
 high_clusters = checkm_df[checkm_df['qual'].str.contains("high")].index.values.tolist()
-med_clusters = checkm_df[checkm_df['qual'].str.contains("med")].index.values.tolist()
-low_clusters = checkm_df[checkm_df['qual'].str.contains("low")].index.values.tolist()
+med_qual_clusters = checkm_df[checkm_df['qual'].str.contains("med")].index.values.tolist()
+low_qual_clusters = checkm_df[checkm_df['qual'].str.contains("low")].index.values.tolist()
 NA = checkm_df[checkm_df['qual'].str.contains("NA")].index.values.tolist()
 # =============================================================================
 # PROKKA PARSE HERE
@@ -102,18 +105,44 @@ for cluster in high_clusters:
     if (len(trna_set) >= 18) and (len(rna_set) == 3):
         high_qual_clusters.append(cluster)
     else:
-        med_clusters.append(cluster) # adds high qual that fail trna/rna
+        med_qual_clusters.append(cluster) # adds high qual that fail trna/rna
+# =============================================================================
+# COPYING FILES INTO QUAL DIRECTORIES
+# =============================================================================
+
+location = "output/results/"
+new_loc = "output/genome_bins/"
+os.makedirs("output/genome_bins/high_qual", exist_ok=True)
+os.makedirs("output/genome_bins/med_qual", exist_ok=True)
+os.makedirs("output/genome_bins/low_qual", exist_ok=True)
+
+for high in high_qual_clusters:
+    file = location + high + ".fasta"
+    copyfile(file, "output/genome_bins/high_qual/"+high+".fasta")
+
+for med in med_qual_clusters:
+    file = location + med + ".fasta"
+    copyfile(file, "output/genome_bins/med_qual/"+med+".fasta")
+
+for low in low_qual_clusters:
+    file = location + low + ".fasta"
+    copyfile(file, "output/genome_bins/low_qual/"+low+".fasta")
+
+# =============================================================================
+# OUTPUT CREATED HERE
+# =============================================================================
+
 print("-" * 12)
 print(" NUMBER MAGs")
 print("-" * 12)
 print("High Qual:", len(high_qual_clusters))
-print("Med Qual:", len(med_clusters))
-print("Low Qual:", len(low_clusters))
+print("Med Qual:", len(med_qual_clusters))
+print("Low Qual:", len(low_qual_clusters))
 print("NA:", len(NA), "\n")
 print("-" * 12)
 print(" MAG IDs")
 print("-" * 12)
 print("High Qual:", high_qual_clusters , "\n")
-print("Med Qual:", med_clusters, "\n")
-print("Low Qual:", low_clusters, "\n")
+print("Med Qual:", med_qual_clusters, "\n")
+print("Low Qual:", low_qual_clusters, "\n")
 print("NA:", NA, "\n")

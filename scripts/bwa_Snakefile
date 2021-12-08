@@ -137,7 +137,7 @@ rule norm_counts:
       conda: "../envs/py3.yaml"
       shell:
         """
-        python scripts/norm_counts.py {input.counts} {input.read_len} {input.contig_list} {output.norm_count}
+        python scripts/python/norm_counts.py {input.counts} {input.read_len} {input.contig_list} {output.norm_count}
         """
 
 rule merge_filecounts:
@@ -152,7 +152,7 @@ rule merge_filecounts:
         "../envs/py3.yaml"
     shell:
         """
-        python scripts/merge_filecounts2.py {params.method} {output.tsv}  -l {input.test}
+        python scripts/python/merge_filecounts.py {params.method} {output.tsv}  -l {input.test}
         """
 
 rule derive:
@@ -166,7 +166,7 @@ rule derive:
         "../envs/py3.yaml" #change clustering (below) when add counts folder..
     shell:
         """
-        python scripts/derive.py {input} {JOBID} {params.thresh}
+        python scripts/python/gen_counts_csv.py {input} {JOBID} {params.thresh}
         """
 
 rule start_feeder:
@@ -179,7 +179,7 @@ rule start_feeder:
         "../envs/py3.yaml"
     shell:
         """
-        python scripts/start_feeder.py clustering {JOBID}
+        python scripts/python/start_feeder.py clustering {JOBID}
         """
 
 rule split_file:
