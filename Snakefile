@@ -181,7 +181,7 @@ rule high_mags:
     shell:
         """
         python scripts/python/qual_parse.py {params.checkm} {params.prokka} > {output.txt}
-        if [ {gtdb} = "Y" ]
+        if [ {gtdb} = "Y" ] && [ -d "tmp/" ]
         then
             rm -r tmp/
         fi
