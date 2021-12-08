@@ -117,15 +117,15 @@ os.makedirs("output/genome_bins/med_qual", exist_ok=True)
 os.makedirs("output/genome_bins/low_qual", exist_ok=True)
 
 for high in high_qual_clusters:
-    file = high + ".fasta"
+    file = location + high + ".fasta"
     copyfile(file, "output/genome_bins/high_qual/"+high+".fasta")
 
 for med in med_qual_clusters:
-    file = med + ".fasta"
+    file = location + med + ".fasta"
     copyfile(file, "output/genome_bins/med_qual/"+med+".fasta")
 
 for low in low_qual_clusters:
-    file = low + ".fasta"
+    file = location + low + ".fasta"
     copyfile(file, "output/genome_bins/low_qual/"+low+".fasta")
 
 # =============================================================================
