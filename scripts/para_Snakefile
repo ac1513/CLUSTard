@@ -38,7 +38,7 @@ rule bin_feeder:
         "../envs/py3.yaml"
     shell:
         """
-        python scripts/bin_feeder.py {input.diffs} {params.all_diffs} {params.thresh} {output.all}
+        python scripts/python/bin_feeder.py {input.diffs} {params.all_diffs} {params.thresh} {output.all}
         """
 
 rule para_sets:
@@ -52,7 +52,7 @@ rule para_sets:
         "../envs/py3.yaml"
     shell:
         """
-        python scripts/para_sets.py {input.bins} {output} {params.thresh}
+        python scripts/python/para_sets.py {input.bins} {output} {params.thresh}
         """
 
 rule para_merge:
@@ -66,7 +66,7 @@ rule para_merge:
         "../envs/py3.yaml"
     shell:
         """
-        python scripts/parallel_merge_step2.py -i {input} -o {output}
+        python scripts/python/parallel_merge_step.py -i {input} -o {output}
         """
 
 rule non_red_step:
@@ -78,7 +78,7 @@ rule non_red_step:
       "../envs/py3.yaml"
     shell:
       """
-      python scripts/step3.py {input} {output}
+      python scripts/python/non_red.py {input} {output}
       """
 
 rule file_parser:
@@ -96,7 +96,7 @@ rule file_parser:
     shell:
         """
         mkdir -p output/{params.wd}
-        python scripts/file_parser.py {params.contigs} {params.csv} {input} {params.wd} -l {params.header}
+        python scripts/python/file_parser.py {params.contigs} {params.csv} {input} {params.wd} -l {params.header}
         """
 
 rule checkm_unbin:

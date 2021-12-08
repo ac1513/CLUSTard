@@ -101,7 +101,7 @@ rule clus_stats:
     shell:
         """
         ls output/results/C*.csv > stat_input.txt
-        python scripts/clus_stats.py stat_input.txt {JOBID} -cm {params.checkm} -sk {params.seqk} -k {params.kraken} -g {params.gtdb_ncbi}
+        python scripts/python/clus_stats.py stat_input.txt {JOBID} -cm {params.checkm} -sk {params.seqk} -k {params.kraken} -g {params.gtdb_ncbi}
         rm stat_input.txt
         """
 
@@ -118,7 +118,7 @@ rule plot:
         "envs/py3.yaml"
     shell:
         """
-        python scripts/plot.py {input.stats_in} {JOBID} {params.sample_list} {params.date} -k_l {kraken_level} -s {params.out_order}
+        python scripts/python/plot.py {input.stats_in} {JOBID} {params.sample_list} {params.date} -k_l {kraken_level} -s {params.out_order}
         """
 
 rule bin_plot:
@@ -133,7 +133,7 @@ rule bin_plot:
         cd output/results/
         cat Cluster*.fasta | awk '$0 ~ ">" {{print c; c=0;printf substr($0,2,100) "\\t"; }} $0 !~ ">" {{c+=length($0);}} END {{ print c; }}' | sort | uniq > {JOBID}_sorted_lengths.tsv
         cd ../../
-        python scripts/bin_plot.py output/results/{JOBID}_unbinned_contigs_stats.tsv output/results/{JOBID}_sorted_lengths.tsv {JOBID}
+        python scripts/python/bin_plot.py output/results/{JOBID}_unbinned_contigs_stats.tsv output/results/{JOBID}_sorted_lengths.tsv {JOBID}
         """
 
 rule abs_derive:
@@ -148,7 +148,7 @@ rule abs_derive:
         "envs/py3.yaml" #change clustering (below) when add counts folder..
     shell:
         """
-        python scripts/absolute_derive.py {params.counts} {JOBID} {params.thresh}
+        python scripts/python/gen_abs_counts_csv.py {params.counts} {JOBID} {params.thresh}
         """
 
 rule abun_plot:
@@ -167,7 +167,7 @@ rule abun_plot:
         cd output/results/
         for f in C*.fasta; do filename="${{f%%.*}}"; echo ">$f"; seqkit fx2tab -n $f; done > {JOBID}_binned_cluster_contig.txt
         cd ../../
-        python scripts/abun_plot.py {JOBID} {input.count_in} output/results/{JOBID}_binned_cluster_contig.txt {params.roa} {params.top_20} -s {samples} Coverage -k {params.kraken_in}
+        python scripts/python/abun_plot.py {JOBID} {input.count_in} output/results/{JOBID}_binned_cluster_contig.txt {params.roa} {params.top_20} -s {samples} Coverage -k {params.kraken_in}
         """
 
 rule high_mags:
@@ -180,8 +180,8 @@ rule high_mags:
         prokka = expand("output/{JOBID}_prokka/", JOBID = JOBID)
     shell:
         """
-        python scripts/qual_parse.py {params.checkm} {params.prokka} > {output.txt}
-        if [ {gtdb} = "Y" ]
+        python scripts/python/qual_parse.py {params.checkm} {params.prokka} > {output.txt}
+        if [ {gtdb} = "Y" ] && [ -d "tmp/" ]
         then
             rm -r tmp/
         fi

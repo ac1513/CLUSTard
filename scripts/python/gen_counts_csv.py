@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 
 # code to select a subset of the "csv" file generated
-# this works!
 # JC 23/06/16
-# improved a bit concerning filenames  JC 13/06/17
-
 # function that adds all the count values together to get a total
+
 def summer(x):
     total = 0
     for loop in x:
