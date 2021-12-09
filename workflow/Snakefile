@@ -29,7 +29,7 @@ rule all:
         expand('results/clustering/{JOBID}_diffs.csv', JOBID = JOBID),
         expand("results/clustering/{JOBID}_parallel_merged.out", JOBID = JOBID),
         expand("results/clustering/{JOBID}_non_red_list.out", JOBID = JOBID),
-        expand("logs/{JOBID}_clusters_done.txt", JOBID=JOBID),
+        expand("results/clustering/{JOBID}_clusters_done.txt", JOBID=JOBID),
         expand("results/clusters/{JOBID}_unbinned_contigs_stats.tsv", JOBID=JOBID),
         expand("results/clusters/{JOBID}_singleton.fa", JOBID=JOBID),
         expand("logs/{JOBID}_singleton_step1.txt", JOBID=JOBID)
@@ -262,7 +262,7 @@ rule file_parser:
     input:
         expand("results/clustering/{JOBID}_non_red_list.out", JOBID = JOBID)
     output:
-        touch("logs/{JOBID}_clusters_done.txt")
+        touch("results/clustering/{JOBID}_clusters_done.txt")
     params:
         contigs = REFIN,
         csv = expand("results/clustering/{JOBID}_read_counts_derived.csv", JOBID = JOBID),
@@ -278,7 +278,7 @@ rule file_parser:
 
 rule checkm_unbin:
     input:
-        expand("logs/{JOBID}_para_done.txt", JOBID = JOBID)
+        expand("results/clustering/{JOBID}_clusters_done.txt", JOBID = JOBID)
     output:
         stats = "results/clusters/{JOBID}_unbinned_contigs_stats.tsv"
     params:
