@@ -318,7 +318,7 @@ checkpoint singleton_split:
     input:
         "results/clusters/{JOBID}_singleton.fa"
     output:
-        "results/clusters/singleton_{JOBID}"
+        directory("results/clusters/singleton_{JOBID}")
     shell:
         """
         mkdir -p {output}
