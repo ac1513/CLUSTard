@@ -239,3 +239,33 @@ rule para_merge:
         """
         python workflow/scripts/python/parallel_merge_step.py -i {input} -o {output}
         """
+
+rule non_red_step:
+    input:
+      expand("results/clustering/{JOBID}_parallel_merged.out", JOBID = JOBID)
+    output:
+      expand("results/clustering/{JOBID}_non_red_list.out", JOBID = JOBID)
+    conda:
+      "envs/py3.yaml"
+    shell:
+      """
+      python scripts/python/non_red.py {input} {output}
+      """
+
+rule file_parser:
+    input:
+        expand("results/clustering/{JOBID}_non_red_list.out", JOBID = JOBID)
+    output:
+        touch("logs/{JOBID}_para_done.txt")
+    params:
+        contigs = REFIN,
+        csv = expand("results/clustering/{JOBID}_read_counts_derived.csv", JOBID = JOBID),
+        wd = "clusters/",
+        header = samples
+    conda:
+        "envs/py3.yaml"
+    shell:
+        """
+        mkdir -p results/{params.wd}
+        python scripts/python/file_parser.py {params.contigs} {params.csv} {input} {params.wd} -l {params.header}
+        """
