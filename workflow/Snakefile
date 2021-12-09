@@ -251,7 +251,7 @@ rule non_red_step:
       "envs/py3.yaml"
     shell:
       """
-      python scripts/python/non_red.py {input} {output}
+      python workflow/scripts/python/non_red.py {input} {output}
       """
 
 rule file_parser:
@@ -269,5 +269,5 @@ rule file_parser:
     shell:
         """
         mkdir -p results/{params.wd}
-        python scripts/python/file_parser.py {params.contigs} {params.csv} {input} {params.wd} -l {params.header}
+        python workflow/scripts/python/file_parser.py {params.contigs} {params.csv} {input} {params.wd} -l {params.header}
         """
