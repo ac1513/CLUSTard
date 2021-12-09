@@ -134,7 +134,7 @@ rule norm_counts:
       conda: "envs/py3.yaml"
       shell:
         """
-        python scripts/python/norm_counts.py {input.counts} {input.read_len} {input.contig_list} {output.norm_count}
+        python workflow/scripts/python/norm_counts.py {input.counts} {input.read_len} {input.contig_list} {output.norm_count}
         """
 
 rule merge_filecounts:
@@ -148,7 +148,7 @@ rule merge_filecounts:
     conda: "envs/py3.yaml"
     shell:
         """
-        python scripts/python/merge_filecounts.py {params.method} {output.tsv}  -l {input.test}
+        python workflow/scripts/python/merge_filecounts.py {params.method} {output.tsv}  -l {input.test}
         """
 
 rule derive:
@@ -162,7 +162,7 @@ rule derive:
         "envs/py3.yaml"
     shell:
         """
-        python scripts/python/gen_counts_csv.py {input} {JOBID} {params.thresh}
+        python workflow/scripts/python/gen_counts_csv.py {input} {JOBID} {params.thresh}
         """
 
 rule start_feeder:
@@ -175,7 +175,7 @@ rule start_feeder:
         "envs/py3.yaml"
     shell:
         """
-        python scripts/python/start_feeder.py clustering {JOBID}
+        python workflow/scripts/python/start_feeder.py clustering {JOBID}
         """
 
 checkpoint split_file:
@@ -202,7 +202,7 @@ rule bin_feeder:
         "envs/py3.yaml"
     shell:
         """
-        python scripts/python/bin_feeder.py {input.diffs} {params.all_diffs} {params.thresh} {output.all}
+        python workflow/scripts/python/bin_feeder.py {input.diffs} {params.all_diffs} {params.thresh} {output.all}
         """
 
 rule para_sets:
@@ -216,7 +216,7 @@ rule para_sets:
         "envs/py3.yaml"
     shell:
         """
-        python scripts/python/para_sets.py {input.bins} {output} {params.thresh}
+        python workflow/scripts/python/para_sets.py {input.bins} {output} {params.thresh}
         """
 
 def aggregate_input(wildcards):
@@ -238,5 +238,5 @@ rule para_merge:
         "envs/py3.yaml"
     shell:
         """
-        python scripts/python/parallel_merge_step.py -i {input} -o {output}
+        python workflow/scripts/python/parallel_merge_step.py -i {input} -o {output}
         """
