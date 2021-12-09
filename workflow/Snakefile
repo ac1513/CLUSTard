@@ -187,6 +187,7 @@ checkpoint split_file:
         diffs = expand("results/clustering/{JOBID}_split/diffs", JOBID=JOBID)
     shell:
         """
+        mkdir -p {output.diffs}
         split -d -l 10000 --additional-suffix=.csv {input.diffs} {params.diffs}
         """
 
