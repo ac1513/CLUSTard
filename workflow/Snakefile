@@ -280,7 +280,7 @@ rule checkm_unbin:
     params:
         input = "results/clusters",
         refin = REFIN,
-        checkmdb = config["checkm_db_root"]
+        checkmdb = CHECKM_DB 
     threads:
         20
     conda:
