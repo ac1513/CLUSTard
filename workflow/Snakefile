@@ -372,6 +372,7 @@ rule singleton_done:
     shell:
         """
         if [ -d "results/clusters/singleton_{JOBID}/" ]
+        then
             mv results/clusters/singleton_{JOBID}/*.fasta results/clusters/
             rm results/clusters/singleton_{JOBID}/
         fi
