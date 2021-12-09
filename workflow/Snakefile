@@ -221,12 +221,10 @@ rule para_sets:
         """
 
 def aggregate_input(wildcards):
-
     checkpoint_output = checkpoints.split_file.get(**wildcards).output[0]
-
     return expand('results/clustering/{JOBID}_split/parallel_sets_{PART}.csv',
-           JOBID=JOBID,
-           PART=glob_wildcards(os.path.join(checkpoint_output, "parallel_sets_{PART}.csv")).PART)
+           JOBID=wildcards.JOBID,
+           PART=glob_wildcards(os.path.join(checkpoint_output, "diffs{PART}.csv")).PART)
 
 rule para_merge:
     input:
