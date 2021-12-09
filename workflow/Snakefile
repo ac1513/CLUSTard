@@ -24,10 +24,10 @@ rule all:
         expand('results/clustering/{SAMPLES}_counts.tsv', SAMPLES=samples),
         expand('results/clustering/{SAMPLES}_proc_counts_out.tsv', SAMPLES = samples),
         expand('results/clustering/{JOBID}_merged_counts.tsv', JOBID= JOBID),
-        expand('results/clustering/{jobid}_read_counts_derived.csv', jobid= JOBID),
-        expand('results/clustering/{jobid}_values.csv', jobid = JOBID),
-        expand('results/clustering/{jobid}_diffs.csv', jobid = JOBID),
-        expand("results/clustering/{JOBID}_bwa_output.txt", JOBID = JOBID)
+        expand('results/clustering/{JOBID}_read_counts_derived.csv', JOBID= JOBID),
+        expand('results/clustering/{JOBID}_values.csv', JOBID = JOBID),
+        expand('results/clustering/{JOBID}_diffs.csv', JOBID = JOBID),
+        expand("results/clustering/{JOBID}_parallel_merged.out", JOBID = JOBID)
 
 localrules: split_file
 
@@ -37,7 +37,7 @@ rule bwa_index:
     output:
         '{REFIN}.sa'
     threads: 20
-    conda: "workflow/envs/bwasam.yaml"
+    conda: "envs/bwasam.yaml"
     shell:
         """
         bwa index {input.ref}
@@ -52,7 +52,7 @@ if MAPPING == "SR":
       output:
           bam = 'results/alignment/{samples}.bam',
           read_len = 'results/alignment/{samples}_read_len.tsv'
-      conda: "workflow/envs/bwasam.yaml"
+      conda: "envs/bwasam.yaml"
       threads: 6
       shell:
           """
@@ -70,7 +70,7 @@ elif MAPPING == "paired_SR":
       output:
           bam = 'results/alignment/{samples}.bam',
           read_len = 'results/alignment/{samples}_read_len.tsv'
-      conda: "workflow/envs/bwasam.yaml"
+      conda: "envs/bwasam.yaml"
       threads: 6
       shell:
           """
@@ -89,7 +89,7 @@ elif MAPPING == "LR":
             read_len = 'results/alignment/{samples}_read_len.tsv'
         params:
             output = 'results/alignment/{samples}.sam'
-        conda: "workflow/envs/minimap2.yaml"
+        conda: "envs/minimap2.yaml"
         threads: 6
         shell:
             """
@@ -105,7 +105,7 @@ rule count_files:
         counts = 'results/clustering/{samples}_counts.tsv',
     params:
         map = MAPPING,
-    conda: "workflow/envs/minimap2.yaml"
+    conda: "envs/minimap2.yaml"
     shell:
         """
         samtools view {input.bam} | awk '{{if ($2!=4 && $2!=133 && $2!=165 && $2!=181 && $2!=101 && $2!=117 && $2!=69 && $2!=77 && $2!=141) print $1 "\t" $3}}' > {output.counts}
@@ -117,7 +117,7 @@ rule contig_len:
         ref = REFIN
     output:
         contig_lengths = "results/clustering/{JOBID}_contig_lengths.tsv"
-    conda: "workflow/envs/minimap2.yaml"
+    conda: "envs/minimap2.yaml"
     shell:
       """
       bioawk -c fastx '{{ print $name, length($seq) }}' < {input.ref} > {output.contig_lengths}
@@ -131,7 +131,7 @@ rule norm_counts:
           contig_list = expand("results/clustering/{JOBID}_contig_lengths.tsv", JOBID = JOBID)
       output:
           norm_count = 'results/clustering/{samples}_proc_counts_out.tsv'
-      conda: "workflow/envs/py3.yaml"
+      conda: "envs/py3.yaml"
       shell:
         """
         python scripts/python/norm_counts.py {input.counts} {input.read_len} {input.contig_list} {output.norm_count}
@@ -145,7 +145,7 @@ rule merge_filecounts:
     params:
         method = COUNT_METHOD,
         ref = REFIN
-    conda: "workflow/envs/py3.yaml"
+    conda: "envs/py3.yaml"
     shell:
         """
         python scripts/python/merge_filecounts.py {params.method} {output.tsv}  -l {input.test}
@@ -159,7 +159,7 @@ rule derive:
     params:
         thresh = CONTIG_T
     conda:
-        "workflow/envs/py3.yaml"
+        "envs/py3.yaml"
     shell:
         """
         python scripts/python/gen_counts_csv.py {input} {JOBID} {params.thresh}
@@ -172,20 +172,71 @@ rule start_feeder:
         values = "results/clustering/{JOBID}_values.csv",
         diffs = "results/clustering/{JOBID}_diffs.csv"
     conda:
-        "workflow/envs/py3.yaml"
+        "envs/py3.yaml"
     shell:
         """
         python scripts/python/start_feeder.py clustering {JOBID}
         """
 
-rule split_file:
+checkpoint split_file:
     input:
         diffs = expand("results/clustering/{JOBID}_diffs.csv", JOBID=JOBID)
     output:
-        touch("results/clustering/{JOBID}_bwa_output.txt")
+        diffs = directory("results/clustering/{JOBID}_split/")
     params:
-        diffs = expand("results/clustering/{JOBID}_diffs", JOBID = JOBID)
+        diffs = expand("results/clustering/{JOBID}_split/diffs", JOBID=JOBID)
     shell:
         """
         split -d -l 10000 --additional-suffix=.csv {input.diffs} {params.diffs}
+        """
+
+rule bin_feeder:
+    input:
+        diffs = 'results/clustering/{JOBID}_split/diffs{PART}.csv'
+    output:
+        all = "results/clustering/{JOBID}_split/output_{PART}.csv",
+    params:
+        thresh = P_THRESH,
+        all_diffs = expand("results/clustering/{JOBID}_diffs.csv", JOBID = JOBID)
+    conda:
+        "envs/py3.yaml"
+    shell:
+        """
+        python scripts/python/bin_feeder.py {input.diffs} {params.all_diffs} {params.thresh} {output.all}
+        """
+
+rule para_sets:
+    input:
+        bins = "results/clustering/{JOBID}_split/output_{PART}.csv"
+    output:
+        "results/clustering/{JOBID}_split/parallel_sets_{PART}.csv"
+    params:
+        thresh = P_THRESH
+    conda:
+        "envs/py3.yaml"
+    shell:
+        """
+        python scripts/python/para_sets.py {input.bins} {output} {params.thresh}
+        """
+
+def aggregate_input(wildcards):
+
+    checkpoint_output = checkpoints.split_file.get(**wildcards).output[0]
+
+    return expand('results/clustering/{JOBID}_split/parallel_sets_{PART}.csv',
+           JOBID=JOBID,
+           PART=glob_wildcards(os.path.join(checkpoint_output, "parallel_sets_{PART}.csv")).PART)
+
+rule para_merge:
+    input:
+        aggregate_input
+    output:
+        "results/clustering/{JOBID}_parallel_merged.out"
+    resources:
+        mem_mb = 64000
+    conda:
+        "envs/py3.yaml"
+    shell:
+        """
+        python scripts/python/parallel_merge_step.py -i {input} -o {output}
         """

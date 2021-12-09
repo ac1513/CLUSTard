@@ -1,5 +1,5 @@
 # Prefix
-JOBID: "snake_v5.6.0"
+JOBID: "snake_split_bin"
 # Input Files
 #Location of samples tsv
 SAMPLES: "config/samples.tsv"
