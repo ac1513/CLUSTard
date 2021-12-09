@@ -371,5 +371,9 @@ rule singleton_done:
         touch("logs/{JOBID}_singleton_done.txt")
     shell:
         """
+        if [ -d "results/clusters/singleton_{JOBID}/" ]
+            mv results/clusters/singleton_{JOBID}/*.fasta results/clusters/
+            rm results/clusters/singleton_{JOBID}/
+        fi
         echo "Singleton analysis done"
         """
