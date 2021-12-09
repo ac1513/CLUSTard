@@ -29,8 +29,8 @@ rule all:
         expand('results/clustering/{JOBID}_diffs.csv', JOBID = JOBID),
         expand("results/clustering/{JOBID}_parallel_merged.out", JOBID = JOBID),
         expand("results/clustering/{JOBID}_non_red_list.out", JOBID = JOBID),
-        expand("logs/{JOBID}_para_done.txt", JOBID=JOBID),
-        expand("logs/{JOBID}_checkm_unbinned", JOBID=JOBID),
+        expand("logs/{JOBID}_clusters_done.txt", JOBID=JOBID),
+        expand("results/clusters/{JOBID}_unbinned_contigs_stats.tsv", JOBID=JOBID),
         expand("results/clusters/{JOBID}_singleton.fa", JOBID=JOBID),
         expand("logs/{JOBID}_singleton_step1.txt", JOBID=JOBID)
 
@@ -262,7 +262,7 @@ rule file_parser:
     input:
         expand("results/clustering/{JOBID}_non_red_list.out", JOBID = JOBID)
     output:
-        touch("logs/{JOBID}_para_done.txt")
+        touch("logs/{JOBID}_clusters_done.txt")
     params:
         contigs = REFIN,
         csv = expand("results/clustering/{JOBID}_read_counts_derived.csv", JOBID = JOBID),
@@ -280,7 +280,7 @@ rule checkm_unbin:
     input:
         expand("logs/{JOBID}_para_done.txt", JOBID = JOBID)
     output:
-        touch("logs/{JOBID}_checkm_unbinned")
+        stats = "results/clusters/{JOBID}_unbinned_contigs_stats.tsv"
     params:
         input = "results/clusters",
         refin = REFIN,
@@ -293,12 +293,12 @@ rule checkm_unbin:
         """
 	    checkm_db={params.checkmdb}
         echo ${{checkm_db}} | checkm data setRoot ${{checkm_db}}
-        checkm unbinned -x fasta results/clusters/ {params.refin} results/clusters/{JOBID}_unbinned_contigs.fa results/clusters/{JOBID}_unbinned_contigs_stats.tsv
+        checkm unbinned -x fasta results/clusters/ {params.refin} results/clusters/{JOBID}_unbinned_contigs.fa {output.stats}
         """
 
 rule singleton:
     input:
-        expand("logs/{JOBID}_checkm_unbinned", JOBID = JOBID)
+        expand("results/clusters/{JOBID}_unbinned_contigs_stats.tsv", JOBID = JOBID)
     output:
         expand("results/clusters/{JOBID}_singleton.fa", JOBID=JOBID)
     params:
