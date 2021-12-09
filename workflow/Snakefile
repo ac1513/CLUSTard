@@ -360,8 +360,9 @@ rule singleton_csv:
 
 def aggregate_single(wildcards):
      checkpoint_output = checkpoints.singleton_split.get(**wildcards).output[0]
-     return expand("results/clustering/singleton_{JOBID}/Cluster_singleton{SINGLETONS}.csv",
-                    SINGLETONS=glob_wildcards(os.path.join(checkpoint_output, "Cluster_singleton{SINGLETONS}.fasta")).SINGLETONS)
+     return expand("results/clustering/singleton_{JOBID}/Cluster_singleton{SINGLETONS}.csv"),
+            JOBID = JOBID,
+            SINGLETONS=glob_wildcards(os.path.join(checkpoint_output, "Cluster_singleton{SINGLETONS}.fasta")).SINGLETONS)
 
 rule singleton_done:
     input:
