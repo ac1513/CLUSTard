@@ -1,12 +1,12 @@
 #OPTIONS
 
 # Prefix
-jobid: "job_prefix"
+jobid: "snake_v5.6.0"
 # Input Files
-REFIN: "data/assembly.fasta" #location of assembly to cluster
+REFIN: "data/canu10_med.fasta" #location of assembly to cluster
 RAW_DIR: "data/" #location of timepoint raw reads
 samples: "samples.tsv"
-in_file_extension: "fastq.gz" #extension of timepoint files
+in_file_extension: "fastq" #extension of timepoint files
 # Method of mapping required
 mapping: "LR" # SR, paired_SR or LR
 #Database locations
