@@ -364,6 +364,7 @@ def aggregate_single(wildcards):
             JOBID = JOBID,
             SINGLETONS=glob_wildcards(os.path.join(checkpoint_output, "Cluster_singleton{SINGLETONS}.fasta")).SINGLETONS)
 
+
 rule singleton_done:
     input:
         aggregate_single
