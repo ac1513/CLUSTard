@@ -307,7 +307,7 @@ rule singleton:
         "envs/py3.yaml"
     shell:
         """
-        seqkit seq -m {params.min_size} results/clusters/*unbinned_contigs.fa > results/results/{JOBID}_singleton.fa
+        seqkit seq -m {params.min_size} results/clusters/*unbinned_contigs.fa > results/clusters/{JOBID}_singleton.fa
         """
 
 rule singleton_split:
