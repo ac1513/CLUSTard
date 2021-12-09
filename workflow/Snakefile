@@ -27,7 +27,9 @@ rule all:
         expand('results/clustering/{JOBID}_read_counts_derived.csv', JOBID= JOBID),
         expand('results/clustering/{JOBID}_values.csv', JOBID = JOBID),
         expand('results/clustering/{JOBID}_diffs.csv', JOBID = JOBID),
-        expand("results/clustering/{JOBID}_parallel_merged.out", JOBID = JOBID)
+        expand("results/clustering/{JOBID}_parallel_merged.out", JOBID = JOBID),
+        expand("results/clustering/{JOBID}_non_red_list.out", JOBID = JOBID),
+        expand("logs/{JOBID}_para_done.txt", JOBID=JOBID)
 
 localrules: split_file
 
