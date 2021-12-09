@@ -12,7 +12,7 @@ MAPPING = config["MAPPING"]
 CONTIG_T = config["CONTIG_T"]
 P_THRESH = config["P_THRESH"]
 COUNT_METHOD = config["COUNT_METHOD"]
-
+CHECKM_DB = config["CHECKM_DB"]
 
 rule all:
     input:
@@ -270,4 +270,24 @@ rule file_parser:
         """
         mkdir -p results/{params.wd}
         python workflow/scripts/python/file_parser.py {params.contigs} {params.csv} {input} {params.wd} -l {params.header}
+        """
+
+rule checkm_unbin:
+    input:
+        expand("logs/{JOBID}_para_done.txt", JOBID = JOBID)
+    output:
+        touch("logs/{JOBID}_checkm_unbinned")
+    params:
+        input = "results/clusters",
+        refin = REFIN,
+        checkmdb = config["checkm_db_root"]
+    threads:
+        20
+    conda:
+        "envs/checkm.yaml"
+    shell:
+        """
+	    checkm_db={params.checkmdb}
+        echo ${{checkm_db}} | checkm data setRoot ${{checkm_db}}
+        checkm unbinned -x fasta results/results/ {params.refin} results/results/{JOBID}_unbinned_contigs.fa results/results/{JOBID}_unbinned_contigs_stats.tsv
         """
