@@ -307,7 +307,7 @@ rule singleton:
         "envs/py3.yaml"
     shell:
         """
-        seqkit seq -m {params.min_size} results/results/*unbinned_contigs.fa > results/results/{JOBID}_singleton.fa
+        seqkit seq -m {params.min_size} results/clusters/*unbinned_contigs.fa > results/results/{JOBID}_singleton.fa
         """
 
 rule singleton_split:
@@ -322,7 +322,7 @@ rule singleton_split:
         do
             if [[ ${{line:0:1}} == '>' ]]
             then
-                outfile=results/results/Cluster_singleton${{count}}.fasta
+                outfile=results/clusters/Cluster_singleton${{count}}.fasta
                 echo ${{line}} > ${{outfile}}
                 count=$((count+1))
             else
