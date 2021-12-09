@@ -348,7 +348,7 @@ rule singleton_csv:
   params:
       csv = expand("results/clustering/{JOBID}_read_counts_derived.csv", JOBID = JOBID),
       header = samples,
-      loc = "results/clusters/singleton_{JOBID}/""
+      loc = "results/clusters/singleton_{JOBID}/"
   conda:
       "envs/py3.yaml"
   shell:
