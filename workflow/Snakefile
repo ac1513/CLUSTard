@@ -293,7 +293,7 @@ rule checkm_unbin:
         """
 	    checkm_db={params.checkmdb}
         echo ${{checkm_db}} | checkm data setRoot ${{checkm_db}}
-        checkm unbinned -x fasta results/results/ {params.refin} results/results/{JOBID}_unbinned_contigs.fa results/results/{JOBID}_unbinned_contigs_stats.tsv
+        checkm unbinned -x fasta results/clusters/ {params.refin} results/clusters/{JOBID}_unbinned_contigs.fa results/clusters/{JOBID}_unbinned_contigs_stats.tsv
         """
 
 rule singleton:
