@@ -15,5 +15,3 @@ MAPPING: "LR" # SR, paired_SR or LR
 CONTIG_T: "1000"
 P_THRESH: "0.997"
 COUNT_METHOD: "norm" # norm or raw
-
-CHECKM_DB: "/mnt/lustre/groups/biol-chong-2019/databases/checkm_data"

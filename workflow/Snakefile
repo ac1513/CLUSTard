@@ -12,7 +12,6 @@ MAPPING = config["MAPPING"]
 CONTIG_T = config["CONTIG_T"]
 P_THRESH = config["P_THRESH"]
 COUNT_METHOD = config["COUNT_METHOD"]
-CHECKM_DB = config["CHECKM_DB"]
 
 rule all:
     input:
@@ -30,7 +29,7 @@ rule all:
         expand("results/clustering/{JOBID}_parallel_merged.out", JOBID = JOBID),
         expand("results/clustering/{JOBID}_non_red_list.out", JOBID = JOBID),
         expand("results/clustering/{JOBID}_clusters_done.txt", JOBID=JOBID),
-        expand("results/clusters/{JOBID}_unbinned_contigs_stats.tsv", JOBID=JOBID),
+        expand("results/clusters/{JOBID}_unbinned_contigs.fa", JOBID=JOBID),
         expand("results/clusters/{JOBID}_singleton.fa", JOBID=JOBID),
         expand("logs/{JOBID}_singleton_step1.txt", JOBID=JOBID)
 
@@ -276,29 +275,29 @@ rule file_parser:
         python workflow/scripts/python/file_parser.py {params.contigs} {params.csv} {input} {params.wd} -l {params.header}
         """
 
-rule checkm_unbin:
+rule unbinned:
     input:
         expand("results/clustering/{JOBID}_clusters_done.txt", JOBID = JOBID)
     output:
-        stats = "results/clusters/{JOBID}_unbinned_contigs_stats.tsv"
+        unbinned = "results/clusters/{JOBID}_unbinned_contigs.fa"
     params:
-        input = "results/clusters",
         refin = REFIN,
-        checkmdb = CHECKM_DB
     threads:
         20
     conda:
-        "envs/checkm.yaml"
+        "envs/py3.yaml"
     shell:
         """
-	    checkm_db={params.checkmdb}
-        echo ${{checkm_db}} | checkm data setRoot ${{checkm_db}}
-        checkm unbinned -x fasta results/clusters/ {params.refin} results/clusters/{JOBID}_unbinned_contigs.fa {output.stats}
+        for FILE in results/clusters/*fasta
+            do
+            seqkit seq -n -i $FILE >> results/clusters/{JOBID}_binned_contigs.txt
+            done
+        seqkit grep -v -f results/clusters/{JOBID}_binned_contigs.txt {REFIN} > results/clusters/{JOBID}_unbinned_contigs.fa
         """
 
 rule singleton:
     input:
-        expand("results/clusters/{JOBID}_unbinned_contigs_stats.tsv", JOBID = JOBID)
+        expand("results/clusters/{JOBID}_unbinned_contigs.fa", JOBID = JOBID)
     output:
         expand("results/clusters/{JOBID}_singleton.fa", JOBID=JOBID)
     params:
