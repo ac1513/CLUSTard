@@ -5,13 +5,15 @@ import argparse
 
 parser = argparse.ArgumentParser(description='')
 parser.add_argument('csv', help='read_counts_derived', type=str)
+parser.add_argument('loc', help='location of singleton fasta files', type=str)
 parser.add_argument('-l', '--header-list', dest='header', nargs='+', default=[])
 args = parser.parse_args()
 
 header = args.header
 counts_file = args.csv
+loc = args.loc
 
-input = glob.glob("output/results/Cluster_singleton*fasta")
+input = glob.glob(loc+"Cluster_singleton*.fasta")
 
 header = ['contig'] + header + ['cover', 'length', 'GC']
 

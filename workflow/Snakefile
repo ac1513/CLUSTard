@@ -31,7 +31,7 @@ rule all:
         expand("results/clustering/{JOBID}_clusters_done.txt", JOBID=JOBID),
         expand("results/clusters/{JOBID}_unbinned_contigs.fa", JOBID=JOBID),
         expand("results/clusters/{JOBID}_singleton.fa", JOBID=JOBID),
-        expand("logs/{JOBID}_singleton_step1.txt", JOBID=JOBID)
+        expand("logs/{JOBID}_singleton_done.txt", JOBID=JOBID)
 
 
 localrules: split_file
@@ -314,13 +314,15 @@ rule singleton:
         fi
         """
 
-rule singleton_split:
+checkpoint singleton_split:
     input:
         "results/clusters/{JOBID}_singleton.fa"
     output:
-        touch("logs/{JOBID}_singleton_step1.txt")
+        "results/clusters/singleton_{JOBID}"
     shell:
         """
+        mkdir -p {output}
+
         if [ -s "results/clusters/{JOBID}_singleton.fa" ]
         then
             count=0
@@ -328,7 +330,7 @@ rule singleton_split:
             do
                 if [[ ${{line:0:1}} == '>' ]]
                 then
-                    outfile=results/clusters/Cluster_singleton${{count}}.fasta
+                    outfile=results/clusters/singleton_{JOBID}/Cluster_singleton${{count}}.fasta
                     echo ${{line}} > ${{outfile}}
                     count=$((count+1))
                 else
@@ -336,4 +338,37 @@ rule singleton_split:
                 fi
             done < {input}
         fi
+        """
+
+rule singleton_csv:
+  input:
+      "results/clusters/singleton_{JOBID}/Cluster_singleton{SINGLETONS}.fasta"
+  output:
+      "results/clusters/singleton_{JOBID}/Cluster_singleton{SINGLETONS}.csv"
+  params:
+      csv = expand("results/clustering/{JOBID}_read_counts_derived.csv", JOBID = JOBID),
+      header = samples,
+      loc = "results/clusters/singleton_{JOBID}/""
+  conda:
+      "envs/py3.yaml"
+  shell:
+      """
+      seqkit head -n 1 -w 0 {input} > {input}.test
+      mv {input}.test {input}
+      python scripts/python/singleton.py {params.csv} {params.loc} -l {params.header}
+      """
+
+def aggregate_single(wildcards):
+     checkpoint_output = checkpoints.singleton_split.get(**wildcards).output[0]
+     return expand("results/clustering/singleton_{JOBID}/Cluster_singleton{SINGLETONS}.csv",
+                    SINGLETONS=glob_wildcards(os.path.join(checkpoint_output, "Cluster_singleton{SINGLETONS}.fasta")).SINGLETONS)
+
+rule singleton_done:
+    input:
+        aggregate_single
+    output:
+        touch("logs/{JOBID}_singleton_done.txt")
+    shell:
+        """
+        echo "Singleton analysis done"
         """
