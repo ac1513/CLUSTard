@@ -307,7 +307,12 @@ rule singleton:
         "envs/py3.yaml"
     shell:
         """
-        seqkit seq -m {params.min_size} results/clusters/*unbinned_contigs.fa > results/clusters/{JOBID}_singleton.fa
+        if [ -f results/clusters/{JOBID}_unbinned_contigs.fa]; then
+            seqkit seq -m {params.min_size} results/clusters/{JOBID}_unbinned_contigs.fa > results/clusters/{JOBID}_singleton.fa
+        fi
+        if [ ! -f results/clusters/{JOBID}_singleton.fa ]; then
+            touch results/clusters/{JOBID}_singleton.fa
+        fi
         """
 
 rule singleton_split:
@@ -317,16 +322,19 @@ rule singleton_split:
         touch("logs/{JOBID}_singleton_step1.txt")
     shell:
         """
-        count=0
-        while read line
-        do
-            if [[ ${{line:0:1}} == '>' ]]
-            then
-                outfile=results/clusters/Cluster_singleton${{count}}.fasta
-                echo ${{line}} > ${{outfile}}
-                count=$((count+1))
-            else
-                echo ${{line}} >> ${{outfile}}
-            fi
-        done < {input}
+        if [ -s "results/clusters/{JOBID}_singleton.fa"]
+        then
+            count=0
+            while read line
+            do
+                if [[ ${{line:0:1}} == '>' ]]
+                then
+                    outfile=results/clusters/Cluster_singleton${{count}}.fasta
+                    echo ${{line}} > ${{outfile}}
+                    count=$((count+1))
+                else
+                    echo ${{line}} >> ${{outfile}}
+                fi
+            done < {input}
+        fi
         """
