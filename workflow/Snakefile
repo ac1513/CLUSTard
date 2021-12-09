@@ -292,3 +292,38 @@ rule checkm_unbin:
         echo ${{checkm_db}} | checkm data setRoot ${{checkm_db}}
         checkm unbinned -x fasta results/results/ {params.refin} results/results/{JOBID}_unbinned_contigs.fa results/results/{JOBID}_unbinned_contigs_stats.tsv
         """
+
+rule singleton:
+    input:
+        expand("logs/{JOBID}_checkm_unbinned", JOBID = JOBID)
+    output:
+        expand("results/clusters/{JOBID}_singleton.fa", JOBID=JOBID)
+    params:
+        min_size = 500000
+    conda:
+        "envs/py3.yaml"
+    shell:
+        """
+        seqkit seq -m {params.min_size} results/results/*unbinned_contigs.fa > results/results/{JOBID}_singleton.fa
+        """
+
+rule singleton_split:
+    input:
+        "results/clusters/{JOBID}_singleton.fa"
+    output:
+        touch("logs/{JOBID}_singleton_step1.txt")
+    shell:
+        """
+        count=0
+        while read line
+        do
+            if [[ ${{line:0:1}} == '>' ]]
+            then
+                outfile=results/results/Cluster_singleton${{count}}.fasta
+                echo ${{line}} > ${{outfile}}
+                count=$((count+1))
+            else
+                echo ${{line}} >> ${{outfile}}
+            fi
+        done < {input}
+        """
