@@ -355,7 +355,7 @@ rule singleton_csv:
       """
       seqkit seq -i {input} | seqkit head -n 1 -w 0 > {input}.test
       mv {input}.test {input}
-      python workflow/scripts/python/singleton.py {params.csv} {params.loc} -l {params.header}
+      python workflow/scripts/python/singleton.py {params.csv} {input} -l {params.header}
       """
 
 def aggregate_single(wildcards):

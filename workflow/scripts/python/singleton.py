@@ -13,7 +13,7 @@ header = args.header
 counts_file = args.csv
 loc = args.loc
 
-input = glob.glob(loc+"Cluster_singleton*.fasta")
+input = loc
 
 header = ['contig'] + header + ['cover', 'length', 'GC']
 
