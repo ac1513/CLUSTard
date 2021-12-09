@@ -353,7 +353,7 @@ rule singleton_csv:
       "envs/py3.yaml"
   shell:
       """
-      seqkit head -n 1 -w 0 {input} > {input}.test
+      seqkit seq -i {input} | seqkit head -n 1 -w 0 > {input}.test
       mv {input}.test {input}
       python workflow/scripts/python/singleton.py {params.csv} {params.loc} -l {params.header}
       """
