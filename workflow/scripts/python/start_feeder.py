@@ -13,7 +13,7 @@ parser = argparse.ArgumentParser(description='')
 parser.add_argument('loc', help='location count files are in', type=str)
 parser.add_argument('jobid', help='location count files are in', type=str)
 args = parser.parse_args()
-loc = str("output/" + args.loc)
+loc = str("results/" + args.loc)
 jobid = args.jobid
 
 df = pd.read_csv(loc + '/' + jobid + '_read_counts_derived.csv', header=None, index_col = 0)

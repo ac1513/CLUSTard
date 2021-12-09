@@ -26,7 +26,7 @@ args = parser.parse_args()
 contig_file = args.contigs
 csv_file = args.csv
 cluster_file = args.clusters
-wd = str("output/" + args.output)
+wd = str("results/" + args.output)
 header = args.header
 
 #add context to header columns
