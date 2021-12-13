@@ -175,7 +175,7 @@ rule checkm:
   threads:
       20
   conda:
-      "../envs/checkm.yaml"
+      "envs/checkm.yaml"
   shell:
       """
       checkm_db={params.checkmdb}
