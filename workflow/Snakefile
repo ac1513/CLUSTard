@@ -27,7 +27,6 @@ rule all:
     input:
         expand("results/kraken/{JOBID}_Cluster_{CLUSTERS}_report_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS),
 
-
 # localrules: kraken_merge, output
 
 rule kraken:
