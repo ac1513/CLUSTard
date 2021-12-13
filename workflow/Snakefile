@@ -110,7 +110,7 @@ if GTDB == "Y":
 
         if wget -q --spider {params.link_arc}; then
           wget -O {params.loc}ar122_metadata.tar.gz {params.link_arc}
-          tar -xf {params.loc}ar122_metadata.tar.gz -C {params.loc}
+          tar -xf {params.loc}ar122_metadata.tar.gz -C {params.link_arc}
         fi
         """
 
