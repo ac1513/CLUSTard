@@ -1,13 +1,18 @@
 
 configfile: "config/config_analysis.yaml"
 
+
 JOBID = config["JOBID"] # this can be different from binning pipeline
 REFIN = config["REFIN"]
 BIN_LOC = config["BIN_LOC"]
 kraken_level = config["kraken_level"]
 krakendb = config["krakendb"]
-GTDB = config["GTDB"]
 checkmdb = config["checkm_db_root"]
+GTDB = config["GTDB"]
+
+gtdb_v_tar_bac = "https://data.ace.uq.edu.au/public/gtdb/data/releases/release95/95.0/bac120_metadata_r95.tar.gz"
+gtdb_v_tar_arc = "https://data.ace.uq.edu.au/public/gtdb/data/releases/release95/95.0/ar122_metadata_r95.tar.gz"
+
 
 if BIN_LOC.endswith("/") == False :
     BIN_LOC = BIN_LOC + "/"
@@ -25,11 +30,32 @@ location = BIN_LOC + "Cluster_{CLUSTER}.fasta"
 
 rule all:
     input:
+        expand("analysis/prokka/{JOBID}/Cluster_{CLUSTERS}/Cluster_{CLUSTERS}.{ext}", JOBID = JOBID, CLUSTERS = CLUSTERS, ext=[ "err", "fna", "faa", "gff", "gbk", "ffn", "sqn", "fsa", "tbl", "log", "txt", "tsv"]),
         expand("analysis/kraken/{JOBID}_Cluster_{CLUSTERS}_report_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS),
         expand("analysis/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level),
-        expand("analysis/prokka/{JOBID}/Cluster_{CLUSTERS}/Cluster_{CLUSTERS}.{ext}", JOBID = JOBID, CLUSTERS = CLUSTERS, ext=[ "err", "fna", "faa", "gff", "gbk", "ffn", "sqn", "fsa", "tbl", "log", "txt", "tsv"]),
+        expand("analysis/kraken/{JOBID}_{kraken_level}_GTDB_lookup.json", JOBID=JOBID, kraken_level = kraken_level),
 
 localrules: kraken_merge#, output
+
+rule prokka:
+    input:
+        clusters = expand("{BIN_LOC}Cluster_{{CLUSTERS}}.fasta", BIN_LOC=BIN_LOC)
+    output:
+        file = expand("analysis/prokka/{{JOBID}}/Cluster_{{CLUSTERS}}/Cluster_{{CLUSTERS}}.{ext}", ext=[ "err", "fna", "faa", "gff", "gbk", "ffn", "sqn", "fsa", "tbl", "log", "txt", "tsv"])
+    params:
+        dir = "analysis/prokka/{JOBID}/Cluster_{CLUSTERS}/",
+        prefix = "Cluster_{CLUSTERS}",
+        prokka = "results/clusters/Cluster_{CLUSTERS}_short.fasta"
+    conda:
+        "envs/prokka.yaml"
+    threads:
+        20
+    shell:
+        """
+        awk '/^>/{{print substr($1,1,21); next}}{{print}}' < {input.clusters} > {params.prokka}
+        prokka {params.prokka} --outdir {params.dir} --prefix {params.prefix} --cpus {threads} --force
+        rm {params.prokka}
+        """
 
 rule kraken:
     input:
@@ -63,22 +89,52 @@ rule kraken_merge:
         find -name '{JOBID}*_report_kraken.out' -type f -printf '\\n%p\\t' -exec sh -c 'echo {{}} | sort -k1nr {{}} | grep -P "\\t{params.level}\\t" | head -n1 ' \\; > {JOBID}_{params.level}_top_kraken.out
         """
 
-rule prokka:
-    input:
-        clusters = expand("{BIN_LOC}Cluster_{{CLUSTERS}}.fasta", BIN_LOC=BIN_LOC)
-    output:
-        file = expand("analysis/prokka/{{JOBID}}/Cluster_{{CLUSTERS}}/Cluster_{{CLUSTERS}}.{ext}", ext=[ "err", "fna", "faa", "gff", "gbk", "ffn", "sqn", "fsa", "tbl", "log", "txt", "tsv"])
-    params:
-        dir = "analysis/prokka/{JOBID}/Cluster_{CLUSTERS}/",
-        prefix = "Cluster_{CLUSTERS}",
-        prokka = "results/clusters/Cluster_{CLUSTERS}_short.fasta"
-    conda:
-        "envs/prokka.yaml"
-    threads:
-        20
-    shell:
+
+if GTDB == "Y":
+    rule GTDB_download:
+      input:
+        kraken_top = expand("analysis/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
+      output:
+        bac120_gtdb_r95 = temp("tmp/gtdb/bac120_metadata.tsv"),
+        ar122_gtdb_r95 = temp("tmp/gtdb/ar122_metadata.tsv")
+      params:
+        loc = "tmp/gtdb/",
+        link_bac = gtdb_v_tar_bac,
+        link_arc = gtdb_v_tar_arc
+      shell:
         """
-        awk '/^>/{{print substr($1,1,21); next}}{{print}}' < {input.clusters} > {params.prokka}
-        prokka {params.prokka} --outdir {params.dir} --prefix {params.prefix} --cpus {threads} --force
-        rm {params.prokka}
+        if wget -q --spider {params.link_bac}; then
+          wget -O {params.loc}bac120_metadata.tar.gz {params.link_bac}
+          tar -xf {params.loc}bac120_metadata.tar.gz -C {params.link_bac}
+        fi
+
+        if wget -q --spider {params.link_arc}; then
+          wget -O {params.loc}ar122_metadata.tar.gz {params.link_arc}
+          tar -xf {params.loc}ar122_metadata.tar.gz -C {params.loc}
+        fi
+        """
+
+    rule gtdb_lookup:
+      input:
+        bac120_gtdb = "tmp/gtdb/bac120_metadata.tsv",
+        ar122_gtdb = "tmp/gtdb/ar122_metadata.tsv",
+        kraken_top = expand("analysis/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
+      output:
+        json_lookup = "analysis/kraken/{JOBID}_{kraken_level}_GTDB_lookup.json"
+      params:
+        level = {kraken_level}
+      shell:
+        """
+        python scripts/python/gtdb_lookup.py {input.kraken_top} {params.level} {input.bac120_gtdb} {input.ar122_gtdb} {output.json_lookup}
+        """
+
+elif GTDB == "N":
+    rule empty_lookup:
+      input:
+        kraken_top = expand("analysis/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
+      output:
+        "analysis/kraken/{JOBID}_{kraken_level}_GTDB_lookup.json"
+      shell:
+        """
+        touch {output}
         """
