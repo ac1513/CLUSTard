@@ -71,7 +71,7 @@ rule prokka:
     params:
         dir = "analysis/prokka/{JOBID}/Cluster_{CLUSTERS}/",
         prefix = "Cluster_{CLUSTERS}",
-        prokka = "analysis/clusters/Cluster_{CLUSTERS}_short.fasta"
+        prokka = "results/clusters/Cluster_{CLUSTERS}_short.fasta"
     conda:
         "envs/prokka.yaml"
     threads:
