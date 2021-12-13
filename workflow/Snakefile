@@ -12,6 +12,8 @@ GTDB = config["GTDB"]
 
 gtdb_v_tar_bac = "https://data.ace.uq.edu.au/public/gtdb/data/releases/release95/95.0/bac120_metadata_r95.tar.gz"
 gtdb_v_tar_arc = "https://data.ace.uq.edu.au/public/gtdb/data/releases/release95/95.0/ar122_metadata_r95.tar.gz"
+gtdb_v_bac = "bac120_metadata_r95.tsv"
+gtdb_v_arc = "ar122_metadata_r95.tsv"
 
 
 if BIN_LOC.endswith("/") == False :
@@ -95,8 +97,8 @@ if GTDB == "Y":
       input:
         kraken_top = expand("analysis/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
       output:
-        bac120_gtdb = temp("tmp/gtdb/bac120_metadata*.tsv"),
-        ar122_gtdb = temp("tmp/gtdb/ar122_metadata*.tsv")
+        bac120_gtdb = temp("tmp/gtdb/{wildcards.gtdb_v_bac}"),
+        ar122_gtdb = temp("tmp/gtdb/{wildcard.gtdb_v_arc}")
       params:
         loc = "tmp/gtdb/",
         link_bac = gtdb_v_tar_bac,
@@ -116,8 +118,8 @@ if GTDB == "Y":
 
     rule gtdb_lookup:
       input:
-        bac120_gtdb = "tmp/gtdb/bac120_metadata*.tsv",
-        ar122_gtdb = "tmp/gtdb/ar122_metadata*.tsv",
+        bac120_gtdb = "tmp/gtdb/{wildcards.gtdb_v_bac}",
+        ar122_gtdb = "tmp/gtdb/{wildcard.gtdb_v_arc}",
         kraken_top = expand("analysis/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
       output:
         json_lookup = "analysis/kraken/{JOBID}_{kraken_level}_GTDB_lookup.json"
