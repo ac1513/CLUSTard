@@ -25,7 +25,7 @@ location = BIN_LOC + "Cluster_{CLUSTER}.fasta"
 
 rule all:
     input:
-        expand("results/kraken/{JOBID}_Cluster_{CLUSTERS}_report_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS),
+        expand("analysis/kraken/{JOBID}_Cluster_{CLUSTERS}_report_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS),
 
 # localrules: kraken_merge, output
 
@@ -33,10 +33,10 @@ rule kraken:
     input:
         expand("{BIN_LOC}Cluster_{{CLUSTERS}}.fasta", BIN_LOC=BIN_LOC)
     output:
-        report = "results/kraken/{JOBID}_Cluster_{CLUSTERS}_report_kraken.out",
+        report = "analysis/kraken/{JOBID}_Cluster_{CLUSTERS}_report_kraken.out",
     params:
         db = krakendb,
-        output = "results/kraken/{JOBID}_Cluster_{CLUSTERS}_kraken.out"
+        output = "analysis/kraken/{JOBID}_Cluster_{CLUSTERS}_kraken.out"
     conda:
         "workflow/envs/kraken2.yaml"
     threads:
