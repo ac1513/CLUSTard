@@ -36,6 +36,9 @@ rule all:
         expand("analysis/kraken/{JOBID}_Cluster_{CLUSTERS}_report_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS),
         expand("analysis/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level),
         expand("analysis/kraken/{JOBID}_{kraken_level}_GTDB_lookup.json", JOBID=JOBID, kraken_level = kraken_level),
+        expand("analysis/{JOBID}_seqkit_stats.tsv", JOBID=JOBID),
+        expand("analysis/{JOBID}_checkm/{JOBID}_checkm.log", JOBID=JOBID)
+
 
 localrules: kraken_merge#, output
 
@@ -142,3 +145,41 @@ elif GTDB == "N":
         """
         touch {output}
         """
+
+rule seqkit:
+  input:
+      wait_for = expand("analysis/kraken/{JOBID}_{kraken_level}_GTDB_lookup.json", JOBID = JOBID, kraken_level = kraken_level),
+  output:
+      "analysis/{JOBID}_seqkit_stats.tsv"
+  params:
+      binning_loc = BIN_LOC
+  conda:
+      "envs/py3.yaml"
+  threads:
+      10
+  shell:
+      """
+      seqkit stats -a -T -j {threads} {params.binning_loc}*.fasta > {output}
+      """
+
+rule checkm:
+  input:
+      expand("results/clusters/Cluster_{CLUSTERS}.fasta", CLUSTERS = CLUSTERS)
+  output:
+      expand("analysis/{JOBID}_checkm/{JOBID}_checkm.log", JOBID=JOBID)
+  params:
+      out = expand("analysis/{JOBID}_checkm", JOBID=JOBID),
+      input = "analysis/clusters",
+      refin = REFIN,
+      checkmdb = checkmdb
+  threads:
+      20
+  conda:
+      "../envs/checkm.yaml"
+  shell:
+      """
+      checkm_db={params.checkmdb}
+      echo ${{checkm_db}} | checkm data setRoot ${{checkm_db}}
+      checkm unbinned -x fasta analysis/clusters/ {params.refin} analysis/clusters/{JOBID}_unbinned_contigs.fa analysis/clusters/{JOBID}_unbinned_contigs_stats.tsv
+      checkm lineage_wf -f {output} --tab_table -x fasta -t {threads} {params.input} {params.out}
+      """
