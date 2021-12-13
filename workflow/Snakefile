@@ -1,381 +1,50 @@
-configfile: "config/config_bin.yaml"
 
-import pandas as pd
-df_samples = pd.read_csv(config["SAMPLES"], sep ='\t', index_col = 0)
-samples = df_samples["sample"].to_list()
+configfile: "config/config_analysis.yaml"
 
 JOBID = config["JOBID"]
 REFIN = config["REFIN"]
-RAW_DIR = config["RAW_DIR"]
-FILE_EX = config["FILE_EX"]
-MAPPING = config["MAPPING"]
-CONTIG_T = config["CONTIG_T"]
-P_THRESH = config["P_THRESH"]
-COUNT_METHOD = config["COUNT_METHOD"]
+BIN_LOC = config["BIN_LOC"]
+kraken_level = config["kraken_level"]
+krakendb = config["krakendb"]
+GTDB = config["GTDB"]
+checkmdb = config["checkm_db_root"]
+
+if BIN_LOC.endswith("/") == False :
+    BIN_LOC = BIN_LOC + "/"
+print("Location of genome bins: " + BIN_LOC)
+
+# FILE_EX = config["FILE_EX"]
+# MAPPING = config["MAPPING"]
+# CONTIG_T = config["CONTIG_T"]
+# P_THRESH = config["P_THRESH"]
+# COUNT_METHOD = config["COUNT_METHOD"]
+
+location = BIN_LOC + "Cluster_{CLUSTER}.fasta"
+
+(CLUSTERS,) = glob_wildcards(location)
 
 rule all:
     input:
-        expand("{REFIN}.sa", REFIN=REFIN),
-        expand("results/clustering/{JOBID}_contig_lengths.tsv", JOBID = JOBID),
-        expand('results/alignment/{SAMPLES}.bam', SAMPLES = samples),
-        expand('results/alignment/{SAMPLES}_read_len.tsv', SAMPLES = samples),
-        expand('results/clustering/{SAMPLES}_counts.tsv', SAMPLES = samples),
-        expand('results/clustering/{SAMPLES}_counts.tsv', SAMPLES=samples),
-        expand('results/clustering/{SAMPLES}_proc_counts_out.tsv', SAMPLES = samples),
-        expand('results/clustering/{JOBID}_merged_counts.tsv', JOBID= JOBID),
-        expand('results/clustering/{JOBID}_read_counts_derived.csv', JOBID= JOBID),
-        expand('results/clustering/{JOBID}_values.csv', JOBID = JOBID),
-        expand('results/clustering/{JOBID}_diffs.csv', JOBID = JOBID),
-        expand("results/clustering/{JOBID}_parallel_merged.out", JOBID = JOBID),
-        expand("results/clustering/{JOBID}_non_red_list.out", JOBID = JOBID),
-        expand("results/clustering/{JOBID}_clusters_done.txt", JOBID=JOBID),
-        expand("results/clusters/{JOBID}_unbinned_contigs.fa", JOBID=JOBID),
-        expand("results/clusters/{JOBID}_singleton.fa", JOBID=JOBID),
-        expand("logs/{JOBID}_singleton_done.txt", JOBID=JOBID)
+        expand("results/kraken/{JOBID}_Cluster_{CLUSTERS}_report_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS),
 
 
-localrules: split_file
+# localrules: kraken_merge, output
 
-rule bwa_index:
+rule kraken:
     input:
-        ref = REFIN
+        expand("{BIN_LOC}Cluster_{{CLUSTERS}}.fasta", BIN_LOC=BIN_LOC)
     output:
-        '{REFIN}.sa'
-    threads: 20
-    conda: "envs/bwasam.yaml"
-    shell:
-        """
-        bwa index {input.ref}
-        """
-
-if MAPPING == "SR":
-  rule bwa_mem:
-      input:
-          fq = expand('{RAW_READ}{{samples}}.{extension}',  RAW_READ=RAW_DIR, extension = FILE_EX),
-          ref = REFIN,
-          ref_ind = expand("{reference}.sa", reference=REFIN) #waits for indexed reference
-      output:
-          bam = 'results/alignment/{samples}.bam',
-          read_len = 'results/alignment/{samples}_read_len.tsv'
-      conda: "envs/bwasam.yaml"
-      threads: 6
-      shell:
-          """
-          bwa mem -M -t {threads} {input.ref} {input.fq} | samtools view -buS - | samtools sort -o {output.bam}
-          bioawk -c fastx '{{ print $name, length($seq) }}' < {input.fq} > {output.read_len}
-          """
-
-elif MAPPING == "paired_SR":
-  rule bwa_mem_pair:
-      input:
-          fq1 = expand('{RAW_READ}{{samples}}_R1.{extension}', RAW_READ=RAW_DIR, extension=FILE_EX),
-          fq2 = expand('{RAW_READ}{{samples}}_R2.{extension}',  RAW_READ=RAW_DIR, extension=FILE_EX),
-          ref = REFIN,
-          ref_ind = expand("{reference}.sa", reference=REFIN) #waits for indexed reference
-      output:
-          bam = 'results/alignment/{samples}.bam',
-          read_len = 'results/alignment/{samples}_read_len.tsv'
-      conda: "envs/bwasam.yaml"
-      threads: 6
-      shell:
-          """
-          bwa mem -M -t {threads} {input.ref} {input.fq1} {input.fq2} | samtools view -buS - | samtools sort -o {output.bam}
-          bioawk -c fastx '{{ print $name, length($seq) }}' < {input.fq1} > {output.read_len}
-          """
-
-elif MAPPING == "LR":
-    rule minimap:
-        input:
-          fq = expand('{RAW_READ}{{samples}}.{extension}',  RAW_READ=RAW_DIR, extension=FILE_EX),
-          ref = REFIN,
-          ref_ind = expand("{reference}.sa", reference=REFIN) #waits for indexed reference
-        output:
-            bam = 'results/alignment/{samples}.bam',
-            read_len = 'results/alignment/{samples}_read_len.tsv'
-        params:
-            output = 'results/alignment/{samples}.sam'
-        conda: "envs/minimap2.yaml"
-        threads: 6
-        shell:
-            """
-            minimap2 -ax map-ont -o {params.output} -t {threads} {input.ref} {input.fq}
-            samtools view -buS {params.output} | samtools sort -o {output.bam}
-            bioawk -c fastx '{{ print $name, length($seq) }}' < {input.fq} > {output.read_len}
-            """
-
-rule count_files:
-    input:
-        bam = 'results/alignment/{samples}.bam'
-    output:
-        counts = 'results/clustering/{samples}_counts.tsv',
+        report = "results/kraken/{JOBID}_Cluster_{CLUSTERS}_report_kraken.out",
     params:
-        map = MAPPING,
-    conda: "envs/minimap2.yaml"
-    shell:
-        """
-        samtools view {input.bam} | awk '{{if ($2!=4 && $2!=133 && $2!=165 && $2!=181 && $2!=101 && $2!=117 && $2!=69 && $2!=77 && $2!=141) print $1 "\t" $3}}' > {output.counts}
-        """
-
-
-rule contig_len:
-    input:
-        ref = REFIN
-    output:
-        contig_lengths = "results/clustering/{JOBID}_contig_lengths.tsv"
-    conda: "envs/minimap2.yaml"
-    shell:
-      """
-      bioawk -c fastx '{{ print $name, length($seq) }}' < {input.ref} > {output.contig_lengths}
-      """
-
-
-rule norm_counts:
-      input:
-          counts = 'results/clustering/{samples}_counts.tsv',
-          read_len = 'results/alignment/{samples}_read_len.tsv',
-          contig_list = expand("results/clustering/{JOBID}_contig_lengths.tsv", JOBID = JOBID)
-      output:
-          norm_count = 'results/clustering/{samples}_proc_counts_out.tsv'
-      conda: "envs/py3.yaml"
-      shell:
-        """
-        python workflow/scripts/python/norm_counts.py {input.counts} {input.read_len} {input.contig_list} {output.norm_count}
-        """
-
-rule merge_filecounts:
-    input:
-        test = expand('results/clustering/{SAMPLES}_proc_counts_out.tsv', SAMPLES = samples)
-    output:
-        tsv = 'results/clustering/{JOBID}_merged_counts.tsv'
-    params:
-        method = COUNT_METHOD,
-        ref = REFIN
-    conda: "envs/py3.yaml"
-    shell:
-        """
-        python workflow/scripts/python/merge_filecounts.py {params.method} {output.tsv}  -l {input.test}
-        """
-
-rule derive:
-    input:
-        expand('results/clustering/{JOBID}_merged_counts.tsv', JOBID=JOBID)
-    output:
-        csv = "results/clustering/{JOBID}_read_counts_derived.csv"
-    params:
-        thresh = CONTIG_T
+        db = krakendb,
+        output = "results/kraken/{JOBID}_Cluster_{CLUSTERS}_kraken.out"
     conda:
-        "envs/py3.yaml"
-    shell:
-        """
-        python workflow/scripts/python/gen_counts_csv.py {input} {JOBID} {params.thresh}
-        """
-
-rule start_feeder:
-    input:
-        expand('results/clustering/{JOBID}_read_counts_derived.csv', JOBID=JOBID, method = COUNT_METHOD)
-    output:
-        values = "results/clustering/{JOBID}_values.csv",
-        diffs = "results/clustering/{JOBID}_diffs.csv"
-    conda:
-        "envs/py3.yaml"
-    shell:
-        """
-        python workflow/scripts/python/start_feeder.py clustering {JOBID}
-        """
-
-checkpoint split_file:
-    input:
-        diffs = expand("results/clustering/{JOBID}_diffs.csv", JOBID=JOBID)
-    output:
-        diffs = directory("results/clustering/{JOBID}_split/")
-    params:
-        diffs = expand("results/clustering/{JOBID}_split/diffs", JOBID=JOBID)
-    shell:
-        """
-        mkdir -p {output.diffs}
-        split -d -l 10000 --additional-suffix=.csv {input.diffs} {params.diffs}
-        """
-
-rule bin_feeder:
-    input:
-        diffs = 'results/clustering/{JOBID}_split/diffs{PART}.csv'
-    output:
-        all = "results/clustering/{JOBID}_split/output_{PART}.csv",
-    params:
-        thresh = P_THRESH,
-        all_diffs = expand("results/clustering/{JOBID}_diffs.csv", JOBID = JOBID)
-    conda:
-        "envs/py3.yaml"
-    shell:
-        """
-        python workflow/scripts/python/bin_feeder.py {input.diffs} {params.all_diffs} {params.thresh} {output.all}
-        """
-
-rule para_sets:
-    input:
-        bins = "results/clustering/{JOBID}_split/output_{PART}.csv"
-    output:
-        "results/clustering/{JOBID}_split/parallel_sets_{PART}.csv"
-    params:
-        thresh = P_THRESH
-    conda:
-        "envs/py3.yaml"
-    shell:
-        """
-        python workflow/scripts/python/para_sets.py {input.bins} {output} {params.thresh}
-        """
-
-def aggregate_input(wildcards):
-    checkpoint_output = checkpoints.split_file.get(**wildcards).output[0]
-    return expand('results/clustering/{JOBID}_split/parallel_sets_{PART}.csv',
-           JOBID=wildcards.JOBID,
-           PART=glob_wildcards(os.path.join(checkpoint_output, "diffs{PART}.csv")).PART)
-
-rule para_merge:
-    input:
-        aggregate_input
-    output:
-        "results/clustering/{JOBID}_parallel_merged.out"
-    resources:
-        mem_mb = 64000
-    conda:
-        "envs/py3.yaml"
-    shell:
-        """
-        python workflow/scripts/python/parallel_merge_step.py -i {input} -o {output}
-        """
-
-rule non_red_step:
-    input:
-      expand("results/clustering/{JOBID}_parallel_merged.out", JOBID = JOBID)
-    output:
-      expand("results/clustering/{JOBID}_non_red_list.out", JOBID = JOBID)
-    conda:
-      "envs/py3.yaml"
-    shell:
-      """
-      python workflow/scripts/python/non_red.py {input} {output}
-      """
-
-rule file_parser:
-    input:
-        expand("results/clustering/{JOBID}_non_red_list.out", JOBID = JOBID)
-    output:
-        touch("results/clustering/{JOBID}_clusters_done.txt")
-    params:
-        contigs = REFIN,
-        csv = expand("results/clustering/{JOBID}_read_counts_derived.csv", JOBID = JOBID),
-        wd = "clusters/",
-        header = samples
-    conda:
-        "envs/py3.yaml"
-    shell:
-        """
-        mkdir -p results/{params.wd}
-        python workflow/scripts/python/file_parser.py {params.contigs} {params.csv} {input} {params.wd} -l {params.header}
-        """
-
-rule unbinned:
-    input:
-        expand("results/clustering/{JOBID}_clusters_done.txt", JOBID = JOBID)
-    output:
-        unbinned = "results/clusters/{JOBID}_unbinned_contigs.fa"
-    params:
-        refin = REFIN,
+        "../envs/kraken2.yaml"
     threads:
-        20
-    conda:
-        "envs/py3.yaml"
+        16
+    resources:
+        mem_mb = 4000
     shell:
         """
-        for FILE in results/clusters/*fasta
-            do
-            seqkit seq -n -i $FILE >> results/clusters/{JOBID}_binned_contigs.txt
-            done
-        seqkit grep -v -f results/clusters/{JOBID}_binned_contigs.txt {REFIN} > results/clusters/{JOBID}_unbinned_contigs.fa
-        """
-
-rule singleton:
-    input:
-        expand("results/clusters/{JOBID}_unbinned_contigs.fa", JOBID = JOBID)
-    output:
-        expand("results/clusters/{JOBID}_singleton.fa", JOBID=JOBID)
-    params:
-        min_size = 500000
-    conda:
-        "envs/py3.yaml"
-    shell:
-        """
-        if [ -f results/clusters/{JOBID}_unbinned_contigs.fa ]; then
-            seqkit seq -m {params.min_size} results/clusters/{JOBID}_unbinned_contigs.fa > results/clusters/{JOBID}_singleton.fa
-        fi
-        if [ ! -f results/clusters/{JOBID}_singleton.fa ]; then
-            touch results/clusters/{JOBID}_singleton.fa
-        fi
-        """
-
-checkpoint singleton_split:
-    input:
-        "results/clusters/{JOBID}_singleton.fa"
-    output:
-        directory("results/clusters/singleton_{JOBID}")
-    shell:
-        """
-        mkdir -p {output}
-
-        if [ -s "results/clusters/{JOBID}_singleton.fa" ]
-        then
-            count=0
-            while read line
-            do
-                if [[ ${{line:0:1}} == '>' ]]
-                then
-                    outfile=results/clusters/singleton_{JOBID}/Cluster_singleton${{count}}.fasta
-                    echo ${{line}} > ${{outfile}}
-                    count=$((count+1))
-                else
-                    echo ${{line}} >> ${{outfile}}
-                fi
-            done < {input}
-        fi
-        """
-
-rule singleton_csv:
-  input:
-      "results/clusters/singleton_{JOBID}/Cluster_singleton{SINGLETONS}.fasta"
-  output:
-      "results/clusters/singleton_{JOBID}/Cluster_singleton{SINGLETONS}.csv"
-  params:
-      csv = expand("results/clustering/{JOBID}_read_counts_derived.csv", JOBID = JOBID),
-      header = samples,
-      loc = "results/clusters/singleton_{JOBID}/"
-  conda:
-      "envs/py3.yaml"
-  shell:
-      """
-      seqkit seq -i {input} | seqkit head -n 1 -w 0 > {input}.test
-      mv {input}.test {input}
-      python workflow/scripts/python/singleton.py {params.csv} {input} -l {params.header}
-      """
-
-def aggregate_single(wildcards):
-     checkpoint_output = checkpoints.singleton_split.get(**wildcards).output[0]
-     return expand("results/clusters/singleton_{JOBID}/Cluster_singleton{SINGLETONS}.csv",
-            JOBID = JOBID,
-            SINGLETONS=glob_wildcards(os.path.join(checkpoint_output, "Cluster_singleton{SINGLETONS}.fasta")).SINGLETONS)
-
-
-rule singleton_done:
-    input:
-        aggregate_single
-    output:
-        touch("logs/{JOBID}_singleton_done.txt")
-    shell:
-        """
-        if [ -d "results/clusters/singleton_{JOBID}/" ]
-        then
-            mv results/clusters/singleton_{JOBID}/* results/clusters/
-            rm -r results/clusters/singleton_{JOBID}/
-        fi
-        echo "Singleton analysis done"
+        kraken2 -db {params.db} --threads {threads} --report {output.report} --output {params.output} --use-names {input}
         """
