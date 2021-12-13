@@ -169,7 +169,7 @@ rule checkm:
       expand("analysis/{JOBID}_checkm/{JOBID}_checkm.log", JOBID=JOBID)
   params:
       out = expand("analysis/{JOBID}_checkm", JOBID=JOBID),
-      input = "analysis/clusters",
+      input = BIN_LOC,
       refin = REFIN,
       checkmdb = checkmdb
   threads:
@@ -180,6 +180,6 @@ rule checkm:
       """
       checkm_db={params.checkmdb}
       echo ${{checkm_db}} | checkm data setRoot ${{checkm_db}}
-      checkm unbinned -x fasta analysis/clusters/ {params.refin} analysis/clusters/{JOBID}_unbinned_contigs.fa analysis/clusters/{JOBID}_unbinned_contigs_stats.tsv
+      checkm unbinned -x fasta {params.input} {params.refin} analysis/{JOBID}_checkm/{JOBID}_unbinned_contigs.fa {analysis/{JOBID}_checkm/{JOBID}_unbinned_contigs_stats.tsv
       checkm lineage_wf -f {output} --tab_table -x fasta -t {threads} {params.input} {params.out}
       """
