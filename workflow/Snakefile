@@ -97,8 +97,8 @@ if GTDB == "Y":
       input:
         kraken_top = expand("analysis/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
       output:
-        bac120_gtdb = temp("tmp/gtdb/{wildcards.gtdb_v_bac}"),
-        ar122_gtdb = temp("tmp/gtdb/{wildcard.gtdb_v_arc}")
+        bac120_gtdb = temp(expand("tmp/gtdb/{gtdb_v_bac}", gtdb_v_bac = gtdb_v_bac)),
+        ar122_gtdb = temp(expand("tmp/gtdb/{gtdb_v_arc}", gtdb_v_arc = gtdb_v_arc))
       params:
         loc = "tmp/gtdb/",
         link_bac = gtdb_v_tar_bac,
