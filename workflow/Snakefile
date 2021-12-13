@@ -26,9 +26,10 @@ location = BIN_LOC + "Cluster_{CLUSTER}.fasta"
 rule all:
     input:
         expand("analysis/kraken/{JOBID}_Cluster_{CLUSTERS}_report_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS),
-        expand("analysis/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
+        expand("analysis/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level),
+        expand("analysis/prokka/{JOBID}/Cluster_{CLUSTERS}/Cluster_{CLUSTERS}.{ext}", JOBID = JOBID, CLUSTERS = CLUSTERS, ext=[ "err", "fna", "faa", "gff", "gbk", "ffn", "sqn", "fsa", "tbl", "log", "txt", "tsv"]),
 
-# localrules: kraken_merge, output
+localrules: kraken_merge#, output
 
 rule kraken:
     input:
@@ -60,4 +61,24 @@ rule kraken_merge:
         """
         cd analysis/kraken
         find -name '{JOBID}*_report_kraken.out' -type f -printf '\\n%p\\t' -exec sh -c 'echo {{}} | sort -k1nr {{}} | grep -P "\\t{params.level}\\t" | head -n1 ' \\; > {JOBID}_{params.level}_top_kraken.out
+        """
+
+rule prokka:
+    input:
+        clusters = expand("{BIN_LOC}Cluster_{{CLUSTERS}}.fasta", BIN_LOC=BIN_LOC)
+    output:
+        file = expand("analysis/prokka/{{JOBID}}/Cluster_{{CLUSTERS}}/Cluster_{{CLUSTERS}}.{ext}", ext=[ "err", "fna", "faa", "gff", "gbk", "ffn", "sqn", "fsa", "tbl", "log", "txt", "tsv"])
+    params:
+        dir = "analysis/prokka/{JOBID}/Cluster_{CLUSTERS}/",
+        prefix = "Cluster_{CLUSTERS}",
+        prokka = "analysis/clusters/Cluster_{CLUSTERS}_short.fasta"
+    conda:
+        "workflow/envs/prokka.yaml"
+    threads:
+        20
+    shell:
+        """
+        awk '/^>/{{print substr($1,1,21); next}}{{print}}' < {input.clusters} > {params.prokka}
+        prokka {params.prokka} --outdir {params.dir} --prefix {params.prefix} --cpus {threads} --force
+        rm {params.prokka}
         """
