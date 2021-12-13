@@ -95,8 +95,8 @@ if GTDB == "Y":
       input:
         kraken_top = expand("analysis/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
       output:
-        bac120_gtdb_r95 = temp("tmp/gtdb/bac120_metadata.tsv"),
-        ar122_gtdb_r95 = temp("tmp/gtdb/ar122_metadata.tsv")
+        bac120_gtdb = temp("tmp/gtdb/bac120_metadata.tsv"),
+        ar122_gtdb = temp("tmp/gtdb/ar122_metadata.tsv")
       params:
         loc = "tmp/gtdb/",
         link_bac = gtdb_v_tar_bac,
@@ -105,12 +105,12 @@ if GTDB == "Y":
         """
         if wget -q --spider {params.link_bac}; then
           wget -O {params.loc}bac120_metadata.tar.gz {params.link_bac}
-          tar -xf {params.loc}bac120_metadata.tar.gz -C {params.link_bac}
+          tar -xf {params.loc}bac120_metadata.tar.gz -C {output.bac120_gtdb}
         fi
 
         if wget -q --spider {params.link_arc}; then
           wget -O {params.loc}ar122_metadata.tar.gz {params.link_arc}
-          tar -xf {params.loc}ar122_metadata.tar.gz -C {params.link_arc}
+          tar -xf {params.loc}ar122_metadata.tar.gz -C {output.ar122_gtdb}
         fi
         """
 
