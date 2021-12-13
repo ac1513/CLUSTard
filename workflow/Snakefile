@@ -1,7 +1,7 @@
 
 configfile: "config/config_analysis.yaml"
 
-JOBID = config["JOBID"]
+JOBID = config["JOBID"] # this can be different from binning pipeline
 REFIN = config["REFIN"]
 BIN_LOC = config["BIN_LOC"]
 kraken_level = config["kraken_level"]
@@ -26,6 +26,7 @@ location = BIN_LOC + "Cluster_{CLUSTER}.fasta"
 rule all:
     input:
         expand("analysis/kraken/{JOBID}_Cluster_{CLUSTERS}_report_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS),
+        expand("analysis/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
 
 # localrules: kraken_merge, output
 
@@ -46,4 +47,17 @@ rule kraken:
     shell:
         """
         kraken2 -db {params.db} --threads {threads} --report {output.report} --output {params.output} --use-names {input}
+        """
+
+rule kraken_merge:
+    input:
+        report = expand("analysis/kraken/{JOBID}_Cluster_{CLUSTERS}_report_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS)
+    output:
+        "analysis/kraken/{JOBID}_{kraken_level}_top_kraken.out"
+    params:
+        level = {kraken_level}
+    shell:
+        """
+        cd analysis/kraken
+        find -name '{JOBID}*_report_kraken.out' -type f -printf '\\n%p\\t' -exec sh -c 'echo {{}} | sort -k1nr {{}} | grep -P "\\t{params.level}\\t" | head -n1 ' \\; > {JOBID}_{params.level}_top_kraken.out
         """
