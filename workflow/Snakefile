@@ -38,7 +38,7 @@ rule kraken:
         db = krakendb,
         output = "results/kraken/{JOBID}_Cluster_{CLUSTERS}_kraken.out"
     conda:
-        "../envs/kraken2.yaml"
+        "workflow/envs/kraken2.yaml"
     threads:
         16
     resources:
