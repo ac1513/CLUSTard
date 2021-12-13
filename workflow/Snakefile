@@ -125,9 +125,11 @@ if GTDB == "Y":
         json_lookup = "analysis/kraken/{JOBID}_{kraken_level}_GTDB_lookup.json"
       params:
         level = {kraken_level}
+      conda:
+            "envs/py3.yaml"
       shell:
         """
-        python scripts/python/gtdb_lookup.py {input.kraken_top} {params.level} {input.bac120_gtdb} {input.ar122_gtdb} {output.json_lookup}
+        python workflow/scripts/python/gtdb_lookup.py {input.kraken_top} {params.level} {input.bac120_gtdb} {input.ar122_gtdb} {output.json_lookup}
         """
 
 elif GTDB == "N":
