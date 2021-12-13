@@ -93,7 +93,6 @@ rule kraken_merge:
         find -name '{JOBID}*_report_kraken.out' -type f -printf '\\n%p\\t' -exec sh -c 'echo {{}} | sort -k1nr {{}} | grep -P "\\t{params.level}\\t" | head -n1 ' \\; > {JOBID}_{params.level}_top_kraken.out
         """
 
-
 if GTDB == "Y":
     rule GTDB_download:
       input:
