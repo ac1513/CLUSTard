@@ -40,7 +40,7 @@ rule kraken:
         db = krakendb,
         output = "analysis/kraken/{JOBID}_Cluster_{CLUSTERS}_kraken.out"
     conda:
-        "workflow/envs/kraken2.yaml"
+        "envs/kraken2.yaml"
     threads:
         16
     resources:
@@ -73,7 +73,7 @@ rule prokka:
         prefix = "Cluster_{CLUSTERS}",
         prokka = "analysis/clusters/Cluster_{CLUSTERS}_short.fasta"
     conda:
-        "workflow/envs/prokka.yaml"
+        "envs/prokka.yaml"
     threads:
         20
     shell:
