@@ -41,12 +41,14 @@ def bins(file, bins):
 parser = argparse.ArgumentParser(description='usage = python entrez_down.py file_list_of_queries')
 parser.add_argument('unbinned_file', help='output from checkm unbinned', type=str)
 parser.add_argument('binned_file', help='output from bash script', type=str)
+parser.add_argument('out_loc', help='the directory for the output', type=str)
 parser.add_argument('prefix', help='prefix of the jobs', type=str)
 
 args = parser.parse_args()
 
 unbinned_file = args.unbinned_file
 binned_file = args.binned_file
+out_loc = args.out_loc
 prefix = args.prefix
 
 #unbinned_file = "unbinned_stats.tsv"
@@ -96,10 +98,10 @@ plt.ylabel('% Contigs', size=8)
 plt.xticks(x, groups)
 plt.tick_params(labelsize = 7)
 #plt.show()
-fig.savefig(str('output/plots/' + prefix + '_bin_contigs.png'), bbox_inches='tight', dpi = 400)
+fig.savefig(str(out_loc + prefix + '_bin_contigs.png'), bbox_inches='tight', dpi = 400)
 
 counts = pd.DataFrame(index=groups)
 counts["binned"] = binned
 counts["unbinned"] = unbinned
 
-counts.to_csv(prefix + "_bin_group_stats.csv")
+counts.to_csv(out_loc + "_bin_group_stats.csv")

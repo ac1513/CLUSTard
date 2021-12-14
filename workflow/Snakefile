@@ -210,13 +210,14 @@ rule bin_plot:
         contig_plot = "analysis/plots/{JOBID}_bin_contigs.png",
         sorted_lengths = "analysis/{JOBID}_sorted_lengths.tsv"
     params:
-        binning_dir = BIN_LOC
+        binning_dir = BIN_LOC,
+        out_loc = "analysis/plots/"
     conda:
         "envs/py3.yaml"
     shell:
         """
         cat {params.binning_dir}*.fasta | awk '$0 ~ ">" {{print c; c=0;printf substr($0,2,100) "\\t"; }} $0 !~ ">" {{c+=length($0);}} END {{ print c; }}' | sort | uniq > {output.sorted_lengths}
-        python workflow/scripts/python/bin_plot.py {input.checkm_unbin} {params.binning_dir}{JOBID}_sorted_lengths.tsv {JOBID}
+        python workflow/scripts/python/bin_plot.py {input.checkm_unbin} {params.binning_dir}{JOBID}_sorted_lengths.tsv {param.out_loc} {JOBID}
         """
 
 # IF CLUSTARD DO THESE
