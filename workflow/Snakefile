@@ -38,7 +38,7 @@ rule all:
         expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level),
         expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_GTDB_lookup.json", JOBID=JOBID, kraken_level = kraken_level),
         expand("analysis/{JOBID}_seqkit_stats.tsv", JOBID=JOBID),
-        expand("output/{JOBID}_cluster_summary_stats.tsv", JOBID = JOBID)
+        expand("analysis/{JOBID}_cluster_summary_stats.tsv", JOBID = JOBID)
 
 
 localrules: kraken_merge#, output
