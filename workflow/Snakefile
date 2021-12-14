@@ -12,7 +12,8 @@ GTDB = config["GTDB"]
 samples = config["samples"]
 date_scale = config["date_scale"]
 plot_order = config["plot_order"]
-
+rel_or_abs = "r"
+top20 = "n"
 
 gtdb_v_tar_bac = "https://data.ace.uq.edu.au/public/gtdb/data/releases/release95/95.0/bac120_metadata_r95.tar.gz"
 gtdb_v_tar_arc = "https://data.ace.uq.edu.au/public/gtdb/data/releases/release95/95.0/ar122_metadata_r95.tar.gz"
@@ -21,14 +22,7 @@ gtdb_v_arc = "ar122_metadata_r95.tsv"
 
 if BIN_LOC.endswith("/") == False :
     BIN_LOC = BIN_LOC + "/"
-
-# FILE_EX = config["FILE_EX"]
-# MAPPING = config["MAPPING"]
-# CONTIG_T = config["CONTIG_T"]
-# P_THRESH = config["P_THRESH"]
-# COUNT_METHOD = config["COUNT_METHOD"]
-
-location = BIN_LOC + "Cluster_{CLUSTER}.fasta"
+location = BIN_LOC + "*{CLUSTER}.fasta"
 
 (CLUSTERS,) = glob_wildcards(location)
 
@@ -261,4 +255,24 @@ rule plot:
     shell:
         """
         python workflow/scripts/python/plot.py {input.stats_in} {JOBID} {params.sample_list} {params.date} -k_l {kraken_level} -s {params.out_order} -out {params.out_loc} -in {params.bin_loc}
+        """
+
+rule abun_plot:
+    input:
+        count_in = expand("results/clustering/{JOBID}_read_counts_absolute.csv", JOBID = JOBID),
+        kraken_in = expand("analysis/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
+    output:
+        plot_out = "analysis/plots/{JOBID}_{out_abun}_abun_plot.png"
+    conda:
+        "envs/py3.yaml"
+    params:
+        roa = rel_or_abs,
+        top_20 = top20,
+        bin_loc = BIN_LOC,
+        out_loc = "analysis/",
+        samples = samples
+    shell:
+        """
+        for f in {params.bin_loc}C*.fasta; do filename="${{f%%.*}}"; echo ">$f"; seqkit fx2tab -n $f; done > {params.out_loc}{JOBID}_binned_cluster_contig.txt
+        python workflow/scripts/python/abun_plot.py {JOBID} {input.count_in} {params.out_loc}{JOBID}_binned_cluster_contig.txt {params.roa} {params.top_20} -s {samples} Coverage -k {input.kraken_in}
         """
