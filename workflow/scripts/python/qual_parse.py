@@ -27,9 +27,12 @@ def qual_cluster(comp, cont):
 parser = argparse.ArgumentParser(description='')
 parser.add_argument('checkm_log', help='checkm output log file (TAB SEPARATED', type=str)
 parser.add_argument('prok_loc', help='directory containing all prokka output for all clusters', type=str)
+parser.add_argument('bin_loc', help='directory containing fasta files for all clusters', type=str)
+
 args = parser.parse_args()
 checkm_log = args.checkm_log
 prok_loc = args.prok_loc
+bin_loc = args.bin_loc
 
 # =============================================================================
 # CHECKM STUFF HERE
@@ -110,23 +113,23 @@ for cluster in high_clusters:
 # COPYING FILES INTO QUAL DIRECTORIES
 # =============================================================================
 
-location = "output/results/"
-new_loc = "output/genome_bins/"
-os.makedirs("output/genome_bins/high_qual", exist_ok=True)
-os.makedirs("output/genome_bins/med_qual", exist_ok=True)
-os.makedirs("output/genome_bins/low_qual", exist_ok=True)
+location = bin_loc
+new_loc = "analysis/genome_bins/"
+os.makedirs(new_loc + "high_qual", exist_ok=True)
+os.makedirs(new_loc + "med_qual", exist_ok=True)
+os.makedirs(new_loc + "low_qual", exist_ok=True)
 
 for high in high_qual_clusters:
     file = location + high + ".fasta"
-    copyfile(file, "output/genome_bins/high_qual/"+high+".fasta")
+    copyfile(file, new_loc+"high_qual/"+high+".fasta")
 
 for med in med_qual_clusters:
     file = location + med + ".fasta"
-    copyfile(file, "output/genome_bins/med_qual/"+med+".fasta")
+    copyfile(file, new_loc+"med_qual/"+med+".fasta")
 
 for low in low_qual_clusters:
     file = location + low + ".fasta"
-    copyfile(file, "output/genome_bins/low_qual/"+low+".fasta")
+    copyfile(file, new_loc+"low_qual/"+low+".fasta")
 
 # =============================================================================
 # OUTPUT CREATED HERE
