@@ -11,3 +11,4 @@ plot_order: "tot_len" # Statistics to order the output plot by, options = 'no_se
 JOBID: "snake_split_bin"
 REFIN: "data/canu10_med.fasta"
 BIN_LOC: "results/clusters/"
+samples: "samples.tsv"
