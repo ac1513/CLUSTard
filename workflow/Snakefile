@@ -17,7 +17,6 @@ import pandas as pd
 df_samples = pd.read_csv(samples, sep ='\t', index_col = 0)
 samples_list = df_samples["sample"].to_list()
 
-
 gtdb_v_tar_bac = "https://data.ace.uq.edu.au/public/gtdb/data/releases/release95/95.0/bac120_metadata_r95.tar.gz"
 gtdb_v_tar_arc = "https://data.ace.uq.edu.au/public/gtdb/data/releases/release95/95.0/ar122_metadata_r95.tar.gz"
 gtdb_v_bac = "bac120_metadata_r95.tsv"
