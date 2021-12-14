@@ -254,10 +254,11 @@ rule plot:
         date = date_scale,
         sample_list = samples,
         out_order = plot_order,
-        bin_loc = BIN_LOC
+        bin_loc = BIN_LOC,
+        out_loc = "analysis/plots/"
     conda:
         "envs/py3.yaml"
     shell:
         """
-        python workflow/scripts/python/plot.py {input.stats_in} {JOBID} {params.sample_list} {params.date} -k_l {kraken_level} -s {params.out_order} -out {params.bin_loc}
+        python workflow/scripts/python/plot.py {input.stats_in} {JOBID} {params.sample_list} {params.date} -k_l {kraken_level} -s {params.out_order} -out {params.out_loc} -in {params.bin_loc}
         """
