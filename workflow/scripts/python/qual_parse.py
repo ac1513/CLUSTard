@@ -118,14 +118,14 @@ for cluster in high_clusters:
 # =============================================================================
 
 location = bin_loc
-new_loc = "analysis/genome_bins/" + job_id
+new_loc = "analysis/genome_bins/" + job_id + "/"
 os.makedirs(new_loc + "high_qual", exist_ok=True)
 os.makedirs(new_loc + "med_qual", exist_ok=True)
 os.makedirs(new_loc + "low_qual", exist_ok=True)
 
 for high in high_qual_clusters:
     file = location + high + ".fasta"
-    copyfile(file, new_loc+"high_qual/"+high+".fasta")
+    copyfile(file, new_loc +"high_qual/"+high+".fasta")
 
 for med in med_qual_clusters:
     file = location + med + ".fasta"
