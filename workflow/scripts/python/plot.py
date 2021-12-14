@@ -25,12 +25,16 @@ parser.add_argument('samples', help='samples.tsv file', type=str)
 parser.add_argument('dates', help='plot date scale y/n', type=str)
 parser.add_argument('-k_l', '--kraken_level', help = 'merged kraken input file', type=str)
 parser.add_argument('-s', '--sort_order', help = 'list to show how output plot should be ordered', type=str, nargs='*', default=["tot_len"])
+parser.add_argument('-out', '--output_dir', help = 'directory for the output', type=str)
+parser.add_argument('-in', '--input_dir', help = 'directory for the bins', type=str)
 
 args = parser.parse_args()
 in_file = args.in_file
 prefix = args.prefix
 samples = args.samples
 sort_order = args.sort_order
+outdir = args.output_dir
+indir = args.input_dir
 
 if args.kraken_level:
     prefix = str(prefix + "_" + args.kraken_level)
@@ -121,7 +125,7 @@ for i in range(0, len(files), 30):
         n_50 = sorted_stats.loc[cluster]["n_50"]
         nu = sorted_stats.loc[cluster]["no_seq"]
 
-        file = "output/results/" + cluster + ".csv"
+        file = indir + cluster + ".csv"
 
         with open(file, 'r') as f:
             file = str(file)
@@ -186,8 +190,8 @@ for i in range(0, len(files), 30):
         mean_df = mean_df.append(pd.Series(mean_list, name = file, index = df_samples["sample"].to_list()))
 
 #    plt.show()
-    plt.savefig('output/plots/' + str(counter) + '_' + prefix + '_plot.png', type='png', dpi=600)
+    plt.savefig(outdir + str(counter) + '_' + prefix + '_plot.png', type='png', dpi=600)
     print('Generated plot number ' + str(counter) + ' -> ' + str(counter) + '_' + prefix + '_plot.png')
     plt.close('all')
 
-mean_df.to_csv(prefix + "_clus_means.csv")
+mean_df.to_csv(outdir + prefix + "_clus_means.csv")
