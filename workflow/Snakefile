@@ -93,7 +93,7 @@ rule high_mags:
         txt = "analysis/{JOBID}_qual_MAGs.txt"
     params:
         prokka = expand("analysis/prokka/{JOBID}/", JOBID = JOBID),
-        bin_loc = BIN_LOC
+        bin_loc = BIN_LOC,
         jobid = JOBID
     conda :
         "envs/py3.yaml"
