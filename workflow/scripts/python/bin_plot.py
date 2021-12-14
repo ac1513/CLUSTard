@@ -104,4 +104,4 @@ counts = pd.DataFrame(index=groups)
 counts["binned"] = binned
 counts["unbinned"] = unbinned
 
-counts.to_csv(out_loc + prefix +  "_bin_group_stats.csv")
+counts.to_csv(out_loc + prefix + "_bin_group_stats.csv")

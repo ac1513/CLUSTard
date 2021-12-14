@@ -10,12 +10,14 @@ krakendb = config["krakendb"]
 checkmdb = config["checkm_db_root"]
 GTDB = config["GTDB"]
 samples = config["samples"]
+date_scale = config["date_scale"]
+plot_order = config["plot_order"]
+
 
 gtdb_v_tar_bac = "https://data.ace.uq.edu.au/public/gtdb/data/releases/release95/95.0/bac120_metadata_r95.tar.gz"
 gtdb_v_tar_arc = "https://data.ace.uq.edu.au/public/gtdb/data/releases/release95/95.0/ar122_metadata_r95.tar.gz"
 gtdb_v_bac = "bac120_metadata_r95.tsv"
 gtdb_v_arc = "ar122_metadata_r95.tsv"
-
 
 if BIN_LOC.endswith("/") == False :
     BIN_LOC = BIN_LOC + "/"
@@ -69,7 +71,8 @@ rule checkm:
   input:
       expand("results/clusters/Cluster_{CLUSTERS}.fasta", CLUSTERS = CLUSTERS)
   output:
-      expand("analysis/checkm/{JOBID}/{JOBID}_checkm.log", JOBID=JOBID)
+      log = expand("analysis/checkm/{JOBID}/{JOBID}_checkm.log", JOBID=JOBID),
+      stats = expand("analysis/{JOBID}_unbinned_contigs_stats.tsv", JOBID = JOBID)
   params:
       out = expand("analysis/checkm/{JOBID}", JOBID=JOBID),
       input = BIN_LOC,
@@ -239,4 +242,20 @@ rule clus_stats:
         ls {params.bin_loc}Cluster*.csv > stat_input.txt
         python workflow/scripts/python/clus_stats.py stat_input.txt {JOBID} -cm {input.checkm} -sk {input.seqk} -k {input.kraken} -g {input.gtdb_ncbi} -out {output.csv}
         rm stat_input.txt
+        """
+
+rule plot:
+    input:
+        stats_in = expand("analysis/{JOBID}_cluster_summary_stats.tsv", JOBID = JOBID),
+    output:
+        cluster_plot = "analysis/plots/1_{JOBID}_{kraken_level}_plot.png"
+    params:
+        date = date_scale,
+        sample_list = samples,
+        out_order = plot_order
+    conda:
+        "envs/py3.yaml"
+    shell:
+        """
+        python workflow/scripts/python/plot.py {input.stats_in} {JOBID} {params.sample_list} {params.date} -k_l {kraken_level} -s {params.out_order}
         """
