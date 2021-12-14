@@ -23,6 +23,7 @@ rule all:
         expand('results/clustering/{SAMPLES}_counts.tsv', SAMPLES=samples),
         expand('results/clustering/{SAMPLES}_proc_counts_out.tsv', SAMPLES = samples),
         expand('results/clustering/{JOBID}_merged_counts.tsv', JOBID= JOBID),
+        expand("results/clustering/{JOBID}_read_counts_absolute.csv", JOBID = JOBID),
         expand('results/clustering/{JOBID}_read_counts_derived.csv', JOBID= JOBID),
         expand('results/clustering/{JOBID}_values.csv', JOBID = JOBID),
         expand('results/clustering/{JOBID}_diffs.csv', JOBID = JOBID),
@@ -154,6 +155,20 @@ rule merge_filecounts:
     shell:
         """
         python workflow/scripts/python/merge_filecounts.py {params.method} {output.tsv}  -l {input.test}
+        """
+
+rule abs_derive:
+    input:
+        counts = expand('results/clustering/{JOBID}_merged_counts.tsv', JOBID=JOBID)
+    output:
+        csv = "results/clustering/{JOBID}_read_counts_absolute.csv"
+    params:
+        thresh = CONTIG_T,
+    conda:
+        "envs/py3.yaml"
+    shell:
+        """
+        python workflow/scripts/python/gen_abs_counts_csv.py {input.counts} {JOBID} {params.thresh}
         """
 
 rule derive:
