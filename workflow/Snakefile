@@ -15,6 +15,11 @@ plot_order = config["plot_order"]
 rel_or_abs = "r"
 top20 = "n"
 
+import pandas as pd
+df_samples = pd.read_csv(samples, sep ='\t', index_col = 0)
+samples_list = df_samples["sample"].to_list()
+
+
 gtdb_v_tar_bac = "https://data.ace.uq.edu.au/public/gtdb/data/releases/release95/95.0/bac120_metadata_r95.tar.gz"
 gtdb_v_tar_arc = "https://data.ace.uq.edu.au/public/gtdb/data/releases/release95/95.0/ar122_metadata_r95.tar.gz"
 gtdb_v_bac = "bac120_metadata_r95.tsv"
@@ -271,12 +276,11 @@ rule abun_plot:
         top_20 = top20,
         bin_loc = BIN_LOC,
         out_loc = "analysis/",
-        samples = samples
+        samples = samples_list
     shell:
         """
         cd {params.bin_loc}
         for f in *.fasta; do filename="${{f%%.*}}"; echo ">$f"; seqkit fx2tab -n $f; done > {JOBID}_binned_cluster_contig.txt
         cd -
-        pwd
         python workflow/scripts/python/abun_plot.py {JOBID} {input.count_in} {params.bin_loc}{JOBID}_binned_cluster_contig.txt {params.roa} {params.top_20} -s {params.samples} Coverage -k {input.kraken_in}
         """
