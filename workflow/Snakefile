@@ -210,7 +210,7 @@ rule bin_plot:
         contig_plot = "analysis/plots/{JOBID}_bin_contigs.png",
         sorted_lengths = "analysis/{JOBID}_sorted_lengths.tsv"
     params:
-        binning_dir = BIN_DIR
+        binning_dir = BIN_LOC
     conda:
         "envs/py3.yaml"
     shell:
