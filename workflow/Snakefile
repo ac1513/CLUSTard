@@ -32,11 +32,13 @@ location = BIN_LOC + "Cluster_{CLUSTER}.fasta"
 rule all:
     input:
         expand("analysis/prokka/{JOBID}/Cluster_{CLUSTERS}/Cluster_{CLUSTERS}.{ext}", JOBID = JOBID, CLUSTERS = CLUSTERS, ext=[ "err", "fna", "faa", "gff", "gbk", "ffn", "sqn", "fsa", "tbl", "log", "txt", "tsv"]),
+        expand("analysis/checkm/{JOBID}/{JOBID}_checkm.log", JOBID=JOBID),
+        expand("analysis/{JOBID}_qual_MAGs.txt", JOBID = JOBID),
         expand("analysis/kraken/{JOBID}/{JOBID}_Cluster_{CLUSTERS}_report_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS),
         expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level),
         expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_GTDB_lookup.json", JOBID=JOBID, kraken_level = kraken_level),
         expand("analysis/{JOBID}_seqkit_stats.tsv", JOBID=JOBID),
-        expand("analysis/checkm/{JOBID}/{JOBID}_checkm.log", JOBID=JOBID)
+        expand("output/{JOBID}_cluster_summary_stats.tsv", JOBID = JOBID)
 
 
 localrules: kraken_merge#, output
@@ -59,6 +61,43 @@ rule prokka:
         awk '/^>/{{print substr($1,1,21); next}}{{print}}' < {input.clusters} > {params.prokka}
         prokka {params.prokka} --outdir {params.dir} --prefix {params.prefix} --cpus {threads} --force
         rm {params.prokka}
+        """
+
+rule checkm:
+  input:
+      expand("results/clusters/Cluster_{CLUSTERS}.fasta", CLUSTERS = CLUSTERS)
+  output:
+      expand("analysis/checkm/{JOBID}/{JOBID}_checkm.log", JOBID=JOBID)
+  params:
+      out = expand("analysis/checkm/{JOBID}", JOBID=JOBID),
+      input = BIN_LOC,
+      refin = REFIN,
+      checkmdb = checkmdb
+  threads:
+      20
+  conda:
+      "envs/checkm.yaml"
+  shell:
+      """
+      checkm_db={params.checkmdb}
+      echo ${{checkm_db}} | checkm data setRoot ${{checkm_db}}
+      checkm unbinned -x fasta {params.input} {params.refin} analysis/{JOBID}_unbinned_contigs.fa analysis/{JOBID}_unbinned_contigs_stats.tsv
+      checkm lineage_wf -f {output} --tab_table -x fasta -t {threads} {params.input} {params.out}
+      """
+
+rule high_mags:
+    input:
+        prokka = expand("analysis/prokka/{JOBID}/Cluster_{CLUSTERS}/Cluster_{CLUSTERS}.{ext}", ext=[ "err", "fna", "faa", "gff", "gbk", "ffn", "sqn", "fsa", "tbl", "log", "txt", "tsv"], CLUSTERS = CLUSTERS, JOBID = JOBID),
+        checkm = expand("analysis/checkm/{JOBID}/{JOBID}_checkm.log", JOBID=JOBID)
+    output:
+        txt = "analysis/{JOBID}_qual_MAGs.txt"
+    params:
+        prokka = expand("analysis/prokka/{JOBID}/", JOBID = JOBID)
+    conda :
+        "envs/py3.yaml"
+    shell:
+        """
+        python workflow/scripts/python/qual_parse.py {input.checkm} {params.prokka} > {output.txt}
         """
 
 rule kraken:
@@ -160,24 +199,22 @@ rule seqkit:
       seqkit stats -a -T -j {threads} {params.binning_loc}*.fasta > {output}
       """
 
-rule checkm:
-  input:
-      expand("results/clusters/Cluster_{CLUSTERS}.fasta", CLUSTERS = CLUSTERS)
-  output:
-      expand("analysis/checkm/{JOBID}/{JOBID}_checkm.log", JOBID=JOBID)
-  params:
-      out = expand("analysis/checkm/{JOBID}", JOBID=JOBID),
-      input = BIN_LOC,
-      refin = REFIN,
-      checkmdb = checkmdb
-  threads:
-      20
-  conda:
-      "envs/checkm.yaml"
-  shell:
-      """
-      checkm_db={params.checkmdb}
-      echo ${{checkm_db}} | checkm data setRoot ${{checkm_db}}
-      checkm unbinned -x fasta {params.input} {params.refin} analysis/{JOBID}_unbinned_contigs.fa analysis/{JOBID}_unbinned_contigs_stats.tsv
-      checkm lineage_wf -f {output} --tab_table -x fasta -t {threads} {params.input} {params.out}
-      """
+rule clus_stats:
+    input:
+        checkm = expand("analysis/checkm/{JOBID}/{JOBID}_checkm.log", JOBID=JOBID),
+        seqk = expand("analysis/{JOBID}_seqkit_stats.tsv", JOBID=JOBID),
+        kraken = expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level),
+        gtdb_ncbi = expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_GTDB_lookup.json", JOBID = JOBID, kraken_level = kraken_level),
+        qual = expand("analysis/{JOBID}_qual_MAGs.txt", JOBID=JOBID)
+    output:
+        csv = "output/{JOBID}_cluster_summary_stats.tsv"
+    conda:
+        "envs/py3.yaml" #change clustering (below) when add counts folder..
+    params:
+        bin_loc = BIN_LOC
+    shell:
+        """
+        ls {params.bin_loc}C*.fasta > stat_input.txt
+        python workflow/scripts/python/clus_stats.py stat_input.txt {JOBID} -cm {input.checkm} -sk {input.seqk} -k {input.kraken} -g {input.gtdb_ncbi}
+        rm stat_input.txt
+        """
