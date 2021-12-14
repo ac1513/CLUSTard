@@ -217,7 +217,7 @@ rule bin_plot:
     shell:
         """
         cat {params.binning_dir}*.fasta | awk '$0 ~ ">" {{print c; c=0;printf substr($0,2,100) "\\t"; }} $0 !~ ">" {{c+=length($0);}} END {{ print c; }}' | sort | uniq > {output.sorted_lengths}
-        python workflow/scripts/python/bin_plot.py {input.checkm_unbin} {params.binning_dir}{JOBID}_sorted_lengths.tsv {params.out_loc} {JOBID}
+        python workflow/scripts/python/bin_plot.py {input.checkm_unbin} {output.sorted_lengths} {params.out_loc} {JOBID}
         """
 
 # IF CLUSTARD DO THESE
