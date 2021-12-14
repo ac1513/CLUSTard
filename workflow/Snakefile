@@ -9,6 +9,7 @@ kraken_level = config["kraken_level"]
 krakendb = config["krakendb"]
 checkmdb = config["checkm_db_root"]
 GTDB = config["GTDB"]
+samples = config["samples"]
 
 gtdb_v_tar_bac = "https://data.ace.uq.edu.au/public/gtdb/data/releases/release95/95.0/bac120_metadata_r95.tar.gz"
 gtdb_v_tar_arc = "https://data.ace.uq.edu.au/public/gtdb/data/releases/release95/95.0/ar122_metadata_r95.tar.gz"
@@ -201,6 +202,23 @@ rule seqkit:
       seqkit stats -a -T -j {threads} {params.binning_loc}*.fasta > {output}
       """
 
+rule bin_plot:
+    input:
+        checkm_unbin = expand("analysis/{JOBID}_unbinned_contigs_stats.tsv", JOBID = JOBID)
+    output:
+        contig_plot = "analysis/plots/{JOBID}_bin_contigs.png",
+        sorted_lengths "analysis/{JOBID}_sorted_lengths.tsv"
+    params:
+        binning_dir = BIN_DIR
+    conda:
+        "envs/py3.yaml"
+    shell:
+        """
+        cat {params.binning_dir}*.fasta | awk '$0 ~ ">" {{print c; c=0;printf substr($0,2,100) "\\t"; }} $0 !~ ">" {{c+=length($0);}} END {{ print c; }}' | sort | uniq > {output.sorted_lengths}
+        python scripts/python/bin_plot.py {input.checkm_unbin} {params.binning_dir}{JOBID}_sorted_lengths.tsv {JOBID}
+        """
+
+# IF CLUSTARD DO THESE
 rule clus_stats:
     input:
         checkm = expand("analysis/checkm/{JOBID}/{JOBID}_checkm.log", JOBID=JOBID),
