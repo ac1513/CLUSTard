@@ -275,8 +275,8 @@ rule abun_plot:
     shell:
         """
         cd {params.bin_loc}
-        for f in *.fasta; do filename="${{f%%.*}}"; echo ">$f"; seqkit fx2tab -n $f; done > {params.out_loc}{JOBID}_binned_cluster_contig.txt
-        cd ~
-        pwd 
-        python workflow/scripts/python/abun_plot.py {JOBID} {input.count_in} {params.out_loc}{JOBID}_binned_cluster_contig.txt {params.roa} {params.top_20} -s {samples} Coverage -k {input.kraken_in}
+        for f in *.fasta; do filename="${{f%%.*}}"; echo ">$f"; seqkit fx2tab -n $f; done > {JOBID}_binned_cluster_contig.txt
+        cd -
+        pwd
+        python workflow/scripts/python/abun_plot.py {JOBID} {input.count_in} {params.bin_loc}{JOBID}_binned_cluster_contig.txt {params.roa} {params.top_20} -s {samples} Coverage -k {input.kraken_in}
         """
