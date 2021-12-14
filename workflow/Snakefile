@@ -12,8 +12,6 @@ GTDB = config["GTDB"]
 samples = config["samples"]
 date_scale = config["date_scale"]
 plot_order = config["plot_order"]
-rel_or_abs = "r"
-top20 = "n"
 
 import pandas as pd
 df_samples = pd.read_csv(samples, sep ='\t', index_col = 0)
@@ -268,12 +266,10 @@ rule abun_plot:
         count_in = expand("results/clustering/{JOBID}_read_counts_absolute.csv", JOBID = JOBID),
         kraken_in = expand("analysis/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
     output:
-        plot_out = "analysis/plots/{JOBID}_{out_abun}_abun_plot.png"
+        plot_out = "analysis/plots/{JOBID}_relative_abun_plot.png"
     conda:
         "envs/py3.yaml"
     params:
-        roa = rel_or_abs,
-        top_20 = top20,
         bin_loc = BIN_LOC,
         out_loc = "analysis/",
         samples = samples_list
@@ -282,5 +278,5 @@ rule abun_plot:
         cd {params.bin_loc}
         for f in *.fasta; do filename="${{f%%.*}}"; echo ">$f"; seqkit fx2tab -n $f; done > {JOBID}_binned_cluster_contig.txt
         cd -
-        python workflow/scripts/python/abun_plot.py {JOBID} {input.count_in} {params.bin_loc}{JOBID}_binned_cluster_contig.txt {params.roa} {params.top_20} {params.out_loc} -s {params.samples} Coverage -k {input.kraken_in}
+        python workflow/scripts/python/abun_plot.py {JOBID} {input.count_in} {params.bin_loc}{JOBID}_binned_cluster_contig.txt {params.out_loc} -s {params.samples} Coverage -k {input.kraken_in}
         """
