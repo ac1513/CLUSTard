@@ -40,7 +40,7 @@ rule all:
         expand("analysis/{JOBID}_cluster_summary_stats.tsv", JOBID = JOBID),
         expand("analysis/plots/{JOBID}_bin_contigs.png", JOBID = JOBID),
         expand("analysis/plots/1_{JOBID}_{kraken_level}_plot.png", JOBID = JOBID, kraken_level = kraken_level),
-        expand("analysis/plots/{JOBID}_{out_abun}_abun_plot.png", JOBID = JOBID, out_abun = rel_or_abs)
+        expand("analysis/plots/{JOBID}_relative_abun_plot.png", JOBID = JOBID)
 
 
 localrules: kraken_merge#, output
@@ -262,8 +262,7 @@ rule plot:
 
 rule abun_plot:
     input:
-        count_in = expand("results/clustering/{JOBID}_read_counts_absolute.csv", JOBID = JOBID),
-        kraken_in = expand("analysis/kraken/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
+        kraken_in = expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
     output:
         plot_out = "analysis/plots/{JOBID}_relative_abun_plot.png"
     conda:
@@ -271,11 +270,13 @@ rule abun_plot:
     params:
         bin_loc = BIN_LOC,
         out_loc = "analysis/",
-        samples = samples_list
+        samples = samples_list,
+        count_in = expand("results/clustering/{JOBID}_read_counts_absolute.csv", JOBID = JOBID),
+
     shell:
         """
         cd {params.bin_loc}
         for f in *.fasta; do filename="${{f%%.*}}"; echo ">$f"; seqkit fx2tab -n $f; done > {JOBID}_binned_cluster_contig.txt
         cd -
-        python workflow/scripts/python/abun_plot.py {JOBID} {input.count_in} {params.bin_loc}{JOBID}_binned_cluster_contig.txt {params.out_loc} -s {params.samples} Coverage -k {input.kraken_in}
+        python workflow/scripts/python/abun_plot.py {JOBID} {params.count_in} {params.bin_loc}{JOBID}_binned_cluster_contig.txt {params.out_loc} -s {params.samples} Coverage -k {input.kraken_in}
         """
