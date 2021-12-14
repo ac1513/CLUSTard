@@ -39,7 +39,8 @@ rule all:
         expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level),
         expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_GTDB_lookup.json", JOBID=JOBID, kraken_level = kraken_level),
         expand("analysis/{JOBID}_seqkit_stats.tsv", JOBID=JOBID),
-        expand("analysis/{JOBID}_cluster_summary_stats.tsv", JOBID = JOBID)
+        expand("analysis/{JOBID}_cluster_summary_stats.tsv", JOBID = JOBID),
+        expand("analysis/plots/{JOBID}_bin_contigs.png", JOBID = JOBID)
 
 
 localrules: kraken_merge#, output
@@ -234,7 +235,6 @@ rule clus_stats:
         bin_loc = BIN_LOC
     shell:
         """
-
         ls {params.bin_loc}Cluster*.csv > stat_input.txt
         python workflow/scripts/python/clus_stats.py stat_input.txt {JOBID} -cm {input.checkm} -sk {input.seqk} -k {input.kraken} -g {input.gtdb_ncbi} -out {output.csv}
         rm stat_input.txt
