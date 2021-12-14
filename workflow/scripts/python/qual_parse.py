@@ -4,6 +4,8 @@
 Created on Tue Oct  6 11:58:34 2020
 
 @author: ac1513
+Script that calculates the quality of MAGs when given a prokka and a checkm output.
+Outputs a file containing the quality and copies the MAGs into a new directory depending on their quality.
 """
 
 import pandas as pd
@@ -28,11 +30,13 @@ parser = argparse.ArgumentParser(description='')
 parser.add_argument('checkm_log', help='checkm output log file (TAB SEPARATED', type=str)
 parser.add_argument('prok_loc', help='directory containing all prokka output for all clusters', type=str)
 parser.add_argument('bin_loc', help='directory containing fasta files for all clusters', type=str)
+parser.add_argument('jobid', help='prefix for current jobs', type=str)
 
 args = parser.parse_args()
 checkm_log = args.checkm_log
 prok_loc = args.prok_loc
 bin_loc = args.bin_loc
+job_id = args.jobid
 
 # =============================================================================
 # CHECKM STUFF HERE
@@ -114,7 +118,7 @@ for cluster in high_clusters:
 # =============================================================================
 
 location = bin_loc
-new_loc = "analysis/genome_bins/"
+new_loc = "analysis/genome_bins/" + job_id
 os.makedirs(new_loc + "high_qual", exist_ok=True)
 os.makedirs(new_loc + "med_qual", exist_ok=True)
 os.makedirs(new_loc + "low_qual", exist_ok=True)

@@ -94,11 +94,12 @@ rule high_mags:
     params:
         prokka = expand("analysis/prokka/{JOBID}/", JOBID = JOBID),
         bin_loc = BIN_LOC
+        jobid = JOBID
     conda :
         "envs/py3.yaml"
     shell:
         """
-        python workflow/scripts/python/qual_parse.py {input.checkm} {params.prokka} {params.bin_loc} > {output.txt}
+        python workflow/scripts/python/qual_parse.py {input.checkm} {params.prokka} {params.bin_loc} {params.jobid} > {output.txt}
         """
 
 rule kraken:
