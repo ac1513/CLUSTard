@@ -282,5 +282,5 @@ rule abun_plot:
         cd {params.bin_loc}
         for f in *.fasta; do filename="${{f%%.*}}"; echo ">$f"; seqkit fx2tab -n $f; done > {JOBID}_binned_cluster_contig.txt
         cd -
-        python workflow/scripts/python/abun_plot.py {JOBID} {input.count_in} {params.bin_loc}{JOBID}_binned_cluster_contig.txt {params.roa} {params.top_20} -s {params.samples} Coverage -k {input.kraken_in}
+        python workflow/scripts/python/abun_plot.py {JOBID} {input.count_in} {params.bin_loc}{JOBID}_binned_cluster_contig.txt {params.roa} {params.top_20} {params.out_loc} -s {params.samples} Coverage -k {input.kraken_in}
         """

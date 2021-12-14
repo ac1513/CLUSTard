@@ -21,6 +21,7 @@ parser.add_argument('csv_in', help='file containing absolute abundance counts fo
 parser.add_argument('binned_in', help='file listing contigs in each cluster', type=str)
 parser.add_argument('plot', help='relative or absolute abundance output (r/a)', type=str)
 parser.add_argument('top20', help = 'output top19 and other or output all y/n', type = str)
+parser.add_argument('out_loc', help = 'location of output dir', type = str)
 parser.add_argument('-s', '--sample', dest='sample', nargs='+', default=[])
 parser.add_argument('-k', '--kraken', dest='kraken', help = 'kraken top output file', type = str)
 
@@ -32,6 +33,7 @@ plot = args.plot
 binned_in = args.binned_in
 sample = args.sample
 top20 = args.top20
+out_loc = args.out_loc
 
 if args.kraken:
     kraken = args.kraken
@@ -91,7 +93,7 @@ with open(binned_in, 'r') as binned_list:
 # =============================================================================
 
 absolute_abun = new_df_abun.copy()
-absolute_abun.to_csv("output/plots/" + prefix + "_absolute_counts.csv")
+absolute_abun.to_csv(out_loc + "plots/" + prefix + "_absolute_counts.csv")
 
 # =============================================================================
 # Save relative counts to file
@@ -106,7 +108,7 @@ for column in new_df_abun: #iterate over columns
     relative_abun[column] = per
 abun_sum = relative_abun.cumsum()
 relative_abun.index = new_df_abun.index.values.tolist()
-relative_abun.to_csv("output/plots/" + prefix + "_relative_counts.csv")
+relative_abun.to_csv(out_loc + "plots/" + prefix + "_relative_counts.csv")
 
 # =============================================================================
 # Calculate top 20 species
@@ -122,7 +124,7 @@ if top20 == 'y':
         top_df_abun.loc["Other"] = other_df_abun.sum(axis=0).drop(columns="sum")
         abun = top_df_abun.copy()
         abun_sum = abun.cumsum()
-        abun.to_csv("output/plots/" + prefix + "_top20_absolute_counts.csv")
+        abun.to_csv(out_loc + "plots/" + prefix + "_top20_absolute_counts.csv")
 
 
     elif 'r' in plot:
@@ -140,7 +142,7 @@ if top20 == 'y':
         abun_sum = top_relative_abun.cumsum()
         top_relative_abun.index = top_df_abun.index.values.tolist()
         abun = top_relative_abun.copy()
-        abun.to_csv("output/plots/" + prefix + "_top20_relative_counts.csv")
+        abun.to_csv(out_loc +"plots/" + prefix + "_top20_relative_counts.csv")
 
 
 
@@ -188,4 +190,4 @@ if 'y' in top20:
     if 'r' in plot:
         plt.ylim(0,100)
     plt.tight_layout()
-    plt.savefig('output/plots/' + prefix +'_' + plot +'_'+ 'abun_plot.png', bbox_inches='tight', dpi = 300)
+    plt.savefig(out_loc + 'plots/' + prefix +'_' + plot +'_'+ 'abun_plot.png', bbox_inches='tight', dpi = 300)
