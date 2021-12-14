@@ -22,10 +22,12 @@ parser.add_argument('-cm', '--checkm_file', help = 'checkm output file - in tab 
 parser.add_argument('-sk', '--seqkit', help = 'seqkit output file - in tab format', type = str)
 parser.add_argument('-k', '--kraken', help = 'kraken output file at selected genus level', type = str)
 parser.add_argument('-g', '--gtdb', help = 'json file of GTDB lookup', type = str)
+parser.add_argument('-out', '--output', help = 'where to save output', type = str)
 
 args = parser.parse_args()
 in_file = args.in_file
 prefix = args.prefix
+output = args.output
 
 # =============================================================================
 # Read in input file(s)
@@ -100,4 +102,4 @@ for file in files:
 
         stats_df.loc[na] = [nu,tot_len,av_cov,sd_cov,av_gc,sd_gc,n_50,comp,conta,krak_id,krak_per,gtdb_ncbi]
 
-stats_df.to_csv("output/" + prefix + "_cluster_summary_stats.tsv", sep='\t')
+stats_df.to_csv(output, sep='\t')

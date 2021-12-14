@@ -209,14 +209,15 @@ rule clus_stats:
         gtdb_ncbi = expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_GTDB_lookup.json", JOBID = JOBID, kraken_level = kraken_level),
         qual = expand("analysis/{JOBID}_qual_MAGs.txt", JOBID=JOBID)
     output:
-        csv = "output/{JOBID}_cluster_summary_stats.tsv"
+        csv = "analysis/{JOBID}_cluster_summary_stats.tsv"
     conda:
         "envs/py3.yaml" #change clustering (below) when add counts folder..
     params:
         bin_loc = BIN_LOC
     shell:
         """
-        ls {params.bin_loc}C*.fasta > stat_input.txt
-        python workflow/scripts/python/clus_stats.py stat_input.txt {JOBID} -cm {input.checkm} -sk {input.seqk} -k {input.kraken} -g {input.gtdb_ncbi}
+
+        ls {params.bin_loc}Cluster*.csv > stat_input.txt
+        python workflow/scripts/python/clus_stats.py stat_input.txt {JOBID} -cm {input.checkm} -sk {input.seqk} -k {input.kraken} -g {input.gtdb_ncbi} -out {output.csv}
         rm stat_input.txt
         """
