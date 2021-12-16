@@ -7,10 +7,45 @@ Created on Sat Jun 22 19:38:16 2019
 """
 
 import matplotlib.pyplot as plt
+plt.rcParams.update({'font.size':10})
 import argparse
 import pandas as pd
 import re
 
+# =============================================================================
+# PLOTTING FUNCTION
+# =============================================================================
+def plotting(abun, top20, plot):
+    
+    if 'y' not in top20:
+        col_zero = abun.columns[0]
+        abun.sort_values(col_zero, inplace=True, ascending=False)
+        
+    abun_flip = abun.transpose()
+        
+    if 'y' in top20:
+        plot = plot + '_top20'
+        colours = ['#502db3', '#008080', '#c200f2', '#f2c200','#36a3d9', '#e6beff','#8c0025', '#f58231', '#bf0080', '#cad900','#911eb4','#e5001f','#0066bf', '#000075','#338000', '#f032e6','#1bca00','#1d4010','#9a6324','#a9a9a9']
+        abun_flip.plot.bar(stacked=True, legend = None, figsize=(15,10), color=colours, width=0.9)
+    else:
+        abun_flip.plot.bar(stacked=True, legend = None, figsize=(15,10), width=0.9)
+    
+    if 'a' in plot:
+        plt.margins(x = 0.01, y=0.05)
+        plt.ylabel("Absolute abundance", fontsize = 18)
+    if 'r' in plot:
+        plt.margins(0)
+        plt.ylim(0,100)
+        plt.ylabel("Relative abundance (%)", fontsize = 18)
+
+    plt.xlabel("Samples", fontsize = 18)
+    
+    plt.xticks(rotation='vertical', fontsize = 10, verticalalignment='center_baseline')
+    plt.legend(loc='upper left', bbox_to_anchor=(1,1), ncol=1, frameon=False, fontsize = 10)
+
+    plt.tight_layout()
+    plt.savefig(out_loc + 'plots/' + prefix +'_' + plot +'_'+ 'abun_plot.png', bbox_inches='tight', dpi = 300)
+        
 # =============================================================================
 # Command line parsing
 # =============================================================================
@@ -43,64 +78,11 @@ else:
 
 df_abun = pd.read_csv(csv_in, index_col = 0, names = sample)
 df_abun = df_abun.drop(columns='Coverage')
-tot = df_abun.sum(axis = 0)
-cluster_abun = pd.DataFrame(columns=df_abun.columns)
-new_df_abun = pd.DataFrame(columns = sample).drop(columns='Coverage')
+
 abun = pd.DataFrame(columns = sample).drop(columns='Coverage')
 
-
-def plotting(abun, top20, plot)
-    prev = ""
-    previous = pd.Series(dtype=float)
-    abun_sum = abun.cumsum()
-    fig = plt.figure(1)
-
-    for i in range(0, len(abun.index.values.tolist())): #for each cluster i.e list of abun index
-        if not prev:
-            plt.bar(abun.keys(), abun.iloc[i, :], label=abun.index.values.tolist()[i], width=0.9)
-        else:
-            plt.bar(abun.keys(), abun.iloc[i, :], bottom=previous, label=abun.index.values.tolist()[i],  width=0.9)
-        prev = 'y'
-        if i != 0:
-            previous = abun.iloc[i, :] + abun_sum.iloc[i-1, :]
-        else:
-            previous = abun.iloc[i, :]
-
-    plt.xticks( rotation='vertical', fontsize = 4, verticalalignment='center_baseline')
-
-    plt.legend(loc='upper left', bbox_to_anchor=(1,1), ncol=1, frameon=False, fontsize = 5)
-
-    if 'a' in plot:
-        plt.margins(x = 0.01, y=0.05)
-    if 'r' in plot:
-        plt.margins(0)
-    if 'y' in top20:
-        plot = plot + '_top20'
-
-    #fig.savefig(str("plots/" + prefix + '_' + plot + '_abun_plot.png'), bbox_inches='tight', dpi = 400)
-    plt.show()
-
-    if 'y' in top20:
-        colours = ['#502db3', '#008080', '#c200f2', '#f2c200','#36a3d9', '#e6beff','#8c0025', '#f58231', '#bf0080', '#cad900','#911eb4','#e5001f','#0066bf', '#000075','#338000', '#f032e6','#1bca00','#1d4010','#9a6324','#a9a9a9']
-
-        abun_flip = abun.transpose()
-        abun_flip.plot.bar(stacked=True, legend = None, figsize=(15,10), color=colours, width=0.9)
-        plt.legend(loc='center left', labelspacing=-2.5, bbox_to_anchor=(1.0, 0.5), frameon=False)
-        if 'r' in plot:
-            plt.ylim(0,100)
-        plt.tight_layout()
-        plt.savefig(out_loc + 'plots/' + prefix +'_' + plot +'_'+ 'abun_plot.png', bbox_inches='tight', dpi = 300)
-     else:
-         abun_flip = abun.transpose()
-         abun_flip.plot.bar(stacked=True, legend = None, figsize=(15,10), width=0.9)
-         plt.legend(loc='center left', labelspacing=-2.5, bbox_to_anchor=(1.0, 0.5), frameon=False)
-         if 'r' in plot:
-             plt.ylim(0,100)
-         plt.tight_layout()
-         plt.savefig(out_loc + 'plots/' + prefix +'_' + plot +'_'+ 'abun_plot.png', bbox_inches='tight', dpi = 300)
-
 # =============================================================================
-# Parse count and taxonomy files
+# Parse abundance and taxonomy files
 # =============================================================================
 
 with open(binned_in, 'r') as binned_list:
@@ -117,10 +99,10 @@ with open(binned_in, 'r') as binned_list:
             else:
                 line = line.strip().split(' ')[0] #split may not work with NAB_997 - check
                 if line in df_abun.index:
-                    if name in new_df_abun.index:
-                        new_df_abun.loc[name] = new_df_abun.loc[name].add(df_abun.loc[line])
+                    if name in abun.index:
+                        abun.loc[name] = abun.loc[name].add(df_abun.loc[line])
                     else:
-                        new_df_abun.loc[name] = df_abun.loc[line]
+                        abun.loc[name] = df_abun.loc[line]
 
         else:
             if line.startswith(">"): #get cluster info
@@ -129,67 +111,59 @@ with open(binned_in, 'r') as binned_list:
             else:
                 line = line.strip().split(' ')[0] #split may not work with NAB_997 - check
                 if line in df_abun.index:
-                    if name in new_df_abun.index:
-                        new_df_abun.loc[name] = new_df_abun.loc[name].add(df_abun.loc[line])
+                    if name in abun.index:
+                        abun.loc[name] = abun.loc[name].add(df_abun.loc[line])
                     else:
-                        new_df_abun.loc[name] = df_abun.loc[line]
+                        abun.loc[name] = df_abun.loc[line]
 
 # =============================================================================
-# Save absolute counts to file
+# Save absolute counts to file and plot
 # =============================================================================
 
-absolute_abun = new_df_abun.copy()
+absolute_abun = abun.copy()
 absolute_abun.to_csv(out_loc + "plots/" + prefix + "_absolute_counts.csv")
 plotting(absolute_abun, "n", "a")
+
 # =============================================================================
 # Save relative counts to file
 # =============================================================================
 
-relative_abun = new_df_abun.copy()
-plotting(relative_abun, "n", "r" )
+relative_abun = abun.copy()
 
-for column in new_df_abun: #iterate over columns
+for column in abun: #iterate over columns
     per = []
-    for val in new_df_abun.loc[:, column]:
-        per.append((val/new_df_abun[column].sum())*100)
+    for val in abun.loc[:, column]:
+        per.append((val/abun[column].sum())*100)
     relative_abun[column] = per
 
-abun_sum = relative_abun.cumsum()
-relative_abun.index = new_df_abun.index.values.tolist()
+relative_abun.index = abun.index.values.tolist()
 
 relative_abun.to_csv(out_loc + "plots/" + prefix + "_relative_counts.csv")
+plotting(relative_abun, "n", "r" )
 
 # =============================================================================
 # Calculate top 20 species
 # =============================================================================
+# =============================================================================
+# Absolute
+# =============================================================================
 
-#absolute
 absolute_abun["sum"] = absolute_abun.sum(axis=1)
-top_df_abun = absolute_abun.sort_values('sum', axis=0, ascending=False).head(19).drop(columns = "sum")
-other_df_abun = absolute_abun.sort_values('sum', axis=0, ascending=False).iloc[19:,]
-top_df_abun.loc["Other"] = other_df_abun.sum(axis=0).drop(columns="sum")
-abun = top_df_abun.copy()
-abun_sum = abun.cumsum()
-abun.to_csv(out_loc + "plots/" + prefix + "_top20_absolute_counts.csv")
-plotting(abun, "y", "a")
+top_abs_abun = absolute_abun.sort_values('sum', axis=0, ascending=False).head(20).drop(columns = "sum")
+other_abs_abun = absolute_abun.sort_values('sum', axis=0, ascending=False).iloc[20:,]
+top_abs_abun.loc["Other"] = other_abs_abun.sum(axis=0).drop(columns="sum")
 
-#relative
-new_df_abun["sum"] = new_df_abun.sum(axis=1)
-top_df_abun = new_df_abun.sort_values('sum', axis=0, ascending=False).head(19).drop(columns = "sum")
-other_df_abun = new_df_abun.sort_values('sum', axis=0, ascending=False).iloc[19:,]
-top_df_abun.loc["Other"] = other_df_abun.sum(axis=0).drop(columns="sum")
-top_relative_abun = top_df_abun.copy()
-for column in top_df_abun: #iterate over columns
-    per = []
-    for val in top_df_abun.loc[:, column]:
-        per.append(((val/top_df_abun[column].sum())*100))
-    top_relative_abun[column] = per
-abun_sum = top_relative_abun.cumsum()
-top_relative_abun.index = top_df_abun.index.values.tolist()
-abun = top_relative_abun.copy()
-abun.to_csv(out_loc +"plots/" + prefix + "_top20_relative_counts.csv")
-plotting(abun, "y", "r")
+top_abs_abun.to_csv(out_loc + "plots/" + prefix + "_top20_absolute_counts.csv")
+plotting(top_abs_abun, "y", "a")
 
 # =============================================================================
-# Plot
+# Relative
 # =============================================================================
+
+relative_abun["sum"] = relative_abun.sum(axis=1)
+top_rel_abun = relative_abun.sort_values('sum', axis=0, ascending=False).head(20).drop(columns = "sum")
+other_rel_abun = relative_abun.sort_values('sum', axis=0, ascending=False).iloc[20:,]
+top_rel_abun.loc["Other"] = other_rel_abun.sum(axis=0).drop(columns="sum")
+
+top_rel_abun.to_csv(out_loc +"plots/" + prefix + "_top20_relative_counts.csv")
+plotting(top_rel_abun, "y", "r")
