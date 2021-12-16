@@ -44,7 +44,7 @@ rule all:
 
 
 
-rule prokka:
+rule prokka_test:
     input:
         clusters = "{BIN_LOC}Cluster_{CLUSTERS}.fasta"
     output:
