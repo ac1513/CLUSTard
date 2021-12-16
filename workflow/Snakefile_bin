@@ -32,10 +32,10 @@ rule all:
         expand("results/clustering/{JOBID}_clusters_done.txt", JOBID=JOBID),
         expand("results/clusters/{JOBID}_unbinned_contigs.fa", JOBID=JOBID),
         expand("results/clusters/{JOBID}_singleton.fa", JOBID=JOBID),
-        expand("logs/{JOBID}_singleton_done.txt", JOBID=JOBID)
+        expand("logs/{JOBID}_binning_done.txt", JOBID=JOBID)
 
 
-localrules: split_file
+localrules: split_file, contig_len, binning_done
 
 rule bwa_index:
     input:
@@ -380,11 +380,11 @@ def aggregate_single(wildcards):
             SINGLETONS=glob_wildcards(os.path.join(checkpoint_output, "Cluster_singleton{SINGLETONS}.fasta")).SINGLETONS)
 
 
-rule singleton_done:
+rule binning_done:
     input:
         aggregate_single
     output:
-        touch("logs/{JOBID}_singleton_done.txt")
+        touch("logs/{JOBID}_binning_done.txt")
     shell:
         """
         if [ -d "results/clusters/singleton_{JOBID}/" ]
@@ -392,5 +392,5 @@ rule singleton_done:
             mv results/clusters/singleton_{JOBID}/* results/clusters/
             rm -r results/clusters/singleton_{JOBID}/
         fi
-        echo "Singleton analysis done"
+        echo "CLUSTard binning done"
         """

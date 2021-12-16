@@ -43,7 +43,7 @@ rule all:
         expand("analysis/plots/{JOBID}_r_abun_plot.png", JOBID = JOBID)
 
 
-localrules: kraken_merge#, output
+localrules: kraken_merge, empty_lookup, bin_plot, clus_stats, plot, abun_plot
 
 rule prokka:
     input:
