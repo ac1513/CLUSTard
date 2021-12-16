@@ -84,7 +84,7 @@ rule checkm:
       checkm_db={params.checkmdb}
       echo ${{checkm_db}} | checkm data setRoot ${{checkm_db}}
       checkm unbinned -x fasta {params.input} {params.refin} analysis/{JOBID}_unbinned_contigs.fa analysis/{JOBID}_unbinned_contigs_stats.tsv
-      checkm lineage_wf -f {output} --tab_table -x fasta -t {threads} {params.input} {params.out}
+      checkm lineage_wf -f {output.log} --tab_table -x fasta -t {threads} {params.input} {params.out}
       """
 
 rule high_mags:
@@ -120,7 +120,7 @@ rule kraken:
         mem_mb = 4000
     shell:
         """
-        kraken2 -db {params.db} --threads {threads} --report {output.report} --output {params.output} --use-names {input}
+        kraken2 -db {params.db} --threads {threads} --report {output.report} --output {params.output} --use-names {input.files}
         """
 
 rule kraken_merge:
