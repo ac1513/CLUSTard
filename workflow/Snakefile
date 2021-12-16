@@ -24,9 +24,8 @@ gtdb_v_arc = "ar122_metadata_r95.tsv"
 
 if BIN_LOC.endswith("/") == False :
     BIN_LOC = BIN_LOC + "/"
-location = BIN_LOC + "*{CLUSTER}.fasta"
 
-(CLUSTERS,) = glob_wildcards(location)
+(CLUSTERS,) = glob_wildcards(BIN_LOC + {CLUSTERS}.fasta)
 
 rule all:
     input:
@@ -44,14 +43,14 @@ rule all:
 
 
 
-rule prokka_test:
+rule prokka:
     input:
-        clusters = "{BIN_LOC}Cluster_{CLUSTERS}.fasta"
+        clusters = expand("{BIN_LOC}Cluster_{{CLUSTERS}}.fasta", BIN_LOC=BIN_LOC)
     output:
         file = expand("analysis/prokka/{{JOBID}}/Cluster_{{CLUSTERS}}/Cluster_{{CLUSTERS}}.{ext}", ext=[ "err", "fna", "faa", "gff", "gbk", "ffn", "sqn", "fsa", "tbl", "log", "txt", "tsv"])
     params:
         dir = "analysis/prokka/{JOBID}/Cluster_{CLUSTERS}/",
-        prefix = "Cluster_{CLUSTERS}",
+        prefix = "{CLUSTERS}",
         prokka = "results/clusters/Cluster_{CLUSTERS}_short.fasta"
     conda:
         "envs/prokka.yaml"
@@ -125,7 +124,7 @@ rule kraken:
 
 rule kraken_merge:
     input:
-        report = expand("analysis/kraken/{{JOBID}}/{{JOBID}}_Cluster_{CLUSTERS}_report_kraken.out", CLUSTERS = CLUSTERS)
+        report = expand("analysis/kraken/{JOBID}/{JOBID}_Cluster_{CLUSTERS}_report_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS)
     output:
         "analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out"
     params:
