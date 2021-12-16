@@ -25,7 +25,7 @@ gtdb_v_arc = "ar122_metadata_r95.tsv"
 if BIN_LOC.endswith("/") == False :
     BIN_LOC = BIN_LOC + "/"
 
-(CLUSTERS,) = glob_wildcards(BIN_LOC + {CLUSTERS}.fasta)
+(CLUSTERS,) = glob_wildcards(BIN_LOC + "{CLUSTERS}.fasta")
 
 rule all:
     input:
