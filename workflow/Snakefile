@@ -43,7 +43,6 @@ rule all:
         expand("analysis/plots/{JOBID}_r_abun_plot.png", JOBID = JOBID)
 
 
-localrules: bin_plot, clus_stats, plot, abun_plot
 
 rule prokka:
     input:
