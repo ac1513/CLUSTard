@@ -238,7 +238,7 @@ rule clus_stats:
     shell:
         """
         ls {params.bin_loc}Cluster*.csv > stat_input.txt
-        python workflow/scripts/python/clus_stats.py stat_input.txt {JOBID} -cm {input.checkm} -sk {input.seqk} -k {input.kraken} -g {input.gtdb_ncbi} -out {output.csv}
+        python workflow/scripts/python/clus_stats.py stat_input.txt {JOBID} -cm {input.checkm} -sk {input.seqk} -k {input.kraken} -g {input.gtdb_ncbi} -q {input.qual} -out {output.csv}
         rm stat_input.txt
         """
 

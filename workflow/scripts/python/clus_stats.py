@@ -22,6 +22,7 @@ parser.add_argument('-cm', '--checkm_file', help = 'checkm output file - in tab 
 parser.add_argument('-sk', '--seqkit', help = 'seqkit output file - in tab format', type = str)
 parser.add_argument('-k', '--kraken', help = 'kraken output file at selected genus level', type = str)
 parser.add_argument('-g', '--gtdb', help = 'json file of GTDB lookup', type = str)
+parser.add_argument('-q', '--qual', help = 'clustard output containing quality of mags', type = str)
 parser.add_argument('-out', '--output', help = 'where to save output', type = str)
 
 args = parser.parse_args()
@@ -51,7 +52,7 @@ if args.gtdb:
 # =============================================================================
 # Stats
 # =============================================================================
-stats_df = pd.DataFrame(columns=['no_seq','tot_len','av_cov','sd_cov', 'av_gc','sd_gc','n_50','comp', 'contam', 'kraken_id', 'kraken_per', 'gtdb_ncbi'])
+stats_df = pd.DataFrame(columns=['no_seq','tot_len','av_cov','sd_cov', 'av_gc','sd_gc','n_50','comp', 'contam', 'kraken_id', 'kraken_per', 'gtdb_ncbi','qual'])
 
 
 for file in files:
@@ -98,8 +99,14 @@ for file in files:
                                 gtdb_ncbi = gtdb_lookup[krak_id]
                             else:
                                 gtdb_ncbi = "Missing"
+        
+        if args.qual:
+            for line in open(args.qual, 'r'):
+                if re.search(na, line):
+                    qual = line.split(":")[0]
+        else:
+            qual = "N/A"
 
-
-        stats_df.loc[na] = [nu,tot_len,av_cov,sd_cov,av_gc,sd_gc,n_50,comp,conta,krak_id,krak_per,gtdb_ncbi]
+        stats_df.loc[na] = [nu,tot_len,av_cov,sd_cov,av_gc,sd_gc,n_50,comp,conta,krak_id,krak_per,gtdb_ncbi,qual]
 
 stats_df.to_csv(output, sep='\t')
