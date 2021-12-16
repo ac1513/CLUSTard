@@ -106,7 +106,7 @@ rule high_mags:
 
 rule kraken:
     input:
-        expand("{BIN_LOC}Cluster_{{CLUSTERS}}.fasta", BIN_LOC=BIN_LOC)
+        files = expand("{BIN_LOC}Cluster_{{CLUSTERS}}.fasta", BIN_LOC=BIN_LOC)
     output:
         report = "analysis/kraken/{JOBID}/{JOBID}_Cluster_{CLUSTERS}_report_kraken.out",
     params:
