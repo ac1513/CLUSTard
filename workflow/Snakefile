@@ -40,7 +40,7 @@ rule all:
         expand("analysis/{JOBID}_cluster_summary_stats.tsv", JOBID = JOBID),
         expand("analysis/plots/{JOBID}_bin_contigs.png", JOBID = JOBID),
         expand("analysis/plots/1_{JOBID}_{kraken_level}_plot.png", JOBID = JOBID, kraken_level = kraken_level),
-        expand("analysis/plots/{JOBID}_relative_abun_plot.png", JOBID = JOBID)
+        expand("analysis/plots/{JOBID}_r_abun_plot.png", JOBID = JOBID)
 
 
 localrules: kraken_merge#, output
@@ -264,7 +264,7 @@ rule abun_plot:
     input:
         kraken_in = expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
     output:
-        plot_out = "analysis/plots/{JOBID}_relative_abun_plot.png"
+        plot_out = "analysis/plots/{JOBID}_r_abun_plot.png"
     conda:
         "envs/py3.yaml"
     params:
