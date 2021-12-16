@@ -46,7 +46,7 @@ rule all:
 
 rule prokka:
     input:
-        clusters = expand("{BIN_LOC}Cluster_{{CLUSTERS}}.fasta", BIN_LOC=BIN_LOC)
+        clusters = "{BIN_LOC}Cluster_{CLUSTERS}.fasta"
     output:
         file = expand("analysis/prokka/{{JOBID}}/Cluster_{{CLUSTERS}}/Cluster_{{CLUSTERS}}.{ext}", ext=[ "err", "fna", "faa", "gff", "gbk", "ffn", "sqn", "fsa", "tbl", "log", "txt", "tsv"])
     params:
