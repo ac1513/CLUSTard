@@ -6,3 +6,4 @@ scripts/.DS_Store
 data/*
 .snakemake/*
 results/*
+analysis/*
