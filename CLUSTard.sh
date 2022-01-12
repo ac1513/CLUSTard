@@ -16,6 +16,21 @@ while getopts ":w:" opt; do
   esac
 done
 
+if ! command -v snakemake &> /dev/null
+then
+    echo " ";
+    echo " ===========================================";
+    echo "   ____ _    _   _ ____ _____             _ ";
+    echo "  / ___| |  | | | / ___|_   _|_ _ _ __ __| |";
+    echo " | |   | |  | | | \___ \ | |/ _\` | '__/ _\` |";
+    echo " | |___| |__| |_| |___) || | (_| | | | (_| |";
+    echo "  \____|_____\___/|____/ |_|\__,_|_|  \__,_|";
+    echo "                                            ";
+    echo " ===========================================";
+    echo "\nSnakemake could not be found, Please ensure Snakemake (>v5.3) is installed before using the pipeline.\n"
+    exit
+fi
+
 if [[ -n $wf ]] && [[ $wf == "both" ]];
 then
   echo " ";
@@ -31,13 +46,17 @@ then
   echo "  workflows will be run as you specified   ";
   echo "  both! 3... 2... 1...";
   echo " ";
-  snakemake -n --snakefile workflow/Snakefile_bin
-  snakemake -n --snakefile workflow/Snakefile_analysis
-  echo " Thank you for using CLUSTard, your metagenome bins are in the directory: ";
-  echo "         results/clusters/                  ";
-  echo " And the analysis output is in the directory";
-  echo "         analysis                 ";
+  { snakemake -n --snakefile workflow/Snakefile_bin &&
+  echo " Thank you for using CLUSTard, your metagenome bins are in the directory: " &&
+  echo "         results/clusters/                  " &&
   echo " Have a good day!"
+} || echo "\nError: Something went wrong, please see above for error message. \n "
+  { snakemake -n --snakefile workflow/Snakefile_analysis &&
+  echo " Thank you for using CLUSTard, your metagenome bins are in the directory: " &&
+  echo "         results/clusters/                  " &&
+  echo " Have a good day!"
+} || echo "\nError: Something went wrong, please see above for error message. \n"
+
 elif [[ -n $wf ]] && [[ $wf == "bin" ]] || [[ $wf == "binning" ]];
 then
   echo " ";
@@ -53,10 +72,11 @@ then
   echo "  will be run as you specified $wf          ";
   echo "  3... 2... 1...";
   echo " ";
-  snakemake -n --snakefile workflow/Snakefile_bin
-  echo " Thank you for using CLUSTard, your metagenome bins are in the directory: ";
-  echo "         results/clusters/                  ";
+  { snakemake -n --snakefile workflow/Snakefile_bin &&
+  echo " Thank you for using CLUSTard, your metagenome bins are in the directory: " &&
+  echo "         results/clusters/                  " &&
   echo " Have a good day!"
+} || echo "\nError: Something went wrong, please see above for error message. \n"
 elif [[ -n $wf ]] && [[ $wf == "analysis" ]] || [[ $wf == "ana" ]];
 then
   echo " ";
@@ -74,10 +94,12 @@ then
   echo "  TBD";
   echo "  3... 2... 1...";
   echo " ";
-  snakemake -n --snakefile workflow/Snakefile_analysis
-  echo " Thank you for using CLUSTard, the analysis output is in the directory:";
-  echo "         analysis                  ";
-  echo " Have a good day!";
+  { snakemake -n --snakefile workflow/Snakefile_bin &&
+  echo " Thank you for using CLUSTard, your metagenome bins are in the directory: " &&
+  echo "         results/clusters/                  " &&
+  echo " Have a good day!"
+} || echo "\nError: Something went wrong, please see above for error message. \n "
+
 else [[ -n $wf ]];
   echo " $wf is not a valid option, please specify workflow from";
   echo " 'both', 'binning' or 'analysis'  ";
