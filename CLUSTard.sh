@@ -47,13 +47,12 @@ then
   echo "  both! 3... 2... 1...";
   echo " ";
   { snakemake -n --snakefile workflow/Snakefile_bin &&
-  echo " Thank you for using CLUSTard, your metagenome bins are in the directory: " &&
-  echo "         results/clusters/                  " &&
-  echo " Have a good day!"
-} || echo "\nError: Something went wrong, please see above for error message. \n "
-  { snakemake -n --snakefile workflow/Snakefile_analysis &&
-  echo " Thank you for using CLUSTard, your metagenome bins are in the directory: " &&
-  echo "         results/clusters/                  " &&
+  echo " Completed binning pipeline . \n Beginning analysis pipeline." &&
+  snakemake -n --snakefile workflow/Snakefile_analysis &&
+  echo "\n Thank you for using CLUSTard, your metagenome bins are in the directory: " &&
+  echo "\n         results/clusters/                  \n" &&
+  echo " And your analysis output is in the directory" &&
+  echo "\n         analysis \n"
   echo " Have a good day!"
 } || echo "\nError: Something went wrong, please see above for error message. \n"
 
@@ -73,8 +72,8 @@ then
   echo "  3... 2... 1...";
   echo " ";
   { snakemake -n --snakefile workflow/Snakefile_bin &&
-  echo " Thank you for using CLUSTard, your metagenome bins are in the directory: " &&
-  echo "         results/clusters/                  " &&
+  echo "\n Thank you for using CLUSTard, your metagenome bins are in the directory: " &&
+  echo "\n         results/clusters/                  \n" &&
   echo " Have a good day!"
 } || echo "\nError: Something went wrong, please see above for error message. \n"
 elif [[ -n $wf ]] && [[ $wf == "analysis" ]] || [[ $wf == "ana" ]];
@@ -95,8 +94,8 @@ then
   echo "  3... 2... 1...";
   echo " ";
   { snakemake -n --snakefile workflow/Snakefile_bin &&
-  echo " Thank you for using CLUSTard, your metagenome bins are in the directory: " &&
-  echo "         results/clusters/                  " &&
+  echo "\n Thank you for using CLUSTard, your analysis output is in the directory: " &&
+  echo "\n         analysis                 \n" &&
   echo " Have a good day!"
 } || echo "\nError: Something went wrong, please see above for error message. \n "
 
