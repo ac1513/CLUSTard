@@ -1,6 +1,4 @@
 
-configfile: "config/config_analysis.yaml"
-
 
 JOBID = config["JOBID"] # this can be different from binning pipeline
 REFIN = config["REFIN"]
@@ -9,7 +7,7 @@ kraken_level = config["kraken_level"]
 krakendb = config["krakendb"]
 checkmdb = config["checkm_db_root"]
 GTDB = config["GTDB"]
-samples = config["samples"]
+samples = config["SAMPLES"]
 date_scale = config["date_scale"]
 plot_order = config["plot_order"]
 
@@ -27,7 +25,7 @@ if BIN_LOC.endswith("/") == False :
 
 (CLUSTERS,) = glob_wildcards(BIN_LOC + "{CLUSTERS}.fasta")
 
-rule all:
+rule ana_all:
     input:
         expand("analysis/prokka/{JOBID}/{CLUSTERS}/{CLUSTERS}.{ext}", JOBID = JOBID, CLUSTERS = CLUSTERS, ext=[ "err", "fna", "faa", "gff", "gbk", "ffn", "sqn", "fsa", "tbl", "log", "txt", "tsv"]),
         expand("analysis/checkm/{JOBID}/{JOBID}_checkm.log", JOBID=JOBID),
@@ -36,11 +34,7 @@ rule all:
         expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level),
         expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_GTDB_lookup.json", JOBID=JOBID, kraken_level = kraken_level),
         expand("analysis/{JOBID}_seqkit_stats.tsv", JOBID=JOBID),
-        expand("analysis/{JOBID}_cluster_summary_stats.tsv", JOBID = JOBID),
-        expand("analysis/plots/{JOBID}_bin_contigs.png", JOBID = JOBID),
-        expand("analysis/plots/1_{JOBID}_{kraken_level}_plot.png", JOBID = JOBID, kraken_level = kraken_level),
-        expand("analysis/plots/{JOBID}_r_abun_plot.png", JOBID = JOBID)
-
+        expand("analysis/plots/{JOBID}_bin_contigs.png", JOBID=JOBID)
 
 
 rule prokka:
@@ -73,7 +67,8 @@ rule checkm:
       out = expand("analysis/checkm/{JOBID}", JOBID=JOBID),
       input = BIN_LOC,
       refin = REFIN,
-      checkmdb = checkmdb
+      checkmdb = checkmdb,
+      jobid = JOBID
   threads:
       20
   conda:
@@ -82,7 +77,7 @@ rule checkm:
       """
       checkm_db={params.checkmdb}
       echo ${{checkm_db}} | checkm data setRoot ${{checkm_db}}
-      checkm unbinned -x fasta {params.input} {params.refin} analysis/{JOBID}_unbinned_contigs.fa analysis/{JOBID}_unbinned_contigs_stats.tsv
+      checkm unbinned -x fasta {params.input} {params.refin} analysis/{params.jobid}_unbinned_contigs.fa analysis/{params.jobid}_unbinned_contigs_stats.tsv
       checkm lineage_wf -f {output.log} --tab_table -x fasta -t {threads} {params.input} {params.out}
       """
 
@@ -131,8 +126,8 @@ rule kraken_merge:
         level = kraken_level
     shell:
         """
-        cd analysis/kraken/{JOBID}
-        find -name '{JOBID}*_report_kraken.out' -type f -printf '\\n%p\\t' -exec sh -c 'echo {{}} | sort -k1nr {{}} | grep -P "\\t{params.level}\\t" | head -n1 ' \\; > {JOBID}_{params.level}_top_kraken.out
+        cd analysis/kraken/{wildcards.JOBID}
+        find -name '{wildcards.JOBID}*_report_kraken.out' -type f -printf '\\n%p\\t' -exec sh -c 'echo {{}} | sort -k1nr {{}} | grep "\\t{params.level}\\t" | head -n1 ' \\; > {wildcards.JOBID}_{params.level}_top_kraken.out
         """
 
 if GTDB == "Y":
@@ -216,65 +211,5 @@ rule bin_plot:
     shell:
         """
         cat {params.binning_dir}*.fasta | awk '$0 ~ ">" {{print c; c=0;printf substr($0,2,100) "\\t"; }} $0 !~ ">" {{c+=length($0);}} END {{ print c; }}' | sort | uniq > {output.sorted_lengths}
-        python workflow/scripts/python/bin_plot.py {input.checkm_unbin} {output.sorted_lengths} {params.out_loc} {JOBID}
-        """
-
-# IF CLUSTARD DO THESE
-rule clus_stats:
-    input:
-        checkm = expand("analysis/checkm/{JOBID}/{JOBID}_checkm.log", JOBID=JOBID),
-        seqk = expand("analysis/{JOBID}_seqkit_stats.tsv", JOBID=JOBID),
-        kraken = expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level),
-        gtdb_ncbi = expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_GTDB_lookup.json", JOBID = JOBID, kraken_level = kraken_level),
-        qual = expand("analysis/{JOBID}_qual_MAGs.txt", JOBID=JOBID)
-    output:
-        csv = "analysis/{JOBID}_cluster_summary_stats.tsv"
-    conda:
-        "envs/py3.yaml" #change clustering (below) when add counts folder..
-    params:
-        bin_loc = BIN_LOC
-    shell:
-        """
-        ls {params.bin_loc}Cluster*.csv > stat_input.txt
-        python workflow/scripts/python/clus_stats.py stat_input.txt {JOBID} -cm {input.checkm} -sk {input.seqk} -k {input.kraken} -g {input.gtdb_ncbi} -q {input.qual} -out {output.csv}
-        rm stat_input.txt
-        """
-
-rule plot:
-    input:
-        stats_in = expand("analysis/{JOBID}_cluster_summary_stats.tsv", JOBID = JOBID),
-    output:
-        cluster_plot = "analysis/plots/1_{JOBID}_{kraken_level}_plot.png"
-    params:
-        date = date_scale,
-        sample_list = samples,
-        out_order = plot_order,
-        bin_loc = BIN_LOC,
-        out_loc = "analysis/plots/"
-    conda:
-        "envs/py3.yaml"
-    shell:
-        """
-        python workflow/scripts/python/plot.py {input.stats_in} {JOBID} {params.sample_list} {params.date} -k_l {kraken_level} -s {params.out_order} -out {params.out_loc} -in {params.bin_loc}
-        """
-
-rule abun_plot:
-    input:
-        kraken_in = expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
-    output:
-        plot_out = "analysis/plots/{JOBID}_r_abun_plot.png"
-    conda:
-        "envs/py3.yaml"
-    params:
-        bin_loc = BIN_LOC,
-        out_loc = "analysis/",
-        samples = samples_list,
-        count_in = expand("results/clustering/{JOBID}_read_counts_absolute.csv", JOBID = JOBID),
-
-    shell:
-        """
-        cd {params.bin_loc}
-        for f in *.fasta; do filename="${{f%%.*}}"; echo ">$f"; seqkit fx2tab -n $f; done > {JOBID}_binned_cluster_contig.txt
-        cd -
-        python workflow/scripts/python/abun_plot.py {JOBID} {params.count_in} {params.bin_loc}{JOBID}_binned_cluster_contig.txt {params.out_loc} -s {params.samples} Coverage -k {input.kraken_in}
+        python workflow/scripts/python/bin_plot.py {input.checkm_unbin} {output.sorted_lengths} {params.out_loc} {wildcards.JOBID}
         """

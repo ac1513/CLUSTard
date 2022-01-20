@@ -7,3 +7,7 @@ data/*
 .snakemake/*
 results/*
 analysis/*
+.idea/*
+tmp/
+old/
+logs/

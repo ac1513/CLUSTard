@@ -1,0 +1,55 @@
+configfile: "config/config.yaml"
+
+import pandas as pd
+df_samples = pd.read_csv(config["SAMPLES"], sep ='\t', index_col = 0)
+samples = df_samples["sample"].to_list()
+SAMPLES = samples
+
+JOBID = config["JOBID"]
+REFIN = config["REFIN"]
+RAW_DIR = config["RAW_DIR"]
+FILE_EX = config["FILE_EX"]
+MAPPING = config["MAPPING"]
+CONTIG_T = config["CONTIG_T"]
+P_THRESH = config["P_THRESH"]
+COUNT_METHOD = config["COUNT_METHOD"]
+BIN_LOC = config["BIN_LOC"]
+kraken_level = config["kraken_level"]
+krakendb = config["krakendb"]
+GTDB = config["GTDB"]
+samples = config["SAMPLES"]
+date_scale = config["date_scale"]
+plot_order = config["plot_order"]
+
+wf = "both"
+
+if wf == "both":
+    rule all:
+        input:
+            expand("logs/{JOBID}_binning_done.txt", JOBID=JOBID),
+            expand("analysis/{JOBID}_qual_MAGs.txt", JOBID = JOBID),
+            expand("analysis/{JOBID}_seqkit_stats.tsv", JOBID=JOBID),
+            expand("analysis/plots/{JOBID}_bin_contigs.png", JOBID=JOBID),
+            expand("analysis/{JOBID}_cluster_summary_stats.tsv", JOBID = JOBID),
+            expand("analysis/plots/1_{JOBID}_{kraken_level}_plot.png", JOBID = JOBID, kraken_level = kraken_level),
+            expand("analysis/plots/{JOBID}_r_abun_plot.png", JOBID = JOBID)
+
+    include: "Snakefile_bin"
+    include: "Snakefile_analysis"
+    include: "Snakefile_plot"
+
+elif wf == "bin":
+    rule all:
+        input:
+            expand("logs/{JOBID}_binning_done.txt", JOBID=JOBID)
+
+    include: "Snakefile_bin"
+
+elif wf == "ana":
+    rule all:
+        input:
+            expand("analysis/{JOBID}_qual_MAGs.txt", JOBID = JOBID),
+            expand("analysis/{JOBID}_seqkit_stats.tsv", JOBID=JOBID),
+            expand("analysis/plots/{JOBID}_bin_contigs.png", JOBID=JOBID)
+
+    include: "Snakefile_analysis"

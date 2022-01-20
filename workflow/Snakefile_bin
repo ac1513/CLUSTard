@@ -1,5 +1,3 @@
-configfile: "config/config_bin.yaml"
-
 import pandas as pd
 df_samples = pd.read_csv(config["SAMPLES"], sep ='\t', index_col = 0)
 samples = df_samples["sample"].to_list()
@@ -12,8 +10,9 @@ MAPPING = config["MAPPING"]
 CONTIG_T = config["CONTIG_T"]
 P_THRESH = config["P_THRESH"]
 COUNT_METHOD = config["COUNT_METHOD"]
+BIN_LOC = config["BIN_LOC"]
 
-rule all:
+rule bin_all:
     input:
         expand("{REFIN}.sa", REFIN=REFIN),
         expand("results/clustering/{JOBID}_contig_lengths.tsv", JOBID = JOBID),
@@ -168,7 +167,7 @@ rule abs_derive:
         "envs/py3.yaml"
     shell:
         """
-        python workflow/scripts/python/gen_abs_counts_csv.py {input.counts} {JOBID} {params.thresh}
+        python workflow/scripts/python/gen_abs_counts_csv.py {input.counts} {wildcards.JOBID} {params.thresh}
         """
 
 rule derive:
@@ -182,7 +181,7 @@ rule derive:
         "envs/py3.yaml"
     shell:
         """
-        python workflow/scripts/python/gen_counts_csv.py {input} {JOBID} {params.thresh}
+        python workflow/scripts/python/gen_counts_csv.py {input} {wildcards.JOBID} {params.thresh}
         """
 
 rule start_feeder:
@@ -195,7 +194,7 @@ rule start_feeder:
         "envs/py3.yaml"
     shell:
         """
-        python workflow/scripts/python/start_feeder.py clustering {JOBID}
+        python workflow/scripts/python/start_feeder.py clustering {wildcards.JOBID}
         """
 
 checkpoint split_file:
@@ -305,47 +304,47 @@ rule unbinned:
         """
         for FILE in results/clusters/*fasta
             do
-            seqkit seq -n -i $FILE >> results/clusters/{JOBID}_binned_contigs.txt
+            seqkit seq -n -i $FILE >> results/clusters/{wildcards.JOBID}_binned_contigs.txt
             done
-        seqkit grep -v -f results/clusters/{JOBID}_binned_contigs.txt {REFIN} > results/clusters/{JOBID}_unbinned_contigs.fa
+        seqkit grep -v -f results/clusters/{wildcards.JOBID}_binned_contigs.txt {params.refin} > results/clusters/{wildcards.JOBID}_unbinned_contigs.fa
         """
 
 rule singleton:
     input:
-        expand("results/clusters/{JOBID}_unbinned_contigs.fa", JOBID = JOBID)
+        unbinned = expand("results/clusters/{JOBID}_unbinned_contigs.fa", JOBID = JOBID)
     output:
-        expand("results/clusters/{JOBID}_singleton.fa", JOBID=JOBID)
+        singleton = expand("results/clusters/{JOBID}_singleton.fa", JOBID=JOBID)
     params:
         min_size = 500000
     conda:
         "envs/py3.yaml"
     shell:
         """
-        if [ -f results/clusters/{JOBID}_unbinned_contigs.fa ]; then
-            seqkit seq -m {params.min_size} results/clusters/{JOBID}_unbinned_contigs.fa > results/clusters/{JOBID}_singleton.fa
+        if [ -f {input.unbinned} ]; then
+            seqkit seq -m {params.min_size} {input.unbinned} > {output.singleton}
         fi
-        if [ ! -f results/clusters/{JOBID}_singleton.fa ]; then
-            touch results/clusters/{JOBID}_singleton.fa
+        if [ ! -f {output.singleton} ]; then
+            touch {output.singleton}
         fi
         """
 
 checkpoint singleton_split:
     input:
-        "results/clusters/{JOBID}_singleton.fa"
+        singleton = "results/clusters/{JOBID}_singleton.fa"
     output:
-        directory("results/clusters/singleton_{JOBID}")
+        dir = directory("results/clusters/singleton_{JOBID}")
     shell:
         """
         mkdir -p {output}
 
-        if [ -s "results/clusters/{JOBID}_singleton.fa" ]
+        if [ -s {input.singleton} ]
         then
             count=0
             while read line
             do
                 if [[ ${{line:0:1}} == '>' ]]
                 then
-                    outfile=results/clusters/singleton_{JOBID}/Cluster_singleton${{count}}.fasta
+                    outfile={output.dir}/Cluster_singleton${{count}}.fasta
                     echo ${{line}} > ${{outfile}}
                     count=$((count+1))
                 else
@@ -384,13 +383,15 @@ rule binning_done:
     input:
         aggregate_single
     output:
-        touch("logs/{JOBID}_binning_done.txt")
+        touch("logs/{JOBID}_binning_done.txt"),
+    params:
+        jobid = JOBID
     shell:
         """
-        if [ -d "results/clusters/singleton_{JOBID}/" ]
+        if [ -d "results/clusters/singleton_{params.jobid}/" ]
         then
-            mv results/clusters/singleton_{JOBID}/* results/clusters/
-            rm -r results/clusters/singleton_{JOBID}/
+            mv results/clusters/singleton_{params.jobid}/* results/clusters/
+            rm -r results/clusters/singleton_{params.jobid}/
         fi
         echo "CLUSTard binning done"
         """

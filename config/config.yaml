@@ -1,25 +1,31 @@
-#OPTIONS
-
+#REQUIRED OPTIONS
 # Prefix
-jobid: "snake_v5.6.0"
+JOBID: "snake_split_bin_test"
 # Input Files
-REFIN: "data/canu10_med.fasta" #location of assembly to cluster
-RAW_DIR: "data/" #location of timepoint raw reads
-samples: "samples.tsv"
-in_file_extension: "fastq" #extension of timepoint files
+#Location of samples tsv
+SAMPLES: "config/samples.tsv"
+#location of assembly to cluster
+REFIN: "data/canu10_med.fasta"
+#location of timepoint raw reads
+RAW_DIR: "data/"
+#extension of timepoint files
+FILE_EX: "fastq"
+
+#BINNING OPTIONS
 # Method of mapping required
-mapping: "LR" # SR, paired_SR or LR
-#Database locations
+MAPPING: "LR" # SR, paired_SR or LR
+# Clustering options
+CONTIG_T: "1000"
+P_THRESH: "0.997"
+COUNT_METHOD: "norm" # norm or raw
+
+#ANALYSIS
+#OPTIONS
 blastdb: "/mnt/lustre/groups/biol-chong-2019/databases/blast/nt/nt"
 checkm_db_root: "/mnt/lustre/groups/biol-chong-2019/databases/checkm_data"
 krakendb: "/mnt/lustre/groups/biol-chong-2019/databases/krakendb/kraken2_samstudio8/"
 GTDB: "Y" # Y/N if the kraken DB is based on GTDB taxonomy, adds NCBI comparison to output
-
-# Clustering options
-CONTIG_T: "1000"
-P_THRESH: "0.997"
-meth_counts: "norm" # norm or raw
-
+BIN_LOC: "results/clusters/"
 # Output plot properties
 kraken_level: "F" # Taxonomic level used in output plots (F, G, S etc.)
 date_scale: "n" # Plot timepoints in plot using date scale (if provided)
