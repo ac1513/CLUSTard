@@ -35,12 +35,14 @@ if wf == "both":
             expand("analysis/plots/{JOBID}_r_abun_plot.png", JOBID = JOBID)
 
     include: "Snakefile_bin"
+
     module analysis_workflow:
         snakefile:
             "Snakefile_analysis"
         config: config
 
     use rule * from analysis_workflow as ana_*
+    (CLUSTERS,) = glob_wildcards(BIN_LOC + "{CLUSTERS}.fasta")
 
     use rule prokka from analysis_workflow as update_prokka with:
         input: rules.in_bins.output
