@@ -37,9 +37,15 @@ rule ana_all:
         expand("analysis/plots/{JOBID}_bin_contigs.png", JOBID=JOBID)
 
 
-rule prokka:
+rule in_bins:
     input:
         clusters = expand("{BIN_LOC}{{CLUSTERS}}.fasta", BIN_LOC=BIN_LOC)
+    output:
+        touch(expand("{BIN_LOC}{{CLUSTERS}}.fasta", BIN_LOC=BIN_LOC))
+
+rule prokka:
+    input:
+        rules.in_bins.output
     output:
         file = expand("analysis/prokka/{{JOBID}}/{{CLUSTERS}}/{{CLUSTERS}}.{ext}", ext=[ "err", "fna", "faa", "gff", "gbk", "ffn", "sqn", "fsa", "tbl", "log", "txt", "tsv"])
     params:
@@ -59,7 +65,7 @@ rule prokka:
 
 rule checkm:
   input:
-      expand("{BIN_LOC}{CLUSTERS}.fasta", BIN_LOC = BIN_LOC, CLUSTERS = CLUSTERS)
+      erules.in_bins.output
   output:
       log = expand("analysis/checkm/{JOBID}/{JOBID}_checkm.log", JOBID=JOBID),
       stats = expand("analysis/{JOBID}_unbinned_contigs_stats.tsv", JOBID = JOBID)

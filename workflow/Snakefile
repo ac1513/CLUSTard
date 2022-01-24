@@ -35,12 +35,6 @@ if wf == "both":
             expand("analysis/plots/{JOBID}_r_abun_plot.png", JOBID = JOBID)
 
     include: "Snakefile_bin"
-
-    (CLUSTERS,) = glob_wildcards(BIN_LOC + "{CLUSTERS}.fasta")
-    rule check_bin:
-        input: expand("logs/{JOBID}_binning_done.txt", JOBID=JOBID)
-        output: touch(expand("{BIN_LOC}{{CLUSTERS}}.fasta", BIN_LOC=BIN_LOC))
-
     include: "Snakefile_analysis"
     include: "Snakefile_plot"
 
