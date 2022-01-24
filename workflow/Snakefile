@@ -42,7 +42,13 @@ if wf == "both":
 
     use rule * from analysis_workflow as ana_*
 
-    use rule in_bins from analysis_workflow as update_in_bins with:
+    use rule prokka from analysis_workflow as update_prokka with:
+        input: rules.in_bins.output
+
+    use rule checkm from analysis_workflow as update_checkm with:
+        input: rules.in_bins.output
+
+    use rule kraken from analysis_workflow as update_kraken with:
         input: rules.in_bins.output
 
     include: "Snakefile_plot"

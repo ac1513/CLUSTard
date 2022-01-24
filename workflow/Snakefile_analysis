@@ -1,5 +1,4 @@
 
-
 JOBID = config["JOBID"] # this can be different from binning pipeline
 REFIN = config["REFIN"]
 BIN_LOC = config["BIN_LOC"]
