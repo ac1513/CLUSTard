@@ -46,7 +46,7 @@ if wf == "both":
         input: rules.in_bins.output
 
     use rule checkm from analysis_workflow as update_checkm with:
-        input: rules.in_bins.output
+        input: expand(rules.in_bins.output)
 
     use rule kraken from analysis_workflow as update_kraken with:
         input: rules.in_bins.output
