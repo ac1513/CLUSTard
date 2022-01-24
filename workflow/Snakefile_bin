@@ -32,8 +32,7 @@ rule bin_all:
         expand("results/clusters/{JOBID}_unbinned_contigs.fa", JOBID=JOBID),
         expand("results/clusters/{JOBID}_singleton.fa", JOBID=JOBID),
         expand("logs/{JOBID}_binning_done.txt", JOBID=JOBID),
-        expand("logs/{JOBID}_bins_here.txt", JOBID = JOBID)
-
+        expand("{BIN_LOC}*.fasta", BIN_LOC=BIN_LOC)),
 
 localrules: split_file, contig_len, binning_done
 
@@ -404,4 +403,3 @@ rule in_bins:
         clusters = expand("{BIN_LOC}{{CLUSTERS}}.fasta", BIN_LOC=BIN_LOC)
     output:
         bins = touch(expand("{BIN_LOC}{{CLUSTERS}}.fasta", BIN_LOC=BIN_LOC)),
-        log = touch("logs/{JOBID}_{{CLUSTERS}}_bins_here.txt"),
