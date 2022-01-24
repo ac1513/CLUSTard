@@ -38,6 +38,7 @@ if wf == "both":
     module analysis_workflow:
         snakefile:
             "Snakefile_analysis"
+        config: config
 
     use rule * from analysis_workflow as ana_*
 
