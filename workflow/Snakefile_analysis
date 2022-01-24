@@ -29,11 +29,11 @@ rule ana_all:
         expand("analysis/prokka/{JOBID}/{CLUSTERS}/{CLUSTERS}.{ext}", JOBID = JOBID, CLUSTERS = CLUSTERS, ext=[ "err", "fna", "faa", "gff", "gbk", "ffn", "sqn", "fsa", "tbl", "log", "txt", "tsv"]),
         expand("analysis/checkm/{JOBID}/{JOBID}_checkm.log", JOBID=JOBID),
         expand("analysis/{JOBID}_qual_MAGs.txt", JOBID = JOBID),
-        expand("analysis/kraken/{JOBID}/{JOBID}_{CLUSTERS}_report_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS),
-        expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level),
-        expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_GTDB_lookup.json", JOBID=JOBID, kraken_level = kraken_level),
-        expand("analysis/{JOBID}_seqkit_stats.tsv", JOBID=JOBID),
-        expand("analysis/plots/{JOBID}_bin_contigs.png", JOBID=JOBID)
+        #expand("analysis/kraken/{JOBID}/{JOBID}_{CLUSTERS}_report_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS),
+        #expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level),
+        #expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_GTDB_lookup.json", JOBID=JOBID, kraken_level = kraken_level),
+        #expand("analysis/{JOBID}_seqkit_stats.tsv", JOBID=JOBID),
+        #expand("analysis/plots/{JOBID}_bin_contigs.png", JOBID=JOBID)
 
 
 rule prokka:
