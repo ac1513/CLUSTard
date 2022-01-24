@@ -32,7 +32,7 @@ rule bin_all:
         expand("results/clusters/{JOBID}_unbinned_contigs.fa", JOBID=JOBID),
         expand("results/clusters/{JOBID}_singleton.fa", JOBID=JOBID),
         expand("logs/{JOBID}_binning_done.txt", JOBID=JOBID),
-        expand("{BIN_LOC}*.fasta", BIN_LOC=BIN_LOC)),
+        expand("{BIN_LOC}*.fasta", BIN_LOC=BIN_LOC),
 
 localrules: split_file, contig_len, binning_done
 
