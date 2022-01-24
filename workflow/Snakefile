@@ -51,7 +51,7 @@ if wf == "both":
     use rule kraken from analysis_workflow as update_kraken with:
         input: rules.in_bins.output
 
-    include: "Snakefile_plot"
+    # include: "Snakefile_plot"
 
 elif wf == "bin":
     rule all:
