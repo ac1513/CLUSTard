@@ -35,15 +35,15 @@ if wf == "both":
             expand("analysis/plots/{JOBID}_r_abun_plot.png", JOBID = JOBID)
 
     include: "Snakefile_bin"
-    include: "Snakefile_analysis"
-    # module analysis_workflow:
-    #     snakefile:
-    #         "Snakefile_analysis"
-    #
-    # use rule * from analysis_workflow as ana_*
-    #
-    # use rule in_bins from analysis_workflow as update_in_bins with:
-    #     input: rules
+    module analysis_workflow:
+        snakefile:
+            "Snakefile_analysis"
+
+    use rule * from analysis_workflow as ana_*
+
+    use rule in_bins from analysis_workflow as update_in_bins with:
+        input: rules.in_bins.output
+
     include: "Snakefile_plot"
 
 elif wf == "bin":
