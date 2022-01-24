@@ -36,6 +36,14 @@ if wf == "both":
 
     include: "Snakefile_bin"
     include: "Snakefile_analysis"
+    # module analysis_workflow:
+    #     snakefile:
+    #         "Snakefile_analysis"
+    #
+    # use rule * from analysis_workflow as ana_*
+    #
+    # use rule in_bins from analysis_workflow as update_in_bins with:
+    #     input: rules
     include: "Snakefile_plot"
 
 elif wf == "bin":
