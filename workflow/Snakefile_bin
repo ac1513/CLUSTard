@@ -404,4 +404,4 @@ rule in_bins:
         clusters = expand("{BIN_LOC}{{CLUSTERS}}.fasta", BIN_LOC=BIN_LOC)
     output:
         bins = touch(expand("{BIN_LOC}{{CLUSTERS}}.fasta", BIN_LOC=BIN_LOC)),
-        log = touch("logs/{JOBID}_bins_here.txt"),
+        log = touch("logs/{JOBID}_{{CLUSTERS}}_bins_here.txt"),
