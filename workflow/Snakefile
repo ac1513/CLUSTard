@@ -42,6 +42,7 @@ if wf == "both":
         config: config
 
     use rule * from analysis_workflow as ana_*
+
     (CLUSTERS,) = glob_wildcards(BIN_LOC + "{CLUSTERS}.fasta")
 
     use rule prokka from analysis_workflow as update_prokka with:
