@@ -65,7 +65,7 @@ rule prokka:
 
 rule checkm:
   input:
-      erules.in_bins.output
+      rules.in_bins.output
   output:
       log = expand("analysis/checkm/{JOBID}/{JOBID}_checkm.log", JOBID=JOBID),
       stats = expand("analysis/{JOBID}_unbinned_contigs_stats.tsv", JOBID = JOBID)
