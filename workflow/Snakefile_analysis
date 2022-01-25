@@ -30,7 +30,7 @@ rule ana_all:
         expand("analysis/checkm/{JOBID}/{JOBID}_checkm.log", JOBID=JOBID),
         expand("analysis/{JOBID}_qual_MAGs.txt", JOBID = JOBID),
         expand("analysis/kraken/{JOBID}/{JOBID}_{CLUSTERS}_report_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS),
-        # expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level),
+        expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level),
         # expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_GTDB_lookup.json", JOBID=JOBID, kraken_level = kraken_level),
         # expand("analysis/{JOBID}_seqkit_stats.tsv", JOBID=JOBID),
         # expand("analysis/plots/{JOBID}_bin_contigs.png", JOBID=JOBID)
@@ -123,19 +123,19 @@ rule kraken:
         kraken2 -db {params.db} --threads {threads} --report {output.report} --output {params.output} --use-names {input.files}
         """
 
-# rule kraken_merge:
-#     input:
-#         report = expand("analysis/kraken/{JOBID}/{JOBID}_{CLUSTERS}_report_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS)
-#     output:
-#         "analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out"
-#     params:
-#         level = kraken_level
-#     shell:
-#         """
-#         cd analysis/kraken/{wildcards.JOBID}
-#         find -name '{wildcards.JOBID}*_report_kraken.out' -type f -printf '\\n%p\\t' -exec sh -c 'echo {{}} | sort -k1nr {{}} | grep "\\t{params.level}\\t" | head -n1 ' \\; > {wildcards.JOBID}_{params.level}_top_kraken.out
-#         """
-#
+rule kraken_merge:
+    input:
+        report = expand("analysis/kraken/{JOBID}/{JOBID}_{CLUSTERS}_report_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS)
+    output:
+        "analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out"
+    params:
+        level = kraken_level
+    shell:
+        """
+        cd analysis/kraken/{wildcards.JOBID}
+        find -name '{wildcards.JOBID}*_report_kraken.out' -type f -printf '\\n%p\\t' -exec sh -c 'echo {{}} | sort -k1nr {{}} | grep "\\t{params.level}\\t" | head -n1 ' \\; > {wildcards.JOBID}_{params.level}_top_kraken.out
+        """
+
 # if GTDB == "Y":
 #     rule GTDB_download:
 #       input:

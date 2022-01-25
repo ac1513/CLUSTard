@@ -29,7 +29,7 @@ if wf == "both":
             expand("logs/{JOBID}_binning_done.txt", JOBID=JOBID),
             expand("logs/{JOBID}_binning_complete.txt", JOBID = JOBID),
             expand("analysis/{JOBID}_qual_MAGs.txt", JOBID = JOBID),
-            expand("analysis/kraken/{JOBID}/{JOBID}_{CLUSTERS}_report_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
+            expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level),
             # expand("analysis/{JOBID}_seqkit_stats.tsv", JOBID=JOBID),
             # expand("analysis/plots/{JOBID}_bin_contigs.png", JOBID=JOBID),
             # expand("analysis/{JOBID}_cluster_summary_stats.tsv", JOBID = JOBID),
