@@ -104,11 +104,12 @@ rule high_mags:
 rule kraken:
     input:
         expand("logs/{JOBID}_binning_done.txt", JOBID = JOBID)
+        files = expand("{BIN_LOC}{{CLUSTERS}}.fasta", BIN_LOC=BIN_LOC)
     output:
         report = "analysis/kraken/{JOBID}/{JOBID}_{CLUSTERS}_report_kraken.out",
     params:
         db = krakendb,
-        output = "analysis/kraken/{JOBID}/{JOBID}_{CLUSTERS}_kraken.out"
+        output = "analysis/kraken/{JOBID}/{JOBID}_{CLUSTERS}_kraken.out",
     conda:
         "envs/kraken2.yaml"
     threads:
