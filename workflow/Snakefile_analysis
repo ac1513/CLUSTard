@@ -39,8 +39,8 @@ rule ana_all:
 
 rule prokka:
     input:
-        expand("logs/{JOBID}_bins.txt", JOBID = JOBID),
-        expand("{BIN_LOC}{{CLUSTERS}}.fasta", BIN_LOC=BIN_LOC))
+        wait = expand("logs/{JOBID}_bins.txt", JOBID = JOBID),
+        clusters = expand("{BIN_LOC}{{CLUSTERS}}.fasta", BIN_LOC=BIN_LOC)
     output:
         file = expand("analysis/prokka/{{JOBID}}/{{CLUSTERS}}/{{CLUSTERS}}.{ext}", ext=[ "err", "fna", "faa", "gff", "gbk", "ffn", "sqn", "fsa", "tbl", "log", "txt", "tsv"])
     params:
