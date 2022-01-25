@@ -123,99 +123,99 @@ rule kraken:
         kraken2 -db {params.db} --threads {threads} --report {output.report} --output {params.output} --use-names {input.files}
         """
 
-rule kraken_merge:
-    input:
-        report = expand("analysis/kraken/{JOBID}/{JOBID}_{CLUSTERS}_report_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS)
-    output:
-        "analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out"
-    params:
-        level = kraken_level
-    shell:
-        """
-        cd analysis/kraken/{wildcards.JOBID}
-        find -name '{wildcards.JOBID}*_report_kraken.out' -type f -printf '\\n%p\\t' -exec sh -c 'echo {{}} | sort -k1nr {{}} | grep "\\t{params.level}\\t" | head -n1 ' \\; > {wildcards.JOBID}_{params.level}_top_kraken.out
-        """
-
-if GTDB == "Y":
-    rule GTDB_download:
-      input:
-        kraken_top = expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
-      output:
-        bac120_gtdb = temp(expand("tmp/gtdb/{gtdb_v_bac}", gtdb_v_bac = gtdb_v_bac)),
-        ar122_gtdb = temp(expand("tmp/gtdb/{gtdb_v_arc}", gtdb_v_arc = gtdb_v_arc))
-      params:
-        loc = "tmp/gtdb/",
-        link_bac = gtdb_v_tar_bac,
-        link_arc = gtdb_v_tar_arc
-      shell:
-        """
-        if wget -q --spider {params.link_bac}; then
-          wget -O {params.loc}bac120_metadata.tar.gz {params.link_bac}
-          tar -xf {params.loc}bac120_metadata.tar.gz -C {params.loc}
-        fi
-
-        if wget -q --spider {params.link_arc}; then
-          wget -O {params.loc}ar122_metadata.tar.gz {params.link_arc}
-          tar -xf {params.loc}ar122_metadata.tar.gz -C {params.loc}
-        fi
-        """
-
-    rule gtdb_lookup:
-      input:
-        bac120_gtdb = expand("tmp/gtdb/{gtdb_v_bac}", gtdb_v_bac = gtdb_v_bac),
-        ar122_gtdb = expand("tmp/gtdb/{gtdb_v_arc}", gtdb_v_arc = gtdb_v_arc),
-        kraken_top = expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
-      output:
-        json_lookup = "analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_GTDB_lookup.json"
-      params:
-        level = {kraken_level}
-      conda:
-            "envs/py3.yaml"
-      shell:
-        """
-        python workflow/scripts/python/gtdb_lookup.py {input.kraken_top} {params.level} {input.bac120_gtdb} {input.ar122_gtdb} {output.json_lookup}
-        """
-
-elif GTDB == "N":
-    rule empty_lookup:
-      input:
-        kraken_top = expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
-      output:
-        "analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_GTDB_lookup.json"
-      shell:
-        """
-        touch {output}
-        """
-
-rule seqkit:
-  input:
-      wait_for = expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_GTDB_lookup.json", JOBID = JOBID, kraken_level = kraken_level),
-  output:
-      "analysis/{JOBID}_seqkit_stats.tsv"
-  params:
-      binning_loc = BIN_LOC
-  conda:
-      "envs/py3.yaml"
-  threads:
-      10
-  shell:
-      """
-      seqkit stats -a -T -j {threads} {params.binning_loc}*.fasta > {output}
-      """
-
-rule bin_plot:
-    input:
-        checkm_unbin = expand("analysis/{JOBID}_unbinned_contigs_stats.tsv", JOBID = JOBID)
-    output:
-        contig_plot = "analysis/plots/{JOBID}_bin_contigs.png",
-        sorted_lengths = "analysis/{JOBID}_sorted_lengths.tsv"
-    params:
-        binning_dir = BIN_LOC,
-        out_loc = "analysis/plots/"
-    conda:
-        "envs/py3.yaml"
-    shell:
-        """
-        cat {params.binning_dir}*.fasta | awk '$0 ~ ">" {{print c; c=0;printf substr($0,2,100) "\\t"; }} $0 !~ ">" {{c+=length($0);}} END {{ print c; }}' | sort | uniq > {output.sorted_lengths}
-        python workflow/scripts/python/bin_plot.py {input.checkm_unbin} {output.sorted_lengths} {params.out_loc} {wildcards.JOBID}
-        """
+# rule kraken_merge:
+#     input:
+#         report = expand("analysis/kraken/{JOBID}/{JOBID}_{CLUSTERS}_report_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS)
+#     output:
+#         "analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out"
+#     params:
+#         level = kraken_level
+#     shell:
+#         """
+#         cd analysis/kraken/{wildcards.JOBID}
+#         find -name '{wildcards.JOBID}*_report_kraken.out' -type f -printf '\\n%p\\t' -exec sh -c 'echo {{}} | sort -k1nr {{}} | grep "\\t{params.level}\\t" | head -n1 ' \\; > {wildcards.JOBID}_{params.level}_top_kraken.out
+#         """
+#
+# if GTDB == "Y":
+#     rule GTDB_download:
+#       input:
+#         kraken_top = expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
+#       output:
+#         bac120_gtdb = temp(expand("tmp/gtdb/{gtdb_v_bac}", gtdb_v_bac = gtdb_v_bac)),
+#         ar122_gtdb = temp(expand("tmp/gtdb/{gtdb_v_arc}", gtdb_v_arc = gtdb_v_arc))
+#       params:
+#         loc = "tmp/gtdb/",
+#         link_bac = gtdb_v_tar_bac,
+#         link_arc = gtdb_v_tar_arc
+#       shell:
+#         """
+#         if wget -q --spider {params.link_bac}; then
+#           wget -O {params.loc}bac120_metadata.tar.gz {params.link_bac}
+#           tar -xf {params.loc}bac120_metadata.tar.gz -C {params.loc}
+#         fi
+#
+#         if wget -q --spider {params.link_arc}; then
+#           wget -O {params.loc}ar122_metadata.tar.gz {params.link_arc}
+#           tar -xf {params.loc}ar122_metadata.tar.gz -C {params.loc}
+#         fi
+#         """
+#
+#     rule gtdb_lookup:
+#       input:
+#         bac120_gtdb = expand("tmp/gtdb/{gtdb_v_bac}", gtdb_v_bac = gtdb_v_bac),
+#         ar122_gtdb = expand("tmp/gtdb/{gtdb_v_arc}", gtdb_v_arc = gtdb_v_arc),
+#         kraken_top = expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
+#       output:
+#         json_lookup = "analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_GTDB_lookup.json"
+#       params:
+#         level = {kraken_level}
+#       conda:
+#             "envs/py3.yaml"
+#       shell:
+#         """
+#         python workflow/scripts/python/gtdb_lookup.py {input.kraken_top} {params.level} {input.bac120_gtdb} {input.ar122_gtdb} {output.json_lookup}
+#         """
+#
+# elif GTDB == "N":
+#     rule empty_lookup:
+#       input:
+#         kraken_top = expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
+#       output:
+#         "analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_GTDB_lookup.json"
+#       shell:
+#         """
+#         touch {output}
+#         """
+#
+# rule seqkit:
+#   input:
+#       wait_for = expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_GTDB_lookup.json", JOBID = JOBID, kraken_level = kraken_level),
+#   output:
+#       "analysis/{JOBID}_seqkit_stats.tsv"
+#   params:
+#       binning_loc = BIN_LOC
+#   conda:
+#       "envs/py3.yaml"
+#   threads:
+#       10
+#   shell:
+#       """
+#       seqkit stats -a -T -j {threads} {params.binning_loc}*.fasta > {output}
+#       """
+#
+# rule bin_plot:
+#     input:
+#         checkm_unbin = expand("analysis/{JOBID}_unbinned_contigs_stats.tsv", JOBID = JOBID)
+#     output:
+#         contig_plot = "analysis/plots/{JOBID}_bin_contigs.png",
+#         sorted_lengths = "analysis/{JOBID}_sorted_lengths.tsv"
+#     params:
+#         binning_dir = BIN_LOC,
+#         out_loc = "analysis/plots/"
+#     conda:
+#         "envs/py3.yaml"
+#     shell:
+#         """
+#         cat {params.binning_dir}*.fasta | awk '$0 ~ ">" {{print c; c=0;printf substr($0,2,100) "\\t"; }} $0 !~ ">" {{c+=length($0);}} END {{ print c; }}' | sort | uniq > {output.sorted_lengths}
+#         python workflow/scripts/python/bin_plot.py {input.checkm_unbin} {output.sorted_lengths} {params.out_loc} {wildcards.JOBID}
+#         """
