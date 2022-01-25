@@ -400,6 +400,7 @@ rule binning_done:
 
 rule in_bins:
     input:
-        clusters = expand("{BIN_LOC}{CLUSTERS}.fasta", BIN_LOC=BIN_LOC, CLUSTERS=CLUSTERS)
+        clusters = expand("{BIN_LOC}{CLUSTERS}.fasta", BIN_LOC=BIN_LOC, CLUSTERS=CLUSTERS),
+        wait = expand("logs/{JOBID}_binning_done.txt", JOBID=JOBID)
     output:
         bins = touch("logs/{JOBID}_binning_complete.txt")
