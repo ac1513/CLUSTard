@@ -53,7 +53,7 @@ if wf == "both":
 
     rule analysis_done:
         input:
-            analysis(expand("analysis/plots/{JOBID}_bin_contigs.png", JOBID=JOBID))
+            analysis(expand("logs/{JOBID}_ana_done.txt", JOBID = JOBID)))
         output:
             touch("logs/{JOBID}_analysis_done.txt")
 
