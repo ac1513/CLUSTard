@@ -26,8 +26,8 @@ wf = "both"
 if wf == "both":
     rule all:
         input:
-            expand("logs/{JOBID}_bins.txt"),
-            expand("logs/{JOBID}_analysis_done.txt")
+            expand("logs/{JOBID}_bins.txt", JOBID = JOBID),
+            expand("logs/{JOBID}_analysis_done.txt", JOBID = JOBID)
 
     subworkflow binning:
         snakefile:
