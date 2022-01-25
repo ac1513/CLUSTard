@@ -42,7 +42,7 @@ if wf == "both":
             "Snakefile_analysis"
         config: config
 
-    use rule * from analysis_workflow as ana_*
+    # use rule * from analysis_workflow as ana_*
 
     (CLUSTERS,) = glob_wildcards(BIN_LOC + "{CLUSTERS}.fasta")
 
