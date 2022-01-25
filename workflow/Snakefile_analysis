@@ -40,7 +40,7 @@ rule collate:
     input:
         "logs/{JOBID}_binning_complete.txt"
     output:
-        touch("{BIN_LOC}{{CLUSTERS}}.fasta", BIN_LOC=BIN_LOC))
+        touch("{BIN_LOC}{{CLUSTERS}}.fasta", BIN_LOC=BIN_LOC)
 
 rule prokka:
     input:
