@@ -26,19 +26,30 @@ wf = "both"
 if wf == "both":
     rule all:
         input:
-            expand("logs/{JOBID}_binning_done.txt", JOBID=JOBID),
-            expand("logs/{JOBID}_binning_complete.txt", JOBID = JOBID),
-            expand("analysis/{JOBID}_qual_MAGs.txt", JOBID = JOBID),
-            expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level),
-            # expand("analysis/{JOBID}_seqkit_stats.tsv", JOBID=JOBID),
-            # expand("analysis/plots/{JOBID}_bin_contigs.png", JOBID=JOBID),
-            # expand("analysis/{JOBID}_cluster_summary_stats.tsv", JOBID = JOBID),
-            # expand("analysis/plots/1_{JOBID}_{kraken_level}_plot.png", JOBID = JOBID, kraken_level = kraken_level),
-            # expand("analysis/plots/{JOBID}_r_abun_plot.png", JOBID = JOBID)
 
-    include: "Snakefile_bin"
-    include: "Snakefile_analysis"
+    subworkflow binning:
+        snakefile:
+            "Snakefile_bin"
 
+    rule bin_done:
+        input:
+            binning(expand("logs/{JOBID}_binning_done.txt", JOBID = JOBID))
+        output:
+            touch("logs/{JOBID}_bins.txt")
+        shell:
+            """
+            echo "Binning pipeline has completed, now starting analysis pipeline"
+            """
+
+    subworkflow analysis:
+        snakefile:
+            "Snakefile_analysis"
+
+    rule analysis_done:
+        input:
+            analysis(expand("analysis/{JOBID}_sorted_lengths.tsv", JOBID = JOBID))
+        output:
+            touch("logs/{JOBID}_analysis_done.txt")
 
     # include: "Snakefile_plot"
 
