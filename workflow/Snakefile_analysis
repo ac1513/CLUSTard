@@ -32,20 +32,15 @@ rule ana_all:
         expand("analysis/{JOBID}_qual_MAGs.txt", JOBID = JOBID),
         expand("analysis/kraken/{JOBID}/{JOBID}_{CLUSTERS}_report_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS),
         expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level),
-        # expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_GTDB_lookup.json", JOBID=JOBID, kraken_level = kraken_level),
-        # expand("analysis/{JOBID}_seqkit_stats.tsv", JOBID=JOBID),
-        # expand("analysis/plots/{JOBID}_bin_contigs.png", JOBID=JOBID)
+        expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_GTDB_lookup.json", JOBID=JOBID, kraken_level = kraken_level),
+        expand("analysis/{JOBID}_seqkit_stats.tsv", JOBID=JOBID),
+        expand("analysis/plots/{JOBID}_bin_contigs.png", JOBID=JOBID)
 
-
-rule collate:
-    input:
-        "logs/{JOBID}_bins.txt"
-    output:
-        touch(expand("{BIN_LOC}{{CLUSTERS}}.fasta", BIN_LOC=BIN_LOC))
 
 rule prokka:
     input:
-        rules.collate.output
+        expand("logs/{JOBID}_bins.txt", JOBID = JOBID),
+        expand("{BIN_LOC}{{CLUSTERS}}.fasta", BIN_LOC=BIN_LOC))
     output:
         file = expand("analysis/prokka/{{JOBID}}/{{CLUSTERS}}/{{CLUSTERS}}.{ext}", ext=[ "err", "fna", "faa", "gff", "gbk", "ffn", "sqn", "fsa", "tbl", "log", "txt", "tsv"])
     params:
@@ -65,8 +60,7 @@ rule prokka:
 
 rule checkm:
   input:
-      expand("{BIN_LOC}{CLUSTERS}.fasta", BIN_LOC = BIN_LOC, CLUSTERS = CLUSTERS),
-      wait_for = expand("analysis/prokka/{JOBID}/{CLUSTERS}/{CLUSTERS}.faa", JOBID = JOBID, CLUSTERS = CLUSTERS)
+      expand("logs/{JOBID}_bins.txt", JOBID = JOBID)
   output:
       log = expand("analysis/checkm/{JOBID}/{JOBID}_checkm.log", JOBID=JOBID),
       stats = expand("analysis/{JOBID}_unbinned_contigs_stats.tsv", JOBID = JOBID)
@@ -107,7 +101,7 @@ rule high_mags:
 
 rule kraken:
     input:
-        rules.collate.output
+        expand("logs/{JOBID}_bins.txt", JOBID = JOBID)
     output:
         report = "analysis/kraken/{JOBID}/{JOBID}_{CLUSTERS}_report_kraken.out",
     params:
