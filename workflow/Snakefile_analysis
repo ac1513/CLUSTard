@@ -35,6 +35,8 @@ rule ana_all:
         expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_GTDB_lookup.json", JOBID=JOBID, kraken_level = kraken_level),
         expand("analysis/{JOBID}_seqkit_stats.tsv", JOBID=JOBID),
         expand("analysis/plots/{JOBID}_bin_contigs.png", JOBID=JOBID)
+    output:
+        touch(expand("logs/{JOBID}_ana_done.txt", JOBID = JOBID))
 
 
 rule prokka:
