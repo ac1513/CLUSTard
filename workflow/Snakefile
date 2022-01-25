@@ -32,6 +32,8 @@ if wf == "both":
     subworkflow binning:
         snakefile:
             "Snakefile_bin"
+        workdir:
+            "."
 
     rule bin_done:
         input:
@@ -46,6 +48,8 @@ if wf == "both":
     subworkflow analysis:
         snakefile:
             "Snakefile_analysis"
+        workdir:
+            "."
 
     rule analysis_done:
         input:
