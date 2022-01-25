@@ -33,7 +33,7 @@ if wf == "both":
         snakefile:
             "Snakefile_bin"
         workdir:
-            "."
+            ".."
 
     rule bin_done:
         input:
@@ -49,7 +49,7 @@ if wf == "both":
         snakefile:
             "Snakefile_analysis"
         workdir:
-            "."
+            ".."
 
     rule analysis_done:
         input:
