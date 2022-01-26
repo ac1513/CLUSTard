@@ -60,7 +60,12 @@ if wf == "both":
         output:
             touch("logs/{JOBID}_analysis_done.txt")
 
-    include: "Snakefile_plot"
+    module plot_wf:
+        snakefile:
+            "Snakefile_plot"
+        config: config
+
+    use rule * from plot_wf as plot_*
 
 elif wf == "bin":
     rule all:
