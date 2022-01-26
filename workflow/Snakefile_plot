@@ -22,6 +22,7 @@ rule plot_all:
 
 rule clus_stats:
     input:
+        wait = expand("logs/{JOBID}_analysis_done.txt", JOBID = JOBID),
         checkm = expand("analysis/checkm/{JOBID}/{JOBID}_checkm.log", JOBID=JOBID),
         seqk = expand("analysis/{JOBID}_seqkit_stats.tsv", JOBID=JOBID),
         kraken = expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level),
@@ -60,6 +61,7 @@ rule plot:
 
 rule abun_plot:
     input:
+        wait = expand("logs/{JOBID}_analysis_done.txt", JOBID = JOBID),
         kraken_in = expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
     output:
         plot_out = "analysis/plots/{JOBID}_r_abun_plot.png"
