@@ -1,3 +1,5 @@
+configfile: "config/config.yaml"
+
 
 JOBID = config["JOBID"] # this can be different from binning pipeline
 REFIN = config["REFIN"]
