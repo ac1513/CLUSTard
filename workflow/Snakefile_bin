@@ -168,7 +168,7 @@ rule abs_derive:
         "envs/py3.yaml"
     shell:
         """
-        python workflow/scripts/python/gen_abs_counts_csv.py {input.coabunts} {wildcards.JOBID} {params.thresh}
+        python workflow/scripts/python/gen_abs_counts_csv.py {input.counts} {wildcards.JOBID} {params.thresh}
         """
 
 rule derive:
