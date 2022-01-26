@@ -131,7 +131,7 @@ rule kraken_merge:
     shell:
         """
         cd analysis/kraken/{wildcards.JOBID}
-        find -name '{wildcards.JOBID}*_report_kraken.out' -type f -printf '\\n%p\\t' -exec sh -c 'echo {{}} | sort -k1nr {{}} | grep "\\t{params.level}\\t" | head -n1 ' \\; > {wildcards.JOBID}_{params.level}_top_kraken.out
+        find -name '{wildcards.JOBID}*_report_kraken.out' -type f -printf '\\n%p\\t' -exec sh -c 'echo {{}} | sort -k1nr {{}} | grep -E "\\W{params.level}\\W" | head -n1 ' \\; > {wildcards.JOBID}_{params.level}_top_kraken.out
         """
 
 if GTDB == "Y":
@@ -139,8 +139,8 @@ if GTDB == "Y":
       input:
         kraken_top = expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
       output:
-        bac120_gtdb = temp(expand("tmp/gtdb/{gtdb_v_bac}", gtdb_v_bac = gtdb_v_bac)),
-        ar122_gtdb = temp(expand("tmp/gtdb/{gtdb_v_arc}", gtdb_v_arc = gtdb_v_arc))
+        bac120_gtdb = expand("tmp/gtdb/{gtdb_v_bac}", gtdb_v_bac = gtdb_v_bac),
+        ar122_gtdb = expand("tmp/gtdb/{gtdb_v_arc}", gtdb_v_arc = gtdb_v_arc)
       params:
         loc = "tmp/gtdb/",
         link_bac = gtdb_v_tar_bac,
