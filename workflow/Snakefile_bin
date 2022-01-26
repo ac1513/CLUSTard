@@ -168,12 +168,13 @@ rule abs_derive:
         "envs/py3.yaml"
     shell:
         """
-        python workflow/scripts/python/gen_abs_counts_csv.py {input.counts} {wildcards.JOBID} {params.thresh}
+        python workflow/scripts/python/gen_abs_counts_csv.py {input.coabunts} {wildcards.JOBID} {params.thresh}
         """
 
 rule derive:
     input:
-        expand('results/clustering/{JOBID}_merged_counts.tsv', JOBID=JOBID)
+        expand('results/clustering/{JOBID}_merged_counts.tsv', JOBID=JOBID),
+        wait = expand("results/clustering/{JOBID}_read_counts_absolute.csv", JOBID = JOBID)
     output:
         csv = "results/clustering/{JOBID}_read_counts_derived.csv"
     params:
