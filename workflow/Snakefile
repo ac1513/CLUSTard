@@ -60,12 +60,16 @@ if wf == "both":
         output:
             touch("logs/{JOBID}_analysis_done.txt")
 
-    module plot_wf:
+    subworkflow plot_wf:
         snakefile:
             "Snakefile_plot"
-        config: config
+        workdir:
+            ".."
 
-    use rule * from plot_wf as plot_*
+    rule plot_done:
+        input: plot_wf(expand("logs/{JOBID}_plot_done.txt", JOBID = JOBID))
+        output:
+            touch("logs/{JOBID}_plot_done.txt")
 
 elif wf == "bin":
     rule all:

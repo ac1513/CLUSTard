@@ -18,6 +18,8 @@ rule plot_all:
         expand("analysis/{JOBID}_cluster_summary_stats.tsv", JOBID = JOBID),
         expand("analysis/plots/1_{JOBID}_{kraken_level}_plot.png", JOBID = JOBID, kraken_level = kraken_level),
         expand("analysis/plots/{JOBID}_r_abun_plot.png", JOBID = JOBID)
+    output:
+        touch(expand("logs/{JOBID}_plot_done.txt", JOBID = JOBID))
 
 
 rule clus_stats:
