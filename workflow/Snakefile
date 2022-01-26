@@ -65,7 +65,7 @@ if wf == "both":
             ".."
 
     rule plot_done:
-        input: plot_wf(expand("logs/{JOBID}_plot_done.txt", JOBID = JOBID))
+        input: plot_wf(expand("logs/{JOBID}_plot.txt", JOBID = JOBID))
         output:
             touch("logs/{JOBID}_plot_done.txt")
 

@@ -21,7 +21,7 @@ rule plot_all:
         expand("analysis/plots/1_{JOBID}_{kraken_level}_plot.png", JOBID = JOBID, kraken_level = kraken_level),
         expand("analysis/plots/{JOBID}_r_abun_plot.png", JOBID = JOBID)
     output:
-        touch(expand("logs/{JOBID}_plot_done.txt", JOBID = JOBID))
+        touch(expand("logs/{JOBID}_plot.txt", JOBID = JOBID))
 
 
 rule clus_stats:
