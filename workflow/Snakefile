@@ -28,6 +28,8 @@ if wf == "both":
         input:
             expand("logs/{JOBID}_bins.txt", JOBID = JOBID),
             expand("logs/{JOBID}_analysis_done.txt", JOBID = JOBID),
+            expand("analysis/{JOBID}_cluster_summary_stats.tsv", JOBID = JOBID),
+            expand("analysis/plots/1_{JOBID}_{kraken_level}_plot.png", JOBID = JOBID, kraken_level = kraken_level),
             expand("analysis/plots/{JOBID}_r_abun_plot.png", JOBID = JOBID)
 
     subworkflow binning:
