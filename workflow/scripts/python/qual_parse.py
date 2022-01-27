@@ -14,7 +14,6 @@ import argparse
 import os
 from shutil import copyfile
 
-
 def qual_cluster(comp, cont):
     if (comp >90) and (cont<5):
         qual = "high"
@@ -54,9 +53,9 @@ NA = checkm_df[checkm_df['qual'].str.contains("NA")].index.values.tolist()
 # =============================================================================
 
 high_qual_clusters= []
-
+# near_comp_clusters = []
 for cluster in high_clusters:
-    loc = str(prok_loc + cluster + '/*.log')
+    loc = str(prok_loc + cluster + '/*.tsv')
     for name in glob.glob(loc):
         prok_file = name
         with open(prok_file, 'r') as prokka_in:
@@ -103,11 +102,11 @@ for cluster in high_clusters:
                     trna_set.add("tRNA-Tyr")
                 if "tRNA-Val" in line:
                     trna_set.add("tRNA-Val")
-                if "5S ribosomal RNA" in line:
+                if ("5S ribosomal RNA" in line) and ("partial" not in line):
                     rna_set.add('5S')
-                if "16S ribosomal RNA" in line:
+                if ("16S ribosomal RNA" in line) and ("partial" not in line):
                     rna_set.add('16S')
-                if "23S ribosomal RNA" in line:
+                if ("23S ribosomal RNA" in line) and ("partial" not in line):
                     rna_set.add('23s')
     if (len(trna_set) >= 18) and (len(rna_set) == 3):
         high_qual_clusters.append(cluster)
@@ -120,6 +119,7 @@ for cluster in high_clusters:
 location = bin_loc
 new_loc = "analysis/genome_bins/" + job_id + "/"
 os.makedirs(new_loc + "high_qual", exist_ok=True)
+# os.makedirs(new_loc + "near_comp", exist_ok=True)
 os.makedirs(new_loc + "med_qual", exist_ok=True)
 os.makedirs(new_loc + "low_qual", exist_ok=True)
 
