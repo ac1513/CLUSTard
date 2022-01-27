@@ -33,7 +33,7 @@ parser.add_argument('bin_loc', help='directory containing fasta files for all cl
 parser.add_argument('jobid', help='prefix for current jobs', type=str)
 
 args = parser.parse_args()
-out_loc = args.output
+output = args.output
 checkm_log = args.checkm_log
 prok_loc = args.prok_loc
 bin_loc = args.bin_loc
