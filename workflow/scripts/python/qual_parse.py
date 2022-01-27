@@ -53,7 +53,7 @@ NA = checkm_df[checkm_df['qual'].str.contains("NA")].index.values.tolist()
 # =============================================================================
 
 high_qual_clusters= []
-# near_comp_clusters = []
+near_comp_clusters = []
 for cluster in high_clusters:
     loc = str(prok_loc + cluster + '/*.tsv')
     for name in glob.glob(loc):
@@ -111,7 +111,7 @@ for cluster in high_clusters:
     if (len(trna_set) >= 18) and (len(rna_set) == 3):
         high_qual_clusters.append(cluster)
     else:
-        med_qual_clusters.append(cluster) # adds high qual that fail trna/rna
+        near_comp_clusters.append(cluster) # adds high qual that fail trna/rna
 # =============================================================================
 # COPYING FILES INTO QUAL DIRECTORIES
 # =============================================================================
@@ -119,13 +119,18 @@ for cluster in high_clusters:
 location = bin_loc
 new_loc = "analysis/genome_bins/" + job_id + "/"
 os.makedirs(new_loc + "high_qual", exist_ok=True)
-# os.makedirs(new_loc + "near_comp", exist_ok=True)
+os.makedirs(new_loc + "near_comp", exist_ok=True)
 os.makedirs(new_loc + "med_qual", exist_ok=True)
 os.makedirs(new_loc + "low_qual", exist_ok=True)
+os.makedirs(new_loc + "failed", exist_ok=True)
 
 for high in high_qual_clusters:
     file = location + high + ".fasta"
     copyfile(file, new_loc +"high_qual/"+high+".fasta")
+
+for nc in near_comp_clusters:
+    file = location + nc + ".fasta"
+    copyfile(file, new_loc +"near_comp/"+nc+".fasta")
 
 for med in med_qual_clusters:
     file = location + med + ".fasta"
@@ -135,6 +140,10 @@ for low in low_qual_clusters:
     file = location + low + ".fasta"
     copyfile(file, new_loc+"low_qual/"+low+".fasta")
 
+for NA_bin in NA:
+    file = location + NA_bin + ".fasta"
+    copyfile(file, new_loc+"failed/"+nc+".fasta")
+
 # =============================================================================
 # OUTPUT CREATED HERE
 # =============================================================================
@@ -143,6 +152,7 @@ print("-" * 12)
 print(" NUMBER MAGs")
 print("-" * 12)
 print("High Qual:", len(high_qual_clusters))
+print("Near Comp:", len(near_comp_clusters))
 print("Med Qual:", len(med_qual_clusters))
 print("Low Qual:", len(low_qual_clusters))
 print("NA:", len(NA), "\n")
@@ -150,6 +160,7 @@ print("-" * 12)
 print(" MAG IDs")
 print("-" * 12)
 print("High Qual:", high_qual_clusters , "\n")
+print("Near Comp:", near_comp_clusters)
 print("Med Qual:", med_qual_clusters, "\n")
 print("Low Qual:", low_qual_clusters, "\n")
 print("NA:", NA, "\n")
