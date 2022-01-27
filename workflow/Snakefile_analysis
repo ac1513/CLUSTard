@@ -99,7 +99,7 @@ rule high_mags:
         "envs/py3.yaml"
     shell:
         """
-        python workflow/scripts/python/qual_parse.py {input.checkm} {params.prokka} {params.bin_loc} {params.jobid} > {output.txt}
+        python workflow/scripts/python/qual_parse.py {params.out_loc} {input.checkm} {params.prokka} {params.bin_loc} {params.jobid} > {output.txt}
         """
 
 rule kraken:
