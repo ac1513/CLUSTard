@@ -86,7 +86,7 @@ rule checkm:
 
 rule high_mags:
     input:
-        prokka = expand("analysis/prokka/{JOBID}/{CLUSTERS}/{CLUSTERS}.{ext}", ext=[ "err", "fna", "faa", "gff", "gbk", "ffn", "sqn", "fsa", "tbl", "log", "txt", "tsv"], CLUSTERS = CLUSTERS, JOBID = JOBID),
+        prokka = expand("analysis/prokka/{JOBID}/{CLUSTERS}/{CLUSTERS}.{ext}", ext=["tsv"], CLUSTERS = CLUSTERS, JOBID = JOBID),
         checkm = expand("analysis/checkm/{JOBID}/{JOBID}_checkm.log", JOBID=JOBID)
     output:
         txt = "analysis/genome_bins/{JOBID}_qual_MAGs.txt"
