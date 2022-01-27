@@ -26,12 +26,14 @@ def qual_cluster(comp, cont):
     return qual
 
 parser = argparse.ArgumentParser(description='')
+parser.add_argument('output', help='output directory for the organised bins', type=str)
 parser.add_argument('checkm_log', help='checkm output log file (TAB SEPARATED', type=str)
 parser.add_argument('prok_loc', help='directory containing all prokka output for all clusters', type=str)
 parser.add_argument('bin_loc', help='directory containing fasta files for all clusters', type=str)
 parser.add_argument('jobid', help='prefix for current jobs', type=str)
 
 args = parser.parse_args()
+out_loc = args.output
 checkm_log = args.checkm_log
 prok_loc = args.prok_loc
 bin_loc = args.bin_loc
@@ -117,7 +119,7 @@ for cluster in high_clusters:
 # =============================================================================
 
 location = bin_loc
-new_loc = "analysis/genome_bins/" + job_id + "/"
+new_loc = output + job_id + "/"
 os.makedirs(new_loc + "high_qual", exist_ok=True)
 os.makedirs(new_loc + "near_comp", exist_ok=True)
 os.makedirs(new_loc + "med_qual", exist_ok=True)

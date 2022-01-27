@@ -93,7 +93,8 @@ rule high_mags:
     params:
         prokka = expand("analysis/prokka/{JOBID}/", JOBID = JOBID),
         bin_loc = BIN_LOC,
-        jobid = JOBID
+        jobid = JOBID,
+        out_loc = "analysis/genome_bins/"
     conda :
         "envs/py3.yaml"
     shell:
