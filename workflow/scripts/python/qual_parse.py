@@ -119,7 +119,7 @@ for cluster in high_clusters:
 # =============================================================================
 
 location = bin_loc
-new_loc = output + job_id + "/"
+new_loc = output + "/" + job_id + "/"
 os.makedirs(new_loc + "high_qual", exist_ok=True)
 os.makedirs(new_loc + "near_comp", exist_ok=True)
 os.makedirs(new_loc + "med_qual", exist_ok=True)
