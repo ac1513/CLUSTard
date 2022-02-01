@@ -38,6 +38,12 @@ rule ana_all:
     output:
         touch(expand("logs/{JOBID}_ana_done.txt", JOBID = JOBID))
 
+module MAGqual:
+  snakefile:
+      github("Chong-Lab-UoY/MAGqual", path= "workflow/Snakefile", tag = "v0.0.1=alpha")
+  config:
+
+use rule * from MAGqual as MAGqual_*
 
 rule prokka:
     input:
