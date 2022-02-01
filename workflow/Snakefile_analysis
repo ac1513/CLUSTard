@@ -40,7 +40,8 @@ rule ana_all:
 
 module MAGqual:
   snakefile:
-      github("Chong-Lab-UoY/MAGqual", path= "workflow/Snakefile", tag = "v0.0.1-alpha.1")
+      "../MAGqual/workflow/Snakefile"
+      #github("Chong-Lab-UoY/MAGqual", path= "workflow/Snakefile", tag = "v0.0.1-alpha.1")
 
 use rule * from MAGqual as MAGqual_*
 
