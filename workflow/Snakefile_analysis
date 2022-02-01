@@ -41,7 +41,6 @@ rule ana_all:
 module MAGqual:
   snakefile:
       github("Chong-Lab-UoY/MAGqual", path= "workflow/Snakefile", tag = "v0.0.1=alpha")
-  config:
 
 use rule * from MAGqual as MAGqual_*
 
