@@ -38,12 +38,13 @@ rule ana_all:
     output:
         touch(expand("logs/{JOBID}_ana_done.txt", JOBID = JOBID))
 
-module MAGqual:
+subworkflow MAGqual:
   snakefile:
       "../../MAGqual/workflow/Snakefile"
       #github("Chong-Lab-UoY/MAGqual", path= "workflow/Snakefile", tag = "v0.0.1-alpha.1")
+  workdir:
+      ..
 
-use rule * from MAGqual as MAGqual_*
 
 # rule prokka:
 #     input:
@@ -210,7 +211,7 @@ rule seqkit:
 
 rule bin_plot:
     input:
-        checkm_unbin = expand("analysis/{JOBID}_unbinned_contigs_stats.tsv", JOBID = JOBID)
+        checkm_unbin = MAGqual(expand("analysis/{JOBID}_unbinned_contigs_stats.tsv", JOBID = JOBID))
     output:
         contig_plot = "analysis/plots/{JOBID}_bin_contigs.png",
         sorted_lengths = "analysis/{JOBID}_sorted_lengths.tsv"
