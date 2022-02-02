@@ -43,7 +43,7 @@ subworkflow MAGqual:
       "../../MAGqual/workflow/Snakefile"
       #github("Chong-Lab-UoY/MAGqual", path= "workflow/Snakefile", tag = "v0.0.1-alpha.1")
   workdir:
-      ..
+      ".."
 
 
 # rule prokka:
