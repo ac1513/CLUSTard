@@ -30,6 +30,7 @@ rule ana_all:
         #expand("analysis/prokka/{JOBID}/{CLUSTERS}/{CLUSTERS}.{ext}", JOBID = JOBID, CLUSTERS = CLUSTERS, ext=[ "err", "fna", "faa", "gff", "gbk", "ffn", "sqn", "fsa", "tbl", "log", "txt", "tsv"]),
         #expand("analysis/checkm/{JOBID}/{JOBID}_checkm.log", JOBID=JOBID),
         #expand("analysis/genome_bins/{JOBID}_qual_MAGs.txt", JOBID = JOBID),
+        expand("analysis/{JOBID}_unbinned_contigs_stats.tsv", JOBID = JOBID),
         expand("analysis/kraken/{JOBID}/{JOBID}_{CLUSTERS}_report_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS),
         expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level),
         expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_GTDB_lookup.json", JOBID=JOBID, kraken_level = kraken_level),
@@ -66,31 +67,29 @@ subworkflow MAGqual:
 #         prokka {params.prokka} --outdir {params.dir} --prefix {params.prefix} --cpus {threads} --force
 #         rm {params.prokka}
 #         """
-#
-# rule checkm:
-#   input:
-#       expand("logs/{JOBID}_binning_done.txt", JOBID = JOBID)
-#   output:
-#       log = expand("analysis/checkm/{JOBID}/{JOBID}_checkm.log", JOBID=JOBID),
-#       stats = expand("analysis/{JOBID}_unbinned_contigs_stats.tsv", JOBID = JOBID)
-#   params:
-#       out = expand("analysis/checkm/{JOBID}", JOBID=JOBID),
-#       input = BIN_LOC,
-#       refin = REFIN,
-#       checkmdb = checkmdb,
-#       jobid = JOBID
-#   threads:
-#       20
-#   conda:
-#       "envs/checkm.yaml"
-#   shell:
-#       """
-#       checkm_db={params.checkmdb}
-#       echo ${{checkm_db}} | checkm data setRoot ${{checkm_db}}
-#       checkm unbinned -x fasta {params.input} {params.refin} analysis/{params.jobid}_unbinned_contigs.fa analysis/{params.jobid}_unbinned_contigs_stats.tsv
-#       checkm lineage_wf -f {output.log} --tab_table -x fasta -t {threads} {params.input} {params.out}
-#       """
-#
+
+rule checkm_unbin:
+  input:
+      expand("logs/{JOBID}_binning_done.txt", JOBID = JOBID)
+  output:
+      stats = expand("analysis/{JOBID}_unbinned_contigs_stats.tsv", JOBID = JOBID)
+  params:
+      out = expand("analysis/checkm/{JOBID}", JOBID=JOBID),
+      input = BIN_LOC,
+      refin = REFIN,
+      checkmdb = checkmdb,
+      jobid = JOBID
+  threads:
+      20
+  conda:
+      "envs/checkm.yaml"
+  shell:
+      """
+      checkm_db={params.checkmdb}
+      echo ${{checkm_db}} | checkm data setRoot ${{checkm_db}}
+      checkm unbinned -x fasta {params.input} {params.refin} analysis/{params.jobid}_unbinned_contigs.fa analysis/{params.jobid}_unbinned_contigs_stats.tsv
+      """
+
 # rule high_mags:
 #     input:
 #         prokka = expand("analysis/prokka/{JOBID}/{CLUSTERS}/{CLUSTERS}.{ext}", ext=["tsv"], CLUSTERS = CLUSTERS, JOBID = JOBID),
@@ -211,7 +210,8 @@ rule seqkit:
 
 rule bin_plot:
     input:
-        checkm_unbin = MAGqual(expand("analysis/{JOBID}_unbinned_contigs_stats.tsv", JOBID = JOBID))
+        checkm_unbin = expand("analysis/{JOBID}_unbinned_contigs_stats.tsv", JOBID = JOBID),
+        mag_qual = MAGqual(expand("analysis/{JOBID}_qual_MAGs.txt", JOBID = JOBID))
     output:
         contig_plot = "analysis/plots/{JOBID}_bin_contigs.png",
         sorted_lengths = "analysis/{JOBID}_sorted_lengths.tsv"
