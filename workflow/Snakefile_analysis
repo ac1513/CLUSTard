@@ -211,7 +211,7 @@ rule seqkit:
 rule bin_plot:
     input:
         checkm_unbin = expand("analysis/{JOBID}_unbinned_contigs_stats.tsv", JOBID = JOBID),
-        mag_qual = MAGqual(expand("analysis/{JOBID}_qual_MAGs.txt", JOBID = JOBID))
+        mag_qual = MAGqual(expand("analysis/genome_bins/{JOBID}_qual_MAGs.txt", JOBID = JOBID))
     output:
         contig_plot = "analysis/plots/{JOBID}_bin_contigs.png",
         sorted_lengths = "analysis/{JOBID}_sorted_lengths.tsv"
