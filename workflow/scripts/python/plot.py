@@ -190,7 +190,7 @@ for i in range(0, len(files), 30):
         mean_df = mean_df.append(pd.Series(mean_list, name = file, index = df_samples["sample"].to_list()))
 
 #    plt.show()
-    plt.savefig(outdir + str(counter) + '_' + prefix + '_plot.png', type='png', dpi=600)
+    plt.savefig(outdir + str(counter) + '_' + prefix + '_plot.png', dpi=600)
     print('Generated plot number ' + str(counter) + ' -> ' + str(counter) + '_' + prefix + '_plot.png')
     plt.close('all')
 
