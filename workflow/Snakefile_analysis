@@ -11,7 +11,7 @@ samples = config["SAMPLES"]
 date_scale = config["date_scale"]
 plot_order = config["plot_order"]
 gtdb_v_tar_bac = config["gtdb_v_bac"]
-gtdb_v_tar_arc = config["gtdb_v_arc]
+gtdb_v_tar_arc = config["gtdb_v_arc"]
 
 import pandas as pd
 df_samples = pd.read_csv(samples, sep ='\t', index_col = 0)
