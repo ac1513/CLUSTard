@@ -179,7 +179,7 @@ rule merge_filecounts:
     conda: "envs/py3.yaml"
     resources:
       mem=cluster["merge_filecounts"]["mem"],
-      time=cluster["merge_filecounts"]["time"]
+      time=cluster["merge_filecounts"]["time"],
       threads=cluster["__default__"]["threads"]
     shell:
         """
