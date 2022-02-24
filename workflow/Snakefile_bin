@@ -13,14 +13,14 @@ CONTIG_T = config["CONTIG_T"]
 P_THRESH = config["P_THRESH"]
 COUNT_METHOD = config["COUNT_METHOD"]
 BIN_LOC = config["BIN_LOC"]
-cluster_config = "config/cluster.json"
+cluster_json = "config/cluster.json"
 
 import json
 import os,sys
 
 cluster=dict()
-if os.path.exists(cluster_config):
-    with open(cluster_config) as file:
+if os.path.exists(cluster_json):
+    with open(cluster_json) as file:
         cluster = json.load(file)
 
 rule bin_all:
