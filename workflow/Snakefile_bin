@@ -54,8 +54,8 @@ rule bwa_index:
         '{REFIN}.sa'
     conda: "envs/bwasam.yaml"
     resources:
-      mem=cluster["bwa_index"]["mem"]
-      threads=cluster["bwa_index"]["threads"]
+      mem=cluster["bwa_index"]["mem"],
+      threads=cluster["bwa_index"]["threads"],
       time=cluster["bwa_index"]["time"]
     shell:
         """
@@ -73,7 +73,7 @@ if MAPPING == "SR":
           read_len = 'results/alignment/{samples}_read_len.tsv'
       conda: "envs/bwasam.yaml"
       resources:
-        threads=cluster["bwa_mem"]["threads"]
+        threads=cluster["bwa_mem"]["threads"],
         time=cluster["bwa_mem"]["time"]
       shell:
           """
@@ -93,7 +93,7 @@ elif MAPPING == "paired_SR":
           read_len = 'results/alignment/{samples}_read_len.tsv'
       conda: "envs/bwasam.yaml"
       resources:
-        threads=cluster["bwa_mem_pair"]["threads"]
+        threads=cluster["bwa_mem_pair"]["threads"],
         time=cluster["bwa_mem_pair"]["time"]
       shell:
           """
@@ -114,7 +114,7 @@ elif MAPPING == "LR":
             output = 'results/alignment/{samples}.sam'
         conda: "envs/minimap2.yaml"
         resources:
-          threads=cluster["minimap"]["threads"]
+          threads=cluster["minimap"]["threads"],
           time=cluster["minimap"]["time"]
         shell:
             """
@@ -158,7 +158,7 @@ rule norm_counts:
           norm_count = 'results/clustering/{samples}_proc_counts_out.tsv'
       conda: "envs/py3.yaml"
       resources:
-        mem=cluster["norm_counts"]["mem"]
+        mem=cluster["norm_counts"]["mem"],
         time=cluster["norm_counts"]["time"]
       shell:
         """
@@ -175,7 +175,7 @@ rule merge_filecounts:
         ref = REFIN
     conda: "envs/py3.yaml"
     resources:
-      mem=cluster["merge_filecounts"]["mem"]
+      mem=cluster["merge_filecounts"]["mem"],
       time=cluster["merge_filecounts"]["time"]
     shell:
         """
@@ -313,7 +313,7 @@ rule file_parser:
     conda:
         "envs/py3.yaml"
     resources:
-      mem=cluster["file_parser"]["mem"]
+      mem=cluster["file_parser"]["mem"],
       time=cluster["file_parser"]["time"]
     shell:
         """

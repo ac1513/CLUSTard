@@ -69,8 +69,8 @@ rule checkm_unbin:
   conda:
       "envs/checkm.yaml"
   resources:
-      mem=cluster["checkm_unbin"]["mem"]
-      threads=cluster["checkm_unbin"]["threads"]
+      mem=cluster["checkm_unbin"]["mem"],
+      threads=cluster["checkm_unbin"]["threads"],
       time =cluster["checkm_unbin"]["time"]
   shell:
       """
