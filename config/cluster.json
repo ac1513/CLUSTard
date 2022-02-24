@@ -55,8 +55,8 @@
     },
     "kraken" :
     {
-        "threads" : 40,
-        "mem" : "8g"
+        "threads" : 60,
+        "mem" : "4g"
     },
     "prokka" :
     {
