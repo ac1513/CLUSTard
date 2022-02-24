@@ -94,7 +94,8 @@ rule kraken:
         cluster["kraken"]["threads"]
     resources:
         mem=cluster["kraken"]["mem"],
-        threads=cluster["kraken"]["threads"]
+        threads=cluster["kraken"]["threads"],
+        time=cluster["__default__"]["time"]
     shell:
         """
         kraken2 -db {params.db} --threads {threads} --report {output.report} --output {params.output} --use-names {input.files}
