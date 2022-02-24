@@ -23,6 +23,11 @@
         "time" : "2-00:00:00",
         "threads" : 6
     },
+    "minimap" :
+    {
+        "time" : "12:00:00",
+        "threads" : 6
+    },
     "bin_feeder" :
     {
         "time" : "12:00:00",
@@ -30,12 +35,12 @@
     "norm_counts" :
     {
         "time" : "01:00:00",
-        "threads" : 8
+        "mem" : "8g"
     },
     "merge_filecounts" :
     {
         "time" : "01:00:00",
-        "threads" : 8
+        "mem" : "8g"
     },
     "checkm_unbin" :
     {
@@ -46,7 +51,7 @@
     "file_parser" :
     {
         "time" : "02:00:00",
-        "threads" : 8
+        "mem" : "8g"
     },
     "kraken" :
     {
@@ -56,7 +61,6 @@
     "prokka" :
     {
         "threads" : 10,
-        "mem" : "1g"
     },
     "checkm" :
     {

@@ -13,6 +13,16 @@ CONTIG_T = config["CONTIG_T"]
 P_THRESH = config["P_THRESH"]
 COUNT_METHOD = config["COUNT_METHOD"]
 BIN_LOC = config["BIN_LOC"]
+cluster_config = "config/cluster.yaml"
+
+
+import yaml
+import os,sys
+
+cluster=dict()
+if os.path.exists(cluster_config):
+    with open(cluster_config) as yml:
+        cluster = yaml.load(yml)
 
 rule bin_all:
     input:
@@ -42,8 +52,11 @@ rule bwa_index:
         ref = REFIN
     output:
         '{REFIN}.sa'
-    threads: 20
     conda: "envs/bwasam.yaml"
+    resources:
+      mem=cluster["bwa_index"]["mem"]
+      threads=cluster["bwa_index"]["threads"]
+      time=cluster["bwa_index"]["time"]
     shell:
         """
         bwa index {input.ref}
@@ -59,10 +72,12 @@ if MAPPING == "SR":
           bam = 'results/alignment/{samples}.bam',
           read_len = 'results/alignment/{samples}_read_len.tsv'
       conda: "envs/bwasam.yaml"
-      threads: 6
+      resources:
+        threads=cluster["bwa_mem"]["threads"]
+        time=cluster["bwa_mem"]["time"]
       shell:
           """
-          bwa mem -M -t {threads} {input.ref} {input.fq} | samtools view -buS - | samtools sort -o {output.bam}
+          bwa mem -M -t {resources.threads} {input.ref} {input.fq} | samtools view -buS - | samtools sort -o {output.bam}
           bioawk -c fastx '{{ print $name, length($seq) }}' < {input.fq} > {output.read_len}
           """
 
@@ -77,10 +92,12 @@ elif MAPPING == "paired_SR":
           bam = 'results/alignment/{samples}.bam',
           read_len = 'results/alignment/{samples}_read_len.tsv'
       conda: "envs/bwasam.yaml"
-      threads: 6
+      resources:
+        threads=cluster["bwa_mem_pair"]["threads"]
+        time=cluster["bwa_mem_pair"]["time"]
       shell:
           """
-          bwa mem -M -t {threads} {input.ref} {input.fq1} {input.fq2} | samtools view -buS - | samtools sort -o {output.bam}
+          bwa mem -M -t {resources.threads} {input.ref} {input.fq1} {input.fq2} | samtools view -buS - | samtools sort -o {output.bam}
           bioawk -c fastx '{{ print $name, length($seq) }}' < {input.fq1} > {output.read_len}
           """
 
@@ -96,10 +113,12 @@ elif MAPPING == "LR":
         params:
             output = 'results/alignment/{samples}.sam'
         conda: "envs/minimap2.yaml"
-        threads: 6
+        resources:
+          threads=cluster["minimap"]["threads"]
+          time=cluster["minimap"]["time"]
         shell:
             """
-            minimap2 -ax map-ont -o {params.output} -t {threads} {input.ref} {input.fq}
+            minimap2 -ax map-ont -o {params.output} -t {resources.threads} {input.ref} {input.fq}
             samtools view -buS {params.output} | samtools sort -o {output.bam}
             bioawk -c fastx '{{ print $name, length($seq) }}' < {input.fq} > {output.read_len}
             """
@@ -138,6 +157,9 @@ rule norm_counts:
       output:
           norm_count = 'results/clustering/{samples}_proc_counts_out.tsv'
       conda: "envs/py3.yaml"
+      resources:
+        mem=cluster["norm_counts"]["mem"]
+        time=cluster["norm_counts"]["time"]
       shell:
         """
         python workflow/scripts/python/norm_counts.py {input.counts} {input.read_len} {input.contig_list} {output.norm_count}
@@ -152,6 +174,9 @@ rule merge_filecounts:
         method = COUNT_METHOD,
         ref = REFIN
     conda: "envs/py3.yaml"
+    resources:
+      mem=cluster["merge_filecounts"]["mem"]
+      time=cluster["merge_filecounts"]["time"]
     shell:
         """
         python workflow/scripts/python/merge_filecounts.py {params.method} {output.tsv}  -l {input.test}
@@ -222,6 +247,8 @@ rule bin_feeder:
         all_diffs = expand("results/clustering/{JOBID}_diffs.csv", JOBID = JOBID)
     conda:
         "envs/py3.yaml"
+    resources:
+      time=cluster["bin_feeder"]["time"]
     shell:
         """
         python workflow/scripts/python/bin_feeder.py {input.diffs} {params.all_diffs} {params.thresh} {output.all}
@@ -285,6 +312,9 @@ rule file_parser:
         header = samples
     conda:
         "envs/py3.yaml"
+    resources:
+      mem=cluster["file_parser"]["mem"]
+      time=cluster["file_parser"]["time"]
     shell:
         """
         mkdir -p results/{params.wd}

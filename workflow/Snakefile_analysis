@@ -1,4 +1,5 @@
 configfile: "config/config.yaml"
+cluster_config = "config/cluster.yaml"
 
 JOBID = config["JOBID"] # this can be different from binning pipeline
 REFIN = config["REFIN"]
@@ -10,8 +11,16 @@ GTDB = config["GTDB"]
 samples = config["SAMPLES"]
 date_scale = config["date_scale"]
 plot_order = config["plot_order"]
-gtdb_v_tar_bac = config["gtdb_v_bac"]
-gtdb_v_tar_arc = config["gtdb_v_arc"]
+gtdb_v_tar_bac = config["gtdb_v_tar_bac"]
+gtdb_v_tar_arc = config["gtdb_v_tar_arc"]
+
+import yaml
+import os,sys
+
+cluster=dict()
+if os.path.exists(cluster_config):
+    with open(cluster_config) as yml:
+        cluster = yaml.load(yml)
 
 import pandas as pd
 df_samples = pd.read_csv(samples, sep ='\t', index_col = 0)
@@ -21,6 +30,7 @@ if BIN_LOC.endswith("/") == False :
     BIN_LOC = BIN_LOC + "/"
 
 (CLUSTERS,) = glob_wildcards(BIN_LOC + "{CLUSTERS}.fasta")
+
 
 rule ana_all:
     input:
@@ -58,6 +68,10 @@ rule checkm_unbin:
       20
   conda:
       "envs/checkm.yaml"
+  resources:
+      mem=cluster["checkm_unbin"]["mem"]
+      threads=cluster["checkm_unbin"]["threads"]
+      time =cluster["checkm_unbin"]["time"]
   shell:
       """
       checkm_db={params.checkmdb}
@@ -77,9 +91,10 @@ rule kraken:
     conda:
         "envs/kraken2.yaml"
     threads:
-        16
+        cluster["kraken"]["threads"]
     resources:
-        mem_mb = 4000
+        mem=cluster["kraken"]["mem"],
+        threads=cluster["kraken"]["threads"]
     shell:
         """
         kraken2 -db {params.db} --threads {threads} --report {output.report} --output {params.output} --use-names {input.files}
@@ -103,7 +118,7 @@ if GTDB == "Y":
       input:
         kraken_top = expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
       output:
-        bac120_gtdb = "tmp/gtdb/bac{version}.tsv"
+        bac120_gtdb = "tmp/gtdb/bac{version}.tsv",
         ar122_gtdb = "tmp/gtdb/arc{version}.tsv"
       params:
         loc = "tmp/gtdb/",
@@ -124,8 +139,8 @@ if GTDB == "Y":
 
     rule gtdb_lookup:
       input:
-        bac120_gtdb = "tmp/gtdb/bac{version}.tsv"
-        ar122_gtdb = "tmp/gtdb/arc{version}.tsv"
+        bac120_gtdb = "tmp/gtdb/bac{version}.tsv",
+        ar122_gtdb = "tmp/gtdb/arc{version}.tsv",
         kraken_top = expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
       output:
         json_lookup = "analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_GTDB_lookup.json"
