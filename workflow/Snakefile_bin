@@ -22,7 +22,7 @@ import os,sys
 cluster=dict()
 if os.path.exists(cluster_config):
     with open(cluster_config) as yml:
-        cluster = yaml.load(yml)
+        cluster = yaml.safe_load(yml)
 
 rule bin_all:
     input:
