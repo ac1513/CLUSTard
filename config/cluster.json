@@ -30,7 +30,7 @@
     },
     "bin_feeder" :
     {
-        "time" : "12:00:00",
+        "time" : "12:00:00"
     },
     "norm_counts" :
     {
@@ -60,7 +60,7 @@
     },
     "prokka" :
     {
-        "threads" : 10,
+        "threads" : 10
     },
     "checkm" :
     {
