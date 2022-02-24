@@ -76,8 +76,7 @@ elif wf == "bin":
             expand("logs/{JOBID}_binning_done.txt", JOBID=JOBID)
 
     include: "Snakefile_bin"
-    rule done_bin:
-        output: touch(expand("logs/{JOBID}_binning_done.txt", JOBID = JOBID)),
+
 
 elif wf == "ana":
     rule all:
@@ -85,8 +84,5 @@ elif wf == "ana":
             expand("analysis/{JOBID}_qual_MAGs.txt", JOBID = JOBID),
             expand("analysis/{JOBID}_seqkit_stats.tsv", JOBID=JOBID),
             expand("analysis/plots/{JOBID}_bin_contigs.png", JOBID=JOBID)
-
-    rule start_ana:
-        output: touch(expand("logs/{JOBID}_binning_done.txt", JOBID = JOBID)),
 
     include: "Snakefile_analysis"

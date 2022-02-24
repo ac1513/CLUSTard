@@ -10,15 +10,12 @@ GTDB = config["GTDB"]
 samples = config["SAMPLES"]
 date_scale = config["date_scale"]
 plot_order = config["plot_order"]
+gtdb_v_tar_bac = config["gtdb_v_bac"]
+gtdb_v_tar_arc = config["gtdb_v_arc]
 
 import pandas as pd
 df_samples = pd.read_csv(samples, sep ='\t', index_col = 0)
 samples_list = df_samples["sample"].to_list()
-
-gtdb_v_tar_bac = "https://data.ace.uq.edu.au/public/gtdb/data/releases/release95/95.0/bac120_metadata_r95.tar.gz"
-gtdb_v_tar_arc = "https://data.ace.uq.edu.au/public/gtdb/data/releases/release95/95.0/ar122_metadata_r95.tar.gz"
-gtdb_v_bac = "bac120_metadata_r95.tsv"
-gtdb_v_arc = "ar122_metadata_r95.tsv"
 
 if BIN_LOC.endswith("/") == False :
     BIN_LOC = BIN_LOC + "/"
@@ -46,28 +43,6 @@ subworkflow MAGqual:
   workdir:
       ".."
 
-
-# rule prokka:
-#     input:
-#         wait = expand("logs/{JOBID}_binning_done.txt", JOBID = JOBID),
-#         clusters = expand("{BIN_LOC}{{CLUSTERS}}.fasta", BIN_LOC=BIN_LOC)
-#     output:
-#         file = expand("analysis/prokka/{{JOBID}}/{{CLUSTERS}}/{{CLUSTERS}}.{ext}", ext=[ "err", "fna", "faa", "gff", "gbk", "ffn", "sqn", "fsa", "tbl", "log", "txt", "tsv"])
-#     params:
-#         dir = "analysis/prokka/{JOBID}/{CLUSTERS}/",
-#         prefix = "{CLUSTERS}",
-#         prokka = "results/clusters/{CLUSTERS}_short.fasta"
-#     conda:
-#         "envs/prokka.yaml"
-#     threads:
-#         20
-#     shell:
-#         """
-#         awk '/^>/{{print substr($1,1,21); next}}{{print}}' < {input.clusters} > {params.prokka}
-#         prokka {params.prokka} --outdir {params.dir} --prefix {params.prefix} --cpus {threads} --force
-#         rm {params.prokka}
-#         """
-
 rule checkm_unbin:
   input:
       expand("logs/{JOBID}_binning_done.txt", JOBID = JOBID)
@@ -89,24 +64,6 @@ rule checkm_unbin:
       echo ${{checkm_db}} | checkm data setRoot ${{checkm_db}}
       checkm unbinned -x fasta {params.input} {params.refin} analysis/{params.jobid}_unbinned_contigs.fa analysis/{params.jobid}_unbinned_contigs_stats.tsv
       """
-
-# rule high_mags:
-#     input:
-#         prokka = expand("analysis/prokka/{JOBID}/{CLUSTERS}/{CLUSTERS}.{ext}", ext=["tsv"], CLUSTERS = CLUSTERS, JOBID = JOBID),
-#         checkm = expand("analysis/checkm/{JOBID}/{JOBID}_checkm.log", JOBID=JOBID)
-#     output:
-#         txt = "analysis/genome_bins/{JOBID}_qual_MAGs.txt"
-#     params:
-#         prokka = expand("analysis/prokka/{JOBID}/", JOBID = JOBID),
-#         bin_loc = BIN_LOC,
-#         jobid = JOBID,
-#         out_loc = "analysis/genome_bins/"
-#     conda :
-#         "envs/py3.yaml"
-#     shell:
-#         """
-#         python workflow/scripts/python/qual_parse.py {params.out_loc} {input.checkm} {params.prokka} {params.bin_loc} {params.jobid} > {output.txt}
-#         """
 
 rule kraken:
     input:
@@ -146,8 +103,8 @@ if GTDB == "Y":
       input:
         kraken_top = expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
       output:
-        bac120_gtdb = expand("tmp/gtdb/{gtdb_v_bac}", gtdb_v_bac = gtdb_v_bac),
-        ar122_gtdb = expand("tmp/gtdb/{gtdb_v_arc}", gtdb_v_arc = gtdb_v_arc)
+        bac120_gtdb = "tmp/gtdb/bac{version}.tsv"
+        ar122_gtdb = "tmp/gtdb/arc{version}.tsv"
       params:
         loc = "tmp/gtdb/",
         link_bac = gtdb_v_tar_bac,
@@ -167,8 +124,8 @@ if GTDB == "Y":
 
     rule gtdb_lookup:
       input:
-        bac120_gtdb = expand("tmp/gtdb/{gtdb_v_bac}", gtdb_v_bac = gtdb_v_bac),
-        ar122_gtdb = expand("tmp/gtdb/{gtdb_v_arc}", gtdb_v_arc = gtdb_v_arc),
+        bac120_gtdb = "tmp/gtdb/bac{version}.tsv"
+        ar122_gtdb = "tmp/gtdb/arc{version}.tsv"
         kraken_top = expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
       output:
         json_lookup = "analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_GTDB_lookup.json"
