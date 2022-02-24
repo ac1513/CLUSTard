@@ -13,7 +13,7 @@ CONTIG_T = config["CONTIG_T"]
 P_THRESH = config["P_THRESH"]
 COUNT_METHOD = config["COUNT_METHOD"]
 BIN_LOC = config["BIN_LOC"]
-cluster_config = "config/cluster.yaml"
+cluster_config = "config/cluster.json"
 
 
 import yaml
