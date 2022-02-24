@@ -313,8 +313,6 @@ rule para_merge:
         aggregate_input
     output:
         "results/clustering/{JOBID}_parallel_merged.out"
-    resources:
-        mem_mb = 64000
     conda:
         "envs/py3.yaml"
     resources:
