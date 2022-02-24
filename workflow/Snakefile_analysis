@@ -108,6 +108,10 @@ rule kraken_merge:
         "analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out"
     params:
         level = kraken_level
+    resources:
+        mem=cluster["__default__"]["mem"],
+        threads=cluster["__default__"]["threads"],
+        time=cluster["__default__"]["time"]
     shell:
         """
         cd analysis/kraken/{wildcards.JOBID}
@@ -125,6 +129,10 @@ if GTDB == "Y":
         loc = "tmp/gtdb/",
         link_bac = gtdb_v_tar_bac,
         link_arc = gtdb_v_tar_arc
+      resources:
+          mem=cluster["__default__"]["mem"],
+          threads=cluster["__default__"]["threads"],
+          time=cluster["__default__"]["time"]
       shell:
         """
         if wget -q --spider {params.link_bac}; then
@@ -149,6 +157,10 @@ if GTDB == "Y":
         level = {kraken_level}
       conda:
             "envs/py3.yaml"
+      resources:
+          mem=cluster["__default__"]["mem"],
+          threads=cluster["__default__"]["threads"],
+          time=cluster["__default__"]["time"]
       shell:
         """
         python workflow/scripts/python/gtdb_lookup.py {input.kraken_top} {params.level} {input.bac120_gtdb} {input.ar122_gtdb} {output.json_lookup}
@@ -160,6 +172,10 @@ elif GTDB == "N":
         kraken_top = expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
       output:
         "analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_GTDB_lookup.json"
+      resources:
+          mem=cluster["__default__"]["mem"],
+          threads=cluster["__default__"]["threads"],
+          time=cluster["__default__"]["time"]
       shell:
         """
         touch {output}
@@ -174,11 +190,13 @@ rule seqkit:
       binning_loc = BIN_LOC
   conda:
       "envs/py3.yaml"
-  threads:
-      10
+  resources:
+      mem=cluster["__default__"]["mem"],
+      threads=cluster["__default__"]["threads"],
+      time=cluster["__default__"]["time"]
   shell:
       """
-      seqkit stats -a -T -j {threads} {params.binning_loc}*.fasta > {output}
+      seqkit stats -a -T -j {resources.threads} {params.binning_loc}*.fasta > {output}
       """
 
 rule bin_plot:
@@ -191,6 +209,10 @@ rule bin_plot:
     params:
         binning_dir = BIN_LOC,
         out_loc = "analysis/plots/"
+    resources:
+        mem=cluster["__default__"]["mem"],
+        threads=cluster["__default__"]["threads"],
+        time=cluster["__default__"]["time"]
     conda:
         "envs/py3.yaml"
     shell:
