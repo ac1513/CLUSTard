@@ -269,6 +269,10 @@ rule para_sets:
         thresh = P_THRESH
     conda:
         "envs/py3.yaml"
+    resources:
+        mem=cluster["__default__"]["mem"],
+        threads=cluster["__default__"]["threads"],
+        time=cluster["__default__"]["time"]
     shell:
         """
         python workflow/scripts/python/para_sets.py {input.bins} {output} {params.thresh}
