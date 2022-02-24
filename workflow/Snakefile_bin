@@ -133,6 +133,10 @@ rule count_files:
     params:
         map = MAPPING,
     conda: "envs/minimap2.yaml"
+    resources:
+        mem=cluster["__default__"]["mem"],
+        threads=cluster["__default__"]["threads"],
+        time=cluster["__default__"]["time"]
     shell:
         """
         samtools view {input.bam} | awk '{{if ($2!=4 && $2!=133 && $2!=165 && $2!=181 && $2!=101 && $2!=117 && $2!=69 && $2!=77 && $2!=141) print $1 "\t" $3}}' > {output.counts}
@@ -145,6 +149,10 @@ rule contig_len:
     output:
         contig_lengths = "results/clustering/{JOBID}_contig_lengths.tsv"
     conda: "envs/minimap2.yaml"
+    resources:
+        mem=cluster["__default__"]["mem"],
+        threads=cluster["__default__"]["threads"],
+        time=cluster["__default__"]["time"]
     shell:
       """
       bioawk -c fastx '{{ print $name, length($seq) }}' < {input.ref} > {output.contig_lengths}
@@ -195,6 +203,10 @@ rule abs_derive:
         thresh = CONTIG_T,
     conda:
         "envs/py3.yaml"
+    resources:
+        mem=cluster["__default__"]["mem"],
+        threads=cluster["__default__"]["threads"],
+        time=cluster["__default__"]["time"]
     shell:
         """
         python workflow/scripts/python/gen_abs_counts_csv.py {input.counts} {wildcards.JOBID} {params.thresh}
@@ -210,6 +222,10 @@ rule derive:
         thresh = CONTIG_T
     conda:
         "envs/py3.yaml"
+    resources:
+        mem=cluster["__default__"]["mem"],
+        threads=cluster["__default__"]["threads"],
+        time=cluster["__default__"]["time"]
     shell:
         """
         python workflow/scripts/python/gen_counts_csv.py {input.tsv} {wildcards.JOBID} {params.thresh}
@@ -223,6 +239,10 @@ rule start_feeder:
         diffs = "results/clustering/{JOBID}_diffs.csv"
     conda:
         "envs/py3.yaml"
+    resources:
+        mem=cluster["__default__"]["mem"],
+        threads=cluster["__default__"]["threads"],
+        time=cluster["__default__"]["time"]
     shell:
         """
         python workflow/scripts/python/start_feeder.py clustering {wildcards.JOBID}
@@ -235,6 +255,10 @@ checkpoint split_file:
         diffs = directory("results/clustering/{JOBID}_split/")
     params:
         diffs = expand("results/clustering/{JOBID}_split/diffs", JOBID=JOBID)
+    resources:
+        mem=cluster["__default__"]["mem"],
+        threads=cluster["__default__"]["threads"],
+        time=cluster["__default__"]["time"]
     shell:
         """
         mkdir -p {output.diffs}
@@ -293,6 +317,10 @@ rule para_merge:
         mem_mb = 64000
     conda:
         "envs/py3.yaml"
+    resources:
+        mem=cluster["__default__"]["mem"],
+        threads=cluster["__default__"]["threads"],
+        time=cluster["__default__"]["time"]
     shell:
         """
         python workflow/scripts/python/parallel_merge_step.py -i {input} -o {output}
@@ -305,6 +333,10 @@ rule non_red_step:
       expand("results/clustering/{JOBID}_non_red_list.out", JOBID = JOBID)
     conda:
       "envs/py3.yaml"
+    resources:
+        mem=cluster["__default__"]["mem"],
+        threads=cluster["__default__"]["threads"],
+        time=cluster["__default__"]["time"]
     shell:
       """
       python workflow/scripts/python/non_red.py {input} {output}
@@ -343,6 +375,10 @@ rule unbinned:
         20
     conda:
         "envs/py3.yaml"
+    resources:
+        mem=cluster["__default__"]["mem"],
+        threads=cluster["__default__"]["threads"],
+        time=cluster["__default__"]["time"]
     shell:
         """
         for FILE in results/clusters/*fasta
@@ -361,6 +397,10 @@ rule singleton:
         min_size = 500000
     conda:
         "envs/py3.yaml"
+    resources:
+        mem=cluster["__default__"]["mem"],
+        threads=cluster["__default__"]["threads"],
+        time=cluster["__default__"]["time"]
     shell:
         """
         if [ -f {input.unbinned} ]; then
@@ -376,6 +416,10 @@ checkpoint singleton_split:
         singleton = "results/clusters/{JOBID}_singleton.fa"
     output:
         dir = directory("results/clusters/singleton_{JOBID}")
+    resources:
+        mem=cluster["__default__"]["mem"],
+        threads=cluster["__default__"]["threads"],
+        time=cluster["__default__"]["time"]
     shell:
         """
         mkdir -p {output}
@@ -408,6 +452,10 @@ rule singleton_csv:
       loc = "results/clusters/singleton_{JOBID}/"
   conda:
       "envs/py3.yaml"
+  resources:
+      mem=cluster["__default__"]["mem"],
+      threads=cluster["__default__"]["threads"],
+      time=cluster["__default__"]["time"]
   shell:
       """
       seqkit seq -i {input} | seqkit head -n 1 -w 0 > {input}.test
@@ -429,6 +477,10 @@ rule binning_done:
         touch("logs/{JOBID}_binning_done.txt"),
     params:
         jobid = JOBID
+    resources:
+        mem=cluster["__default__"]["mem"],
+        threads=cluster["__default__"]["threads"],
+        time=cluster["__default__"]["time"]
     shell:
         """
         if [ -d "results/clusters/singleton_{params.jobid}/" ]
