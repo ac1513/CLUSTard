@@ -139,8 +139,8 @@ if GTDB == "Y":
 
     rule gtdb_lookup:
       input:
-        bac120_gtdb = "tmp/gtdb/bac{version}.tsv",
-        ar122_gtdb = "tmp/gtdb/arc{version}.tsv",
+        bac120_gtdb = "tmp/gtdb/bac*.tsv",
+        ar122_gtdb = "tmp/gtdb/arc*.tsv",
         kraken_top = expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
       output:
         json_lookup = "analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_GTDB_lookup.json"
