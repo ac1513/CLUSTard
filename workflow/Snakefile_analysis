@@ -1,0 +1,222 @@
+configfile: "config/config.yaml"
+cluster_json = "config/cluster.json"
+
+JOBID = config["JOBID"] # this can be different from binning pipeline
+REFIN = config["REFIN"]
+BIN_LOC = config["BIN_LOC"]
+kraken_level = config["kraken_level"]
+krakendb = config["krakendb"]
+checkmdb = config["checkm_db_root"]
+GTDB = config["GTDB"]
+samples = config["SAMPLES"]
+date_scale = config["date_scale"]
+plot_order = config["plot_order"]
+gtdb_v_tar_bac = config["gtdb_v_tar_bac"]
+gtdb_v_tar_arc = config["gtdb_v_tar_arc"]
+
+import json
+import os,sys
+
+cluster=dict()
+if os.path.exists(cluster_json):
+    with open(cluster_json) as file:
+        cluster = json.load(file)
+
+import pandas as pd
+df_samples = pd.read_csv(samples, sep ='\t', index_col = 0)
+samples_list = df_samples["sample"].to_list()
+
+if BIN_LOC.endswith("/") == False :
+    BIN_LOC = BIN_LOC + "/"
+
+(CLUSTERS,) = glob_wildcards(BIN_LOC + "{CLUSTERS}.fasta")
+
+
+rule ana_all:
+    input:
+        #expand("analysis/prokka/{JOBID}/{CLUSTERS}/{CLUSTERS}.{ext}", JOBID = JOBID, CLUSTERS = CLUSTERS, ext=[ "err", "fna", "faa", "gff", "gbk", "ffn", "sqn", "fsa", "tbl", "log", "txt", "tsv"]),
+        #expand("analysis/checkm/{JOBID}/{JOBID}_checkm.log", JOBID=JOBID),
+        #expand("analysis/genome_bins/{JOBID}_qual_MAGs.txt", JOBID = JOBID),
+        expand("analysis/{JOBID}_unbinned_contigs_stats.tsv", JOBID = JOBID),
+        expand("analysis/kraken/{JOBID}/{JOBID}_{CLUSTERS}_report_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS),
+        expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level),
+        expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_GTDB_lookup.json", JOBID=JOBID, kraken_level = kraken_level),
+        expand("analysis/{JOBID}_seqkit_stats.tsv", JOBID=JOBID),
+        expand("analysis/plots/{JOBID}_bin_contigs.png", JOBID=JOBID)
+    output:
+        touch(expand("logs/{JOBID}_ana_done.txt", JOBID = JOBID))
+
+subworkflow MAGqual:
+  snakefile:
+      "../../MAGqual/workflow/Snakefile"
+      #github("Chong-Lab-UoY/MAGqual", path= "workflow/Snakefile", tag = "v0.0.1-alpha.1")
+  workdir:
+      ".."
+
+rule checkm_unbin:
+  input:
+      expand("logs/{JOBID}_binning_done.txt", JOBID = JOBID)
+  output:
+      stats = expand("analysis/{JOBID}_unbinned_contigs_stats.tsv", JOBID = JOBID)
+  params:
+      out = expand("analysis/checkm/{JOBID}", JOBID=JOBID),
+      input = BIN_LOC,
+      refin = REFIN,
+      checkmdb = checkmdb,
+      jobid = JOBID
+  threads:
+      20
+  conda:
+      "envs/checkm.yaml"
+  resources:
+      mem=cluster["checkm_unbin"]["mem"],
+      threads=cluster["checkm_unbin"]["threads"],
+      time =cluster["checkm_unbin"]["time"]
+  shell:
+      """
+      checkm_db={params.checkmdb}
+      echo ${{checkm_db}} | checkm data setRoot ${{checkm_db}}
+      checkm unbinned -x fasta {params.input} {params.refin} analysis/{params.jobid}_unbinned_contigs.fa analysis/{params.jobid}_unbinned_contigs_stats.tsv
+      """
+
+rule kraken:
+    input:
+        expand("logs/{JOBID}_binning_done.txt", JOBID = JOBID),
+        files = expand("{BIN_LOC}{{CLUSTERS}}.fasta", BIN_LOC=BIN_LOC)
+    output:
+        report = "analysis/kraken/{JOBID}/{JOBID}_{CLUSTERS}_report_kraken.out",
+    params:
+        db = krakendb,
+        output = "analysis/kraken/{JOBID}/{JOBID}_{CLUSTERS}_kraken.out",
+    conda:
+        "envs/kraken2.yaml"
+    threads:
+        cluster["kraken"]["threads"]
+    resources:
+        mem=cluster["kraken"]["mem"],
+        threads=cluster["kraken"]["threads"],
+        time=cluster["__default__"]["time"]
+    shell:
+        """
+        kraken2 -db {params.db} --threads {threads} --report {output.report} --output {params.output} --use-names {input.files}
+        """
+
+rule kraken_merge:
+    input:
+        report = expand("analysis/kraken/{JOBID}/{JOBID}_{CLUSTERS}_report_kraken.out", JOBID = JOBID, CLUSTERS = CLUSTERS)
+    output:
+        "analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out"
+    params:
+        level = kraken_level
+    resources:
+        mem=cluster["__default__"]["mem"],
+        threads=cluster["__default__"]["threads"],
+        time=cluster["__default__"]["time"]
+    shell:
+        """
+        cd analysis/kraken/{wildcards.JOBID}
+        find -name '{wildcards.JOBID}*_report_kraken.out' -type f -printf '\\n%p\\t' -exec sh -c 'echo {{}} | sort -k1nr {{}} | grep -E "\\W{params.level}\\W" | head -n1 ' \\; > {wildcards.JOBID}_{params.level}_top_kraken.out
+        """
+
+if GTDB == "Y":
+    rule GTDB_download:
+      input:
+        kraken_top = expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
+      output:
+        bac120_gtdb = "tmp/gtdb/bac{version}.tsv",
+        ar122_gtdb = "tmp/gtdb/arc{version}.tsv"
+      params:
+        loc = "tmp/gtdb/",
+        link_bac = gtdb_v_tar_bac,
+        link_arc = gtdb_v_tar_arc
+      resources:
+          mem=cluster["__default__"]["mem"],
+          threads=cluster["__default__"]["threads"],
+          time=cluster["__default__"]["time"]
+      shell:
+        """
+        if wget -q --spider {params.link_bac}; then
+          wget -O {params.loc}bac120_metadata.tar.gz {params.link_bac}
+          tar -xf {params.loc}bac120_metadata.tar.gz -C {params.loc}
+        fi
+
+        if wget -q --spider {params.link_arc}; then
+          wget -O {params.loc}ar122_metadata.tar.gz {params.link_arc}
+          tar -xf {params.loc}ar122_metadata.tar.gz -C {params.loc}
+        fi
+        """
+
+    rule gtdb_lookup:
+      input:
+        bac120_gtdb = "tmp/gtdb/bac*.tsv",
+        ar122_gtdb = "tmp/gtdb/arc*.tsv",
+        kraken_top = expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
+      output:
+        json_lookup = "analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_GTDB_lookup.json"
+      params:
+        level = {kraken_level}
+      conda:
+            "envs/py3.yaml"
+      resources:
+          mem=cluster["__default__"]["mem"],
+          threads=cluster["__default__"]["threads"],
+          time=cluster["__default__"]["time"]
+      shell:
+        """
+        python workflow/scripts/python/gtdb_lookup.py {input.kraken_top} {params.level} {input.bac120_gtdb} {input.ar122_gtdb} {output.json_lookup}
+        """
+
+elif GTDB == "N":
+    rule empty_lookup:
+      input:
+        kraken_top = expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
+      output:
+        "analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_GTDB_lookup.json"
+      resources:
+          mem=cluster["__default__"]["mem"],
+          threads=cluster["__default__"]["threads"],
+          time=cluster["__default__"]["time"]
+      shell:
+        """
+        touch {output}
+        """
+
+rule seqkit:
+  input:
+      wait_for = expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_GTDB_lookup.json", JOBID = JOBID, kraken_level = kraken_level),
+  output:
+      "analysis/{JOBID}_seqkit_stats.tsv"
+  params:
+      binning_loc = BIN_LOC
+  conda:
+      "envs/py3.yaml"
+  resources:
+      mem=cluster["__default__"]["mem"],
+      threads=cluster["__default__"]["threads"],
+      time=cluster["__default__"]["time"]
+  shell:
+      """
+      seqkit stats -a -T -j {resources.threads} {params.binning_loc}*.fasta > {output}
+      """
+
+rule bin_plot:
+    input:
+        checkm_unbin = expand("analysis/{JOBID}_unbinned_contigs_stats.tsv", JOBID = JOBID),
+        mag_qual = MAGqual(expand("analysis/genome_bins/{JOBID}_qual_MAGs.txt", JOBID = JOBID))
+    output:
+        contig_plot = "analysis/plots/{JOBID}_bin_contigs.png",
+        sorted_lengths = "analysis/{JOBID}_sorted_lengths.tsv"
+    params:
+        binning_dir = BIN_LOC,
+        out_loc = "analysis/plots/"
+    resources:
+        mem=cluster["__default__"]["mem"],
+        threads=cluster["__default__"]["threads"],
+        time=cluster["__default__"]["time"]
+    conda:
+        "envs/py3.yaml"
+    shell:
+        """
+        cat {params.binning_dir}*.fasta | awk '$0 ~ ">" {{print c; c=0;printf substr($0,2,100) "\\t"; }} $0 !~ ">" {{c+=length($0);}} END {{ print c; }}' | sort | uniq > {output.sorted_lengths}
+        python workflow/scripts/python/bin_plot.py {input.checkm_unbin} {output.sorted_lengths} {params.out_loc} {wildcards.JOBID}
+        """

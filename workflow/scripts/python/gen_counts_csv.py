@@ -51,6 +51,6 @@ with open(file_name, 'r') as data_store:
                 new_record = [values]
                 nr = True
 
-with open('output/clustering/' +  jobid + '_read_counts_derived.csv', 'w') as f:
+with open('results/clustering/' +  jobid + '_read_counts_derived.csv', 'w') as f:
     writer = csv.writer(f)
     writer.writerows(new_record)

@@ -9,13 +9,13 @@
     },
     "bwa_index" :
     {
-        "time" : "2-00:00:00",
+        "time" : "12:00:00",
         "threads" : 20,
         "mem" : "2g"
     },
     "bwa_mem" :
     {
-        "time" : "2-00:00:00",
+        "time" : "12:00:00",
         "threads" : 6
     },
     "bwa_mem_pair" :
@@ -23,20 +23,24 @@
         "time" : "2-00:00:00",
         "threads" : 6
     },
+    "minimap" :
+    {
+        "time" : "12:00:00",
+        "threads" : 6
+    },
     "bin_feeder" :
     {
-        "time" : "6-23:59:00",
-        "partition" : "week"
+        "time" : "12:00:00"
     },
     "norm_counts" :
     {
         "time" : "01:00:00",
-        "threads" : 8
+        "mem" : "8g"
     },
     "merge_filecounts" :
     {
         "time" : "01:00:00",
-        "threads" : 8
+        "mem" : "8g"
     },
     "checkm_unbin" :
     {
@@ -47,17 +51,16 @@
     "file_parser" :
     {
         "time" : "02:00:00",
-        "threads" : 8
+        "mem" : "8g"
     },
     "kraken" :
     {
-        "threads" : 20,
+        "threads" : 60,
         "mem" : "4g"
     },
     "prokka" :
     {
-        "threads" : 10,
-        "mem" : "1g"
+        "threads" : 10
     },
     "checkm" :
     {

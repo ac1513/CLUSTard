@@ -1,0 +1,88 @@
+configfile: "config/config.yaml"
+
+import pandas as pd
+df_samples = pd.read_csv(config["SAMPLES"], sep ='\t', index_col = 0)
+samples = df_samples["sample"].to_list()
+SAMPLES = samples
+
+JOBID = config["JOBID"]
+REFIN = config["REFIN"]
+RAW_DIR = config["RAW_DIR"]
+FILE_EX = config["FILE_EX"]
+MAPPING = config["MAPPING"]
+CONTIG_T = config["CONTIG_T"]
+P_THRESH = config["P_THRESH"]
+COUNT_METHOD = config["COUNT_METHOD"]
+BIN_LOC = config["BIN_LOC"]
+kraken_level = config["kraken_level"]
+krakendb = config["krakendb"]
+GTDB = config["GTDB"]
+samples = config["SAMPLES"]
+date_scale = config["date_scale"]
+plot_order = config["plot_order"]
+
+wf = "both"
+
+if wf == "both":
+    rule all:
+        input:
+            expand("logs/{JOBID}_bins.txt", JOBID = JOBID),
+            expand("logs/{JOBID}_analysis_done.txt", JOBID = JOBID),
+            expand("logs/{JOBID}_plot_done.txt", JOBID = JOBID)
+
+    subworkflow binning:
+        snakefile:
+            "Snakefile_bin"
+        workdir:
+            ".."
+
+    rule bin_done:
+        input:
+            binning(expand("logs/{JOBID}_binning_done.txt", JOBID = JOBID))
+        output:
+            touch("logs/{JOBID}_bins.txt")
+        shell:
+            """
+            echo "Binning pipeline has completed, now starting analysis pipeline"
+            """
+
+    subworkflow analysis:
+        snakefile:
+            "Snakefile_analysis"
+        workdir:
+            ".."
+
+    rule analysis_done:
+        input:
+            analysis(expand("logs/{JOBID}_ana_done.txt", JOBID = JOBID))
+        output:
+            touch("logs/{JOBID}_analysis_done.txt")
+
+    subworkflow plot_wf:
+        snakefile:
+            "Snakefile_plot"
+        workdir:
+            ".."
+
+    rule plot_done:
+        input: plot_wf(expand("logs/{JOBID}_plot.txt", JOBID = JOBID))
+
+        output:
+            touch("logs/{JOBID}_plot_done.txt")
+
+elif wf == "bin":
+    rule all:
+        input:
+            expand("logs/{JOBID}_binning_done.txt", JOBID=JOBID)
+
+    include: "Snakefile_bin"
+
+
+elif wf == "ana":
+    rule all:
+        input:
+            expand("analysis/{JOBID}_qual_MAGs.txt", JOBID = JOBID),
+            expand("analysis/{JOBID}_seqkit_stats.tsv", JOBID=JOBID),
+            expand("analysis/plots/{JOBID}_bin_contigs.png", JOBID=JOBID)
+
+    include: "Snakefile_analysis"

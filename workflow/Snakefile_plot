@@ -1,0 +1,84 @@
+configfile: "config/config.yaml"
+
+
+JOBID = config["JOBID"] # this can be different from binning pipeline
+REFIN = config["REFIN"]
+BIN_LOC = config["BIN_LOC"]
+kraken_level = config["kraken_level"]
+krakendb = config["krakendb"]
+GTDB = config["GTDB"]
+samples = config["SAMPLES"]
+date_scale = config["date_scale"]
+plot_order = config["plot_order"]
+
+import pandas as pd
+df_samples = pd.read_csv(samples, sep ='\t', index_col = 0)
+samples_list = df_samples["sample"].to_list()
+
+rule plot_all:
+    input:
+        expand("analysis/{JOBID}_cluster_summary_stats.tsv", JOBID = JOBID),
+        expand("analysis/plots/1_{JOBID}_{kraken_level}_plot.png", JOBID = JOBID, kraken_level = kraken_level),
+        expand("analysis/plots/{JOBID}_r_abun_plot.png", JOBID = JOBID)
+    output:
+        touch(expand("logs/{JOBID}_plot.txt", JOBID = JOBID))
+
+
+rule clus_stats:
+    input:
+        checkm = expand("analysis/checkm/{JOBID}/{JOBID}_checkm.log", JOBID=JOBID),
+        seqk = expand("analysis/{JOBID}_seqkit_stats.tsv", JOBID=JOBID),
+        kraken = expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level),
+        gtdb_ncbi = expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_GTDB_lookup.json", JOBID = JOBID, kraken_level = kraken_level),
+        qual = expand("analysis/genome_bins/{JOBID}_qual_MAGs.txt", JOBID=JOBID)
+    output:
+        csv = "analysis/{JOBID}_cluster_summary_stats.tsv"
+    conda:
+        "envs/py3.yaml" #change clustering (below) when add counts folder..
+    params:
+        bin_loc = BIN_LOC
+    shell:
+        """
+        ls {params.bin_loc}Cluster*.csv > stat_input.txt
+        python workflow/scripts/python/clus_stats.py stat_input.txt {JOBID} -cm {input.checkm} -sk {input.seqk} -k {input.kraken} -g {input.gtdb_ncbi} -q {input.qual} -out {output.csv}
+        rm stat_input.txt
+        """
+
+rule plot:
+    input:
+        stats_in = expand("analysis/{JOBID}_cluster_summary_stats.tsv", JOBID = JOBID),
+    output:
+        cluster_plot = "analysis/plots/1_{JOBID}_{kraken_level}_plot.png"
+    params:
+        date = date_scale,
+        sample_list = samples,
+        out_order = plot_order,
+        bin_loc = BIN_LOC,
+        out_loc = "analysis/plots/"
+    conda:
+        "envs/py3.yaml"
+    shell:
+        """
+        python workflow/scripts/python/plot.py {input.stats_in} {JOBID} {params.sample_list} {params.date} -k_l {kraken_level} -s {params.out_order} -out {params.out_loc} -in {params.bin_loc}
+        """
+
+rule abun_plot:
+    input:
+        kraken_in = expand("analysis/kraken/{JOBID}/{JOBID}_{kraken_level}_top_kraken.out", JOBID = JOBID, kraken_level = kraken_level)
+    output:
+        plot_out = "analysis/plots/{JOBID}_r_abun_plot.png"
+    conda:
+        "envs/py3.yaml"
+    params:
+        bin_loc = BIN_LOC,
+        out_loc = "analysis/",
+        samples = samples_list,
+        count_in = expand("results/clustering/{JOBID}_read_counts_absolute.csv", JOBID = JOBID),
+
+    shell:
+        """
+        cd {params.bin_loc}
+        for f in *.fasta; do filename="${{f%%.*}}"; echo ">$f"; seqkit fx2tab -n $f; done > {JOBID}_binned_cluster_contig.txt
+        cd -
+        python workflow/scripts/python/abun_plot.py {JOBID} {params.count_in} {params.bin_loc}{JOBID}_binned_cluster_contig.txt {params.out_loc} -s {params.samples} Coverage -k {input.kraken_in}
+        """

@@ -4,6 +4,8 @@
 Created on Tue Oct  6 11:58:34 2020
 
 @author: ac1513
+Script that calculates the quality of MAGs when given a prokka and a checkm output.
+Outputs a file containing the quality and copies the MAGs into a new directory depending on their quality.
 """
 
 import pandas as pd
@@ -11,7 +13,6 @@ import glob
 import argparse
 import os
 from shutil import copyfile
-
 
 def qual_cluster(comp, cont):
     if (comp >90) and (cont<5):
@@ -25,11 +26,18 @@ def qual_cluster(comp, cont):
     return qual
 
 parser = argparse.ArgumentParser(description='')
+parser.add_argument('output', help='output directory for the organised bins', type=str)
 parser.add_argument('checkm_log', help='checkm output log file (TAB SEPARATED', type=str)
 parser.add_argument('prok_loc', help='directory containing all prokka output for all clusters', type=str)
+parser.add_argument('bin_loc', help='directory containing fasta files for all clusters', type=str)
+parser.add_argument('jobid', help='prefix for current jobs', type=str)
+
 args = parser.parse_args()
+output = args.output
 checkm_log = args.checkm_log
 prok_loc = args.prok_loc
+bin_loc = args.bin_loc
+job_id = args.jobid
 
 # =============================================================================
 # CHECKM STUFF HERE
@@ -47,9 +55,9 @@ NA = checkm_df[checkm_df['qual'].str.contains("NA")].index.values.tolist()
 # =============================================================================
 
 high_qual_clusters= []
-
+near_comp_clusters = []
 for cluster in high_clusters:
-    loc = str(prok_loc + cluster + '/*.log')
+    loc = str(prok_loc + cluster + '/*.tsv')
     for name in glob.glob(loc):
         prok_file = name
         with open(prok_file, 'r') as prokka_in:
@@ -96,37 +104,47 @@ for cluster in high_clusters:
                     trna_set.add("tRNA-Tyr")
                 if "tRNA-Val" in line:
                     trna_set.add("tRNA-Val")
-                if "5S ribosomal RNA" in line:
+                if ("5S ribosomal RNA" in line) and ("partial" not in line):
                     rna_set.add('5S')
-                if "16S ribosomal RNA" in line:
+                if ("16S ribosomal RNA" in line) and ("partial" not in line):
                     rna_set.add('16S')
-                if "23S ribosomal RNA" in line:
+                if ("23S ribosomal RNA" in line) and ("partial" not in line):
                     rna_set.add('23s')
     if (len(trna_set) >= 18) and (len(rna_set) == 3):
         high_qual_clusters.append(cluster)
     else:
-        med_qual_clusters.append(cluster) # adds high qual that fail trna/rna
+        near_comp_clusters.append(cluster) # adds high qual that fail trna/rna
 # =============================================================================
 # COPYING FILES INTO QUAL DIRECTORIES
 # =============================================================================
 
-location = "output/results/"
-new_loc = "output/genome_bins/"
-os.makedirs("output/genome_bins/high_qual", exist_ok=True)
-os.makedirs("output/genome_bins/med_qual", exist_ok=True)
-os.makedirs("output/genome_bins/low_qual", exist_ok=True)
+location = bin_loc
+new_loc = output + "/" + job_id + "/"
+os.makedirs(new_loc + "high_qual", exist_ok=True)
+os.makedirs(new_loc + "near_comp", exist_ok=True)
+os.makedirs(new_loc + "med_qual", exist_ok=True)
+os.makedirs(new_loc + "low_qual", exist_ok=True)
+os.makedirs(new_loc + "failed", exist_ok=True)
 
 for high in high_qual_clusters:
     file = location + high + ".fasta"
-    copyfile(file, "output/genome_bins/high_qual/"+high+".fasta")
+    copyfile(file, new_loc +"high_qual/"+high+".fasta")
+
+for nc in near_comp_clusters:
+    file = location + nc + ".fasta"
+    copyfile(file, new_loc +"near_comp/"+nc+".fasta")
 
 for med in med_qual_clusters:
     file = location + med + ".fasta"
-    copyfile(file, "output/genome_bins/med_qual/"+med+".fasta")
+    copyfile(file, new_loc+"med_qual/"+med+".fasta")
 
 for low in low_qual_clusters:
     file = location + low + ".fasta"
-    copyfile(file, "output/genome_bins/low_qual/"+low+".fasta")
+    copyfile(file, new_loc+"low_qual/"+low+".fasta")
+
+for NA_bin in NA:
+    file = location + NA_bin + ".fasta"
+    copyfile(file, new_loc+"failed/"+nc+".fasta")
 
 # =============================================================================
 # OUTPUT CREATED HERE
@@ -136,13 +154,20 @@ print("-" * 12)
 print(" NUMBER MAGs")
 print("-" * 12)
 print("High Qual:", len(high_qual_clusters))
+print("Near Comp:", len(near_comp_clusters))
 print("Med Qual:", len(med_qual_clusters))
 print("Low Qual:", len(low_qual_clusters))
-print("NA:", len(NA), "\n")
+print("Failed:", len(NA), "\n")
 print("-" * 12)
 print(" MAG IDs")
 print("-" * 12)
-print("High Qual:", high_qual_clusters , "\n")
-print("Med Qual:", med_qual_clusters, "\n")
-print("Low Qual:", low_qual_clusters, "\n")
-print("NA:", NA, "\n")
+print("High Qual:")
+print(*high_qual_clusters, sep=", ")
+print("\nNear Comp:")
+print(*near_comp_clusters, sep=", ")
+print("\nMed Qual:")
+print(*med_qual_clusters, sep=", ")
+print("\nLow Qual:")
+print(*low_qual_clusters, sep=", ")
+print("\nFailed:")
+print(*NA, sep=", ")

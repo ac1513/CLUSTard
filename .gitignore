@@ -3,3 +3,11 @@
 .DS_Store
 scripts/.DS_Store
 *.out
+data/*
+.snakemake/*
+results/*
+analysis/*
+.idea/*
+tmp/
+old/
+logs/
