@@ -139,7 +139,7 @@ rule count_files:
         time=cluster["__default__"]["time"]
     shell:
         """
-        samtools view {input.bam} | awk '{{if ($2!=4 && $2!=133 && $2!=165 && $2!=181 && $2!=101 && $2!=117 && $2!=69 && $2!=77 && $2!=141) print $1 "\t" $3}}' > {output.counts}
+        samtools view -F 4 {input.bam} | awk '{{ print $1 "\t" $3 }}' > {output.counts}
         """
 
 
