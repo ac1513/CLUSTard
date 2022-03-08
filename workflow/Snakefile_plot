@@ -15,6 +15,14 @@ import pandas as pd
 df_samples = pd.read_csv(samples, sep ='\t', index_col = 0)
 samples_list = df_samples["sample"].to_list()
 
+import json
+import os,sys
+
+cluster=dict()
+if os.path.exists(cluster_json):
+    with open(cluster_json) as file:
+        cluster = json.load(file)
+
 rule plot_all:
     input:
         expand("analysis/{JOBID}_cluster_summary_stats.tsv", JOBID = JOBID),
