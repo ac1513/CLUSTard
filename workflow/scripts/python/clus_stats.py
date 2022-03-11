@@ -78,6 +78,7 @@ for file in files:
             seqkit_df = pd.read_csv(args.seqkit, sep = '\t', index_col =0)
             file_fa = file.replace(".csv",".fasta")
             n_50 = seqkit_df["N50"][file_fa]
+            tot_len = str(seqkit_df["sum_len"][file_fa])
 
         if args.checkm_file:
             checkm_df = pd.read_csv(args.checkm_file, sep = '\t', index_col = 0)
@@ -99,7 +100,7 @@ for file in files:
                                 gtdb_ncbi = gtdb_lookup[krak_id]
                             else:
                                 gtdb_ncbi = "Missing"
-        
+
         if args.qual:
             for line in open(args.qual, 'r'):
                 if re.search(na, line):
