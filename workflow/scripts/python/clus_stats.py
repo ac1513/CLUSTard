@@ -79,6 +79,7 @@ for file in files:
             file_fa = file.replace(".csv",".fasta")
             n_50 = seqkit_df["N50"][file_fa]
             tot_len = str(seqkit_df["sum_len"][file_fa])
+            nu = str(seqkit_df["num_seqs"][file_fa])
 
         if args.checkm_file:
             checkm_df = pd.read_csv(args.checkm_file, sep = '\t', index_col = 0)
