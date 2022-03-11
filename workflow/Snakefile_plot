@@ -1,4 +1,5 @@
 configfile: "config/config.yaml"
+cluster_json = "config/cluster.json"
 
 
 JOBID = config["JOBID"] # this can be different from binning pipeline
@@ -51,7 +52,7 @@ rule clus_stats:
         time=cluster["__default__"]["time"]
     shell:
         """
-        ls {params.bin_loc}Cluster*.csv > stat_input.txt
+        ls results/clusters/*.fasta | sed 's/fasta/csv/g' > stat_input.txt
         python workflow/scripts/python/clus_stats.py stat_input.txt {JOBID} -cm {input.checkm} -sk {input.seqk} -k {input.kraken} -g {input.gtdb_ncbi} -q {input.qual} -out {output.csv}
         rm stat_input.txt
         """
