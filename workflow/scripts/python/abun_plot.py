@@ -16,20 +16,20 @@ import re
 # PLOTTING FUNCTION
 # =============================================================================
 def plotting(abun, top20, plot):
-    
+
     if 'y' not in top20:
         col_zero = abun.columns[0]
         abun.sort_values(col_zero, inplace=True, ascending=False)
-        
+
     abun_flip = abun.transpose()
-        
+
     if 'y' in top20:
         plot = plot + '_top20'
-        colours = ['#502db3', '#008080', '#c200f2', '#f2c200','#36a3d9', '#e6beff','#8c0025', '#f58231', '#bf0080', '#cad900','#911eb4','#e5001f','#0066bf', '#000075','#338000', '#f032e6','#1bca00','#1d4010','#9a6324','#a9a9a9']
+        colours = ['#502db3', '#008080', '#c200f2', '#f2c200','#36a3d9', '#e6beff','#8c0025', '#f58231', '#bf0080', '#cad900','#911eb4','#e5001f','#0066bf', '#000075','#338000', '#f032e6','#1bca00','#1d4010','#9a6324','#00b1b3','#a9a9a9']
         abun_flip.plot.bar(stacked=True, legend = None, figsize=(15,10), color=colours, width=0.9)
     else:
         abun_flip.plot.bar(stacked=True, legend = None, figsize=(15,10), width=0.9)
-    
+
     if 'a' in plot:
         plt.margins(x = 0.01, y=0.05)
         plt.ylabel("Absolute abundance", fontsize = 18)
@@ -39,13 +39,13 @@ def plotting(abun, top20, plot):
         plt.ylabel("Relative abundance (%)", fontsize = 18)
 
     plt.xlabel("Samples", fontsize = 18)
-    
+
     plt.xticks(rotation='vertical', fontsize = 10, verticalalignment='center_baseline')
     plt.legend(loc='upper left', bbox_to_anchor=(1,1), ncol=1, frameon=False, fontsize = 10)
 
     plt.tight_layout()
     plt.savefig(out_loc + 'plots/' + prefix +'_' + plot +'_'+ 'abun_plot.png', bbox_inches='tight', dpi = 300)
-        
+
 # =============================================================================
 # Command line parsing
 # =============================================================================
