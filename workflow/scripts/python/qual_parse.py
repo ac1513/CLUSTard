@@ -13,6 +13,8 @@ import glob
 import argparse
 import os
 from shutil import copyfile
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 def qual_cluster(comp, cont):
     if (comp >90) and (cont<5):
@@ -24,6 +26,24 @@ def qual_cluster(comp, cont):
     else:
         qual = "NA"
     return qual
+
+def gen_qual(comp, cont):
+    if (comp - (cont*5)) >= 50:
+        genome = "y"
+    else:
+        genome = "n"
+    return genome
+
+def len_psearch(prok_loc, cluster):
+    loc = str(prok_loc + str(cluster) + '/*.log')
+    for name in glob.glob(loc):
+        prok_file = name
+        with open(prok_file, 'r') as prok_log:
+            for line in prok_log:
+                if "contigs totalling" in line:
+                    length = line.split(" ")[-2]
+    length = float(length)
+    return length
 
 parser = argparse.ArgumentParser(description='')
 parser.add_argument('output', help='output directory for the organised bins', type=str)
@@ -43,8 +63,11 @@ job_id = args.jobid
 # CHECKM STUFF HERE
 # =============================================================================
 
-checkm_df = pd.read_csv(checkm_log, sep = "\t", index_col = 0)
+checkm_df = pd.read_csv(checkm_log, sep = "\t")
 checkm_df['qual'] = checkm_df.apply(lambda x: qual_cluster(x['Completeness'], x['Contamination']), axis=1)
+checkm_df['keep'] = checkm_df.apply(lambda x: gen_qual(x['Completeness'], x['Contamination']), axis=1)
+checkm_df["length"] = checkm_df.apply(lambda x: len_psearch(prok_loc, x["Bin Id"]), axis = 1)
+checkm_df = checkm_df.set_index("Bin Id")
 
 high_clusters = checkm_df[checkm_df['qual'].str.contains("high")].index.values.tolist()
 med_qual_clusters = checkm_df[checkm_df['qual'].str.contains("med")].index.values.tolist()
@@ -115,6 +138,14 @@ for cluster in high_clusters:
     else:
         near_comp_clusters.append(cluster) # adds high qual that fail trna/rna
 # =============================================================================
+# Basic plot
+# =============================================================================
+
+plt.figure(figsize=(15, 10))
+ax = sns.scatterplot(data = checkm_df, x="Completeness", y="Contamination",
+                hue="qual", size = "length", sizes=(20, 800), alpha = 0.5)
+plt.savefig(job_id + '_mag_qual.png')
+# =============================================================================
 # COPYING FILES INTO QUAL DIRECTORIES
 # =============================================================================
 
@@ -144,7 +175,7 @@ for low in low_qual_clusters:
 
 for NA_bin in NA:
     file = location + NA_bin + ".fasta"
-    copyfile(file, new_loc+"failed/"+nc+".fasta")
+    copyfile(file, new_loc+"failed/"+NA_bin+".fasta")
 
 # =============================================================================
 # OUTPUT CREATED HERE
@@ -161,13 +192,8 @@ print("Failed:", len(NA), "\n")
 print("-" * 12)
 print(" MAG IDs")
 print("-" * 12)
-print("High Qual:")
-print(*high_qual_clusters, sep=", ")
-print("\nNear Comp:")
-print(*near_comp_clusters, sep=", ")
-print("\nMed Qual:")
-print(*med_qual_clusters, sep=", ")
-print("\nLow Qual:")
-print(*low_qual_clusters, sep=", ")
-print("\nFailed:")
-print(*NA, sep=", ")
+print("High Qual: " , ", ".join([str(x) for x in high_qual_clusters]))
+print("Near Comp: ", ", ".join([str(x) for x in near_comp_clusters]))
+print("Med Qual: ", ", ".join([str(x) for x in med_qual_clusters]))
+print("Low Qual: ", ", ".join([str(x) for x in low_qual_clusters]))
+print("Failed: ", ", ".join([str(x) for x in NA]))
