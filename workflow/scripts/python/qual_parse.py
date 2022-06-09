@@ -13,8 +13,6 @@ import glob
 import argparse
 import os
 from shutil import copyfile
-import seaborn as sns
-import matplotlib.pyplot as plt
 
 def qual_cluster(comp, cont):
     if (comp >90) and (cont<5):
@@ -137,14 +135,7 @@ for cluster in high_clusters:
         high_qual_clusters.append(cluster)
     else:
         near_comp_clusters.append(cluster) # adds high qual that fail trna/rna
-# =============================================================================
-# Basic plot
-# =============================================================================
 
-plt.figure(figsize=(15, 10))
-ax = sns.scatterplot(data = checkm_df, x="Completeness", y="Contamination",
-                hue="qual", size = "length", sizes=(20, 800), alpha = 0.5)
-plt.savefig(job_id + '_mag_qual.png')
 # =============================================================================
 # COPYING FILES INTO QUAL DIRECTORIES
 # =============================================================================
