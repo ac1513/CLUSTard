@@ -44,7 +44,7 @@ def plotting(abun, top20, plot):
     plt.legend(loc='upper left', bbox_to_anchor=(1,1), ncol=1, frameon=False, fontsize = 10)
 
     plt.tight_layout()
-    plt.savefig(out_loc + 'plots/' + prefix +'_' + plot +'_'+ 'abun_plot.png', bbox_inches='tight', dpi = 300)
+    plt.savefig(out_loc + 'plots/' + prefix +'_' + plot +'_'+ 'abun_plot.png', dpi = 300)
 
 # =============================================================================
 # Command line parsing
